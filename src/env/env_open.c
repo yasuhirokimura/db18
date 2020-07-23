@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 1996, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 1996, 2019 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *
@@ -145,13 +145,14 @@ __env_open(dbenv, db_home, flags, mode)
 	size_t old_passwd_len;
 	u_int32_t old_encrypt_flags;
 
+	COMPQUIET(old_passwd_len, 0);
+
 	ip = NULL;
 	env = dbenv->env;
 	recovery_failed = 1;
 	register_recovery = 0;
 	retry_flags = 0;
 	old_passwd = NULL;
-	old_passwd_len = 0;
 	old_encrypt_flags = 0;
 
 	/* Initial configuration. */

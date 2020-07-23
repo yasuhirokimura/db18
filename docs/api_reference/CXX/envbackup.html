@@ -14,7 +14,7 @@
   <body>
     <div xmlns="" class="navheader">
       <div class="libver">
-        <p>Library Version 18.1.25</p>
+        <p>Library Version 18.1.32</p>
       </div>
       <table width="100%" summary="Navigation header">
         <tr>
@@ -118,7 +118,7 @@ DbEnv::backup(const char *target, u_int32_t flags);</pre>
         <div class="titlepage">
           <div>
             <div>
-              <h3 class="title"><a id="idm140315890827760"></a>Parameters</h3>
+              <h3 class="title"><a id="idm140176770732016"></a>Parameters</h3>
             </div>
           </div>
         </div>
@@ -126,7 +126,7 @@ DbEnv::backup(const char *target, u_int32_t flags);</pre>
           <div class="titlepage">
             <div>
               <div>
-                <h4 class="title"><a id="idm140315890826608"></a>target</h4>
+                <h4 class="title"><a id="idm140176770732304"></a>target</h4>
               </div>
             </div>
           </div>
@@ -153,7 +153,7 @@ DbEnv::backup(const char *target, u_int32_t flags);</pre>
           <div class="titlepage">
             <div>
               <div>
-                <h4 class="title"><a id="idm140315891227072"></a>flags</h4>
+                <h4 class="title"><a id="idm140176770829360"></a>flags</h4>
               </div>
             </div>
           </div>
@@ -172,6 +172,15 @@ DbEnv::backup(const char *target, u_int32_t flags);</pre>
                 <p>
                         Before performing the backup, first remove all
                         files from the target backup directory tree.
+                    </p>
+              </li>
+              <li>
+                <p>
+                        <code class="literal">DB_BACKUP_DEEP_COPY</code>
+                    </p>
+                <p>
+                        Copy databases in any sub-directories in the
+		        environment home and any supplied data directories.
                     </p>
               </li>
               <li>
@@ -242,7 +251,7 @@ DbEnv::backup(const char *target, u_int32_t flags);</pre>
         <div class="titlepage">
           <div>
             <div>
-              <h3 class="title"><a id="idm140315890790400"></a>Errors</h3>
+              <h3 class="title"><a id="idm140176770694464"></a>Errors</h3>
             </div>
           </div>
         </div>
@@ -260,7 +269,7 @@ DbEnv::backup(const char *target, u_int32_t flags);</pre>
           <div class="titlepage">
             <div>
               <div>
-                <h4 class="title"><a id="idm140315890796064"></a>EEXIST</h4>
+                <h4 class="title"><a id="idm140176770700128"></a>EEXIST</h4>
               </div>
             </div>
           </div>
@@ -275,7 +284,7 @@ DbEnv::backup(const char *target, u_int32_t flags);</pre>
           <div class="titlepage">
             <div>
               <div>
-                <h4 class="title"><a id="idm140315890794400"></a>ENOENT</h4>
+                <h4 class="title"><a id="idm140176770681120"></a>ENOENT</h4>
               </div>
             </div>
           </div>
@@ -289,7 +298,7 @@ DbEnv::backup(const char *target, u_int32_t flags);</pre>
           <div class="titlepage">
             <div>
               <div>
-                <h4 class="title"><a id="idm140315890778608"></a>EINVAL</h4>
+                <h4 class="title"><a id="idm140176770716752"></a>EINVAL</h4>
               </div>
             </div>
           </div>
@@ -302,7 +311,7 @@ DbEnv::backup(const char *target, u_int32_t flags);</pre>
         <div class="titlepage">
           <div>
             <div>
-              <h3 class="title"><a id="idm140315890808944"></a>Class</h3>
+              <h3 class="title"><a id="idm140176770712592"></a>Class</h3>
             </div>
           </div>
         </div>
@@ -314,7 +323,7 @@ DbEnv::backup(const char *target, u_int32_t flags);</pre>
         <div class="titlepage">
           <div>
             <div>
-              <h3 class="title"><a id="idm140315890818800"></a>See Also</h3>
+              <h3 class="title"><a id="idm140176770724880"></a>See Also</h3>
             </div>
           </div>
         </div>

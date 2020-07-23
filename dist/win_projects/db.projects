@@ -66,6 +66,7 @@ ex_sql_binding
 ex_sql_fts3
 ex_sql_index
 ex_sql_load
+bdb_sqlthreadtest
 ex_sql_multi_thread
 ex_sql_query
 ex_sql_rtree

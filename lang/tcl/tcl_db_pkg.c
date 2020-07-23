@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 1999, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 1999, 2019 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *
@@ -40,6 +40,22 @@ static int	bdb_SeqOpen __P((Tcl_Interp *, int, Tcl_Obj * CONST*,
 static int	heap_callback __P((DB *dbp, const DBT *, const DBT *, DBT *));
 
 #ifdef CONFIG_TEST
+static DB_ENV *thread_env;
+static DB *thread_db;
+static DBC *thread_dbc;
+static DB_TXN *thread_txn;
+
+static int	bdb_ThreadEnvInit __P((Tcl_Interp *, int, Tcl_Obj * CONST*));
+static int	bdb_ThreadCreateDbc __P((Tcl_Interp *, int, Tcl_Obj * CONST*));
+static int	bdb_ThreadDbcGet __P((Tcl_Interp *, int, Tcl_Obj * CONST*));
+static int	bdb_ThreadDbcPut __P((Tcl_Interp *, int, Tcl_Obj * CONST*));
+static int	bdb_ThreadDbcClose __P((Tcl_Interp *, int, Tcl_Obj * CONST*));
+static int	bdb_ThreadTxnBegin __P((Tcl_Interp *, int, Tcl_Obj * CONST*));
+static int	bdb_ThreadTxnCommit __P((Tcl_Interp *, int, Tcl_Obj * CONST*));
+static int	bdb_ThreadTxnAbort __P((Tcl_Interp *, int, Tcl_Obj * CONST*));
+static int	bdb_ThreadEnvDispose __P((Tcl_Interp *, int,
+    Tcl_Obj * CONST*));
+
 static int	bdb_DbConvert __P((Tcl_Interp *, int, Tcl_Obj * CONST*,
     DBTCL_INFO *));
 static int	bdb_DbUpgrade __P((Tcl_Interp *, int, Tcl_Obj * CONST*));
@@ -149,6 +165,15 @@ berkdb_Cmd(notused, interp, objc, objv)
 		"msgtype",
 		"slice_enabled",
 		"upgrade",
+		"thread_env_init",
+		"thread_dbc_create",
+		"thread_dbc_get",
+		"thread_dbc_put",
+		"thread_dbc_close",
+		"thread_txn_begin",
+		"thread_txn_commit",
+		"thread_txn_abort",
+		"thread_env_dispose",
 #endif
 		"dbremove",
 		"dbrename",
@@ -183,6 +208,15 @@ berkdb_Cmd(notused, interp, objc, objv)
 		BDB_MSGTYPE,
 		BDB_SLICEENABLED,
 		BDB_UPGRADE,
+		BDB_THREAD_ENV_INIT,
+		BDB_THREAD_DBC_CREATE,
+		BDB_THREAD_DBC_GET,
+		BDB_THREAD_DBC_PUT,
+		BDB_THREAD_DBC_CLOSE,
+		BDB_THREAD_TXN_BEGIN,
+		BDB_THREAD_TXN_COMMIT,
+		BDB_THREAD_TXN_ABORT,
+		BDB_THREAD_ENV_DISPOSE,
 #endif
 		BDB_DBREMOVE,
 		BDB_DBRENAME,
@@ -302,6 +336,33 @@ berkdb_Cmd(notused, interp, objc, objv)
 		break;
 	case BDB_UPGRADE:
 		result = bdb_DbUpgrade(interp, objc, objv);
+		break;
+	case BDB_THREAD_ENV_INIT:
+		result = bdb_ThreadEnvInit(interp, objc, objv);
+		break;
+	case BDB_THREAD_DBC_CREATE:
+		result = bdb_ThreadCreateDbc(interp, objc, objv);
+		break;
+	case BDB_THREAD_DBC_PUT:
+		result = bdb_ThreadDbcPut(interp, objc, objv);
+		break;
+	case BDB_THREAD_DBC_GET:
+		result = bdb_ThreadDbcGet(interp, objc, objv);
+		break;
+	case BDB_THREAD_DBC_CLOSE:
+		result = bdb_ThreadDbcClose(interp, objc, objv);
+		break;
+	case BDB_THREAD_TXN_BEGIN:
+		result = bdb_ThreadTxnBegin(interp, objc, objv);
+		break;
+	case BDB_THREAD_TXN_COMMIT:
+		result = bdb_ThreadTxnCommit(interp, objc, objv);
+		break;
+	case BDB_THREAD_TXN_ABORT:
+		result = bdb_ThreadTxnAbort(interp, objc, objv);
+		break;
+	case BDB_THREAD_ENV_DISPOSE:
+		result = bdb_ThreadEnvDispose(interp, objc, objv);
 		break;
 #endif
 	case BDB_VERSION:
@@ -5456,6 +5517,345 @@ error:
 		(void)dbp->close(dbp, 0);
 	if (dbr)
 		__os_free(env, dbr);
+	return (result);
+}
+
+/*
+ * bdb_ThreadEnvInit --
+ *	Initialize the static pointers thread_env and thread_db.
+ */
+static int
+bdb_ThreadEnvInit(interp, objc, objv)
+	Tcl_Interp *interp;		/* Interpreter */
+	int objc;			/* How many arguments? */
+	Tcl_Obj *CONST objv[];		/* The argument objects */
+{
+	int ret, result;
+	int env_flags, db_flags;
+	char *home;
+
+	home = NULL;
+	thread_env = NULL;
+	thread_db = NULL;
+	thread_dbc = NULL;
+	thread_txn = NULL;
+
+	if (objc < 3) {
+		Tcl_WrongNumArgs(interp, 2, objv, "testdir");
+		return (TCL_ERROR);
+	}
+	home = Tcl_GetStringFromObj(objv[objc-1], NULL);
+
+	if ((ret = db_env_create(&thread_env, 0)) != 0)
+		goto end;
+
+	thread_env->set_errcall(thread_env, _ErrorFunc);
+
+	env_flags = DB_CREATE | DB_INIT_LOCK | 
+	    DB_INIT_MPOOL | DB_INIT_LOG | DB_INIT_TXN | DB_THREAD;
+	if ((ret = 
+	    thread_env->open(thread_env, home, env_flags, 0644)) != 0)
+		goto end;
+
+	if ((ret = db_create(&thread_db, thread_env, 0)) != 0)
+		goto end;
+
+	db_flags = DB_CREATE | DB_AUTO_COMMIT | DB_THREAD;
+	if ((ret = thread_db->open(thread_db, 
+	    NULL, "thread.db", NULL, DB_BTREE, db_flags, 0644)) != 0)
+		goto end;
+
+end: 	result = _ReturnSetup(interp, 
+	    ret, DB_RETOK_STD(ret), "thread_env_init");
+
+	if (result != TCL_OK) {
+		if (thread_db != NULL) {
+			(void)thread_db->close(thread_db, 0);
+			thread_db = NULL;
+		}
+		if (thread_env != NULL) {
+			(void)thread_env->close(thread_env, 0);
+			thread_env = NULL;
+		}
+	}
+	return (result);
+}
+
+/*
+ * bdb_ThreadCreateDbc --
+ *	DB->cursor(DB *db, 
+ *	    DB_TXN *txnid, DBC **cursorp, u_int32_t flags)
+ */
+static int
+bdb_ThreadCreateDbc(interp, objc, objv)
+	Tcl_Interp *interp;		/* Interpreter */
+	int objc;			/* How many arguments? */
+	Tcl_Obj *CONST objv[];		/* The argument objects */
+{
+	int flag;
+	int ret, result;
+
+	flag = 0;
+
+	if (thread_txn == NULL || thread_db == NULL) {
+		ret = EINVAL;
+		goto end;
+	}
+
+	if (objc < 2) {
+		Tcl_WrongNumArgs(interp, 2, objv, "");
+		return (TCL_ERROR);
+	}
+
+	ret = thread_db->cursor(thread_db, thread_txn, &thread_dbc, flag);
+end:	result = 
+	    _ReturnSetup(interp, ret, DB_RETOK_STD(ret), "thread_dbc_create");
+	return (result);
+}
+
+/*
+ * bdb_ThreadDbcPut --
+ *	Dbcursor->put(DBC *DBcursor, 
+ *	    DBT *key, DBT *data, u_int32_t flags)
+ */
+static int
+bdb_ThreadDbcPut(interp, objc, objv)
+	Tcl_Interp *interp;		/* Interpreter */
+	int objc;			/* How many arguments? */
+	Tcl_Obj *CONST objv[];		/* The argument objects */
+{
+	int ret, result;
+	int freekey, freedata;
+	DBT key, data;
+	void *ktmp, *dtmp;
+
+	freekey = freedata = 0;
+
+	if (thread_db == NULL || thread_dbc == NULL) {
+		ret = EINVAL;
+		goto end;
+	}
+
+	if (objc < 4) {
+		Tcl_WrongNumArgs(interp, 2, objv, "key data");
+		return (TCL_ERROR);
+	}
+
+	memset(&key, 0, sizeof(key));
+	memset(&data, 0, sizeof(data));
+
+	if ((ret = _CopyObjBytes(interp, 
+	    objv[objc-2], &ktmp, &key.size, &freekey)) != 0)
+		goto end;
+	key.data = ktmp;
+
+	if ((ret = _CopyObjBytes(interp, 
+	    objv[objc-1], &dtmp, &data.size, &freedata)) != 0)
+		goto end;
+	data.data = dtmp;
+
+	ret = thread_dbc->put(thread_dbc, &key, &data, DB_KEYFIRST);
+end: 	result = 
+	    _ReturnSetup(interp, ret, DB_RETOK_DBCPUT(ret), "thread_dbc_put");
+
+	if (freedata)
+		__os_free(NULL, dtmp);
+	if (freekey)
+		__os_free(NULL, ktmp);
+	return (result);
+}
+
+/*
+ * bdb_ThreadDbcGet --
+ *	DBcursor->get(DBC *DBcursor, 
+ *	    DBT *key, DBT *data, u_int32_t flags)
+ */
+static int
+bdb_ThreadDbcGet(interp, objc, objv)
+	Tcl_Interp *interp;		/* Interpreter */
+	int objc;			/* How many arguments? */
+	Tcl_Obj *CONST objv[];		/* The argument objects */
+{
+	int ret, result;
+	int freekey;
+	DBT key, data;
+	void *ktmp;
+
+	Tcl_Obj *retlist;
+	retlist = Tcl_NewListObj(0, NULL);
+
+	freekey = 0;
+	ktmp = NULL;
+
+	if (objc < 3) {
+		Tcl_WrongNumArgs(interp, 2, objv, "key");
+		return (TCL_ERROR);
+	}
+
+	if (thread_db == NULL || thread_dbc == NULL) {
+		ret = EINVAL;
+		goto end;
+	}
+
+	memset(&key, 0, sizeof(key));
+	memset(&data, 0, sizeof(data));
+
+	if ((ret = _CopyObjBytes(interp, 
+	    objv[objc-1], &ktmp, &key.size, &freekey)) != 0)
+		goto end;
+	key.data = ktmp;
+
+	ret = thread_dbc->get(thread_dbc, &key, &data, DB_SET);
+	if (ret != 0)
+		goto end;
+
+	result = _SetListElem(interp, 
+	    retlist, key.data, key.size, data.data, data.size);
+	if (result == TCL_OK)
+		Tcl_SetObjResult(interp, retlist);
+	if (freekey)
+		__os_free(NULL, ktmp);
+	return (result);
+
+end:	result = 
+	    _ReturnSetup(interp, ret, DB_RETOK_DBCGET(ret), "thread_dbc_get");
+
+	
+	if (freekey)
+		__os_free(NULL, ktmp);
+	return (result);
+}
+
+/*
+ * bdb_ThreadDbcClose --
+ *	DBcursor->close(DBC *DBcursor)
+ */
+static int
+bdb_ThreadDbcClose (interp, objc, objv)
+	Tcl_Interp *interp;	/* Interpreter */
+	int objc;	 	/* How many arguments? */
+	Tcl_Obj *CONST objv[];	/* The argument objects */
+{
+	int ret, result;
+
+	if (thread_dbc == NULL) {
+		ret = EINVAL;
+		goto end;
+	}
+	(void)thread_dbc->close(thread_dbc);
+	thread_dbc = NULL;
+
+end:	result = 
+	    _ReturnSetup(interp, 0, DB_RETOK_STD(0), "thread_dbc_close");
+	return (result);
+}
+
+/*
+ * bdb_ThreadTxnBegin --
+ *	DB_TXN->txn_begin(DB_ENV *env, 
+ *	    DB_TXN *parent, DB_TXN **tid, u_int32_t flags)
+ */
+static int
+bdb_ThreadTxnBegin(interp, objc, objv)
+	Tcl_Interp *interp;		/* Interpreter */
+	int objc;			/* How many arguments? */
+	Tcl_Obj *CONST objv[];		/* The argument objects */
+{
+	int ret, result;
+	if (thread_env == NULL) {
+		ret = EINVAL;
+		goto end;
+	}
+	ret = thread_env->txn_begin(thread_env, NULL, &thread_txn, 0);
+
+end:	result = 
+	    _ReturnSetup(interp, ret, DB_RETOK_STD(ret), "thread_txn_begin");
+	return (result);
+}
+
+/*
+ * bdb_ThreadTxnCommit --
+ *	DB_TXN->txn_commit(DB_TXN *tid, u_int32_t flags)
+ */
+static int
+bdb_ThreadTxnCommit(interp, objc, objv)
+	Tcl_Interp *interp;		/* Interpreter */
+	int objc;			/* How many arguments? */
+	Tcl_Obj *CONST objv[];		/* The argument objects */
+{
+	int ret, result;
+	if (thread_txn == NULL) {
+		ret = EINVAL;
+		goto end;
+	}
+
+	if ((ret = thread_txn->commit(thread_txn, 0)) != 0)
+		goto end;
+	thread_txn = NULL;
+
+end:	result = 
+	    _ReturnSetup(interp, ret, DB_RETOK_STD(ret), "thread_txn_commit");
+	return (result);
+}
+
+/*
+ * bdb_ThreadTxnAbort --
+ *	DB_TXN->abort(DB_TXN *tid)
+ */
+static int
+bdb_ThreadTxnAbort(interp, objc, objv)
+	Tcl_Interp *interp;		/* Interpreter */
+	int objc;			/* How many arguments? */
+	Tcl_Obj *CONST objv[];		/* The argument objects */
+{
+	int ret, result;
+
+	if (thread_txn == NULL) {
+		ret = EINVAL;
+		goto end;
+	}
+
+	if ((ret = thread_txn->abort(thread_txn)) != 0)
+		goto end;
+	thread_txn = NULL;
+
+end:	result = 
+	    _ReturnSetup(interp, ret, DB_RETOK_STD(ret), "thread_txn_abort");
+	return (result);
+}
+
+/*
+ * bdb_ThreadEnvDispose --
+ *	Dispose all static handles including 
+ *	    thread_env, thread_db, thread_dbc and thread_txn.
+ */
+static int
+bdb_ThreadEnvDispose(interp, objc, objv)
+	Tcl_Interp *interp;		/* Interpreter */
+	int objc;			/* How many arguments? */
+	Tcl_Obj *CONST objv[];		/* The argument objects */
+{
+	int result;
+
+	if (thread_txn != NULL) {
+		(void)thread_txn->abort(thread_txn);
+		thread_txn = NULL;
+	}
+	if (thread_dbc != NULL) {
+		(void)thread_dbc->close(thread_dbc);
+		thread_dbc = NULL;
+	}
+	if (thread_db != NULL) {
+		(void)thread_db->close(thread_db, 0);
+		thread_db = NULL;
+	}
+	if (thread_env != NULL) {
+		(void)thread_env->close(thread_env, 0);
+		thread_env = NULL;
+	}
+
+	result = 
+	    _ReturnSetup(interp, 0, DB_RETOK_STD(0), "thread_env_dispose");
 	return (result);
 }
 

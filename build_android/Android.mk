@@ -1,6 +1,6 @@
 # DO NOT EDIT: automatically built by dist/s_android.
 # Makefile for building a drop-in replacement of SQLite using
-# Berkeley DB Release 18.1, library version 18.1.25: (May 29, 2018)
+# Berkeley DB Release 18.1, library version 18.1.32: (February 19, 2019)
 ###################################################################
 LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
@@ -10,7 +10,7 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := libsqlite
 
 # BDB_TOP will change with release numbers
-BDB_TOP := db-18.1.25
+BDB_TOP := db-18.1.32
 BDB_PATH := $(LOCAL_PATH)/$(BDB_TOP)/src
 
 # This directive results in arm (vs thumb) code.  It's necessary to

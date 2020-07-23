@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 1996, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 1996, 2019 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *
@@ -520,6 +520,12 @@ __bam_key_range(dbc, dbt, kp, flags)
 
 	factor = 1.0;
 
+	/* If the first page has no entries, then the database is empty. */
+	if (cp->sp->entries == 0) {
+		kp->equal = 0;
+		goto end;
+	}
+
 	/* Correct the leaf page. */
 	cp->csp->entries /= 2;
 	cp->csp->indx /= 2;
@@ -559,7 +565,7 @@ __bam_key_range(dbc, dbt, kp, flags)
 		kp->equal = 0;
 	}
 
-	if ((ret = __bam_stkrel(dbc, 0)) != 0)
+ end:	if ((ret = __bam_stkrel(dbc, 0)) != 0)
 		return (ret);
 
 	return (0);

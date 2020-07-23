@@ -910,7 +910,7 @@ Java_com_sleepycat_db_internal_db_1javaJNI_DbEnv_1lock_1vec(JNIEnv *jenv,
 		switch (op) {
 		case DB_LOCK_GET_TIMEOUT:
 			/* Needed: mode, timeout, obj.  Returned: lock. */
-			prereq->op = (db_lockop_t)(*jenv)->GetIntField(
+			prereq->timeout = (db_timeout_t)(*jenv)->GetIntField(
 			    jenv, jlockreq, lockreq_timeout_fid);
 			/* FALLTHROUGH */
 		case DB_LOCK_GET:

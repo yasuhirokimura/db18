@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 1999, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 1999, 2019 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *
@@ -1065,7 +1065,8 @@ env_Cmd(clientData, interp, objc, objv)
 			return (TCL_ERROR);
 		}
 		dbenv->get_errpfx(dbenv, &strval);
-		res = NewStringObj(strval, strlen(strval));
+		res = NewStringObj(strval,
+			strval != NULL ? strlen(strval) : 0);
 		break;
 	case ENVGETEXTFILEDB:
 		if (objc != 2) {
@@ -1109,7 +1110,8 @@ env_Cmd(clientData, interp, objc, objv)
 		ret = dbenv->get_lg_dir(dbenv, &strval);
 		if ((result = _ReturnSetup(interp, ret, DB_RETOK_STD(ret),
 		    "env get_lg_dir")) == TCL_OK)
-			res = NewStringObj(strval, strlen(strval));
+			res = NewStringObj(strval,
+				strval != NULL ? strlen(strval) : 0);
 		break;
 	case ENVGETLGFILEMODE:
 		if (objc != 2) {
@@ -1265,7 +1267,8 @@ env_Cmd(clientData, interp, objc, objv)
 		ret = dbenv->get_metadata_dir(dbenv, &strval);
 		if ((result = _ReturnSetup(interp, ret, DB_RETOK_STD(ret),
 		    "env get_metadata_dir")) == TCL_OK)
-			res = NewStringObj(strval, strlen(strval));
+			res = NewStringObj(strval,
+				strval != NULL ? strlen(strval) : 0);
 		break;
 	case ENVGETMPMAXOPENFD:
 		if (objc != 2) {
@@ -1336,7 +1339,8 @@ env_Cmd(clientData, interp, objc, objv)
 			return (TCL_ERROR);
 		}
 		dbenv->get_msgpfx(dbenv, &strval);
-		res = NewStringObj(strval, strlen(strval));
+		res = NewStringObj(strval,
+			strval != NULL ? strlen(strval) : 0);
 		break;
 	case ENVGETOPENFLAG:
 		result = env_GetOpenFlag(interp, objc, objv, dbenv);
@@ -1349,7 +1353,8 @@ env_Cmd(clientData, interp, objc, objv)
 		ret = dbenv->get_region_dir(dbenv, &strval);
 		if ((result = _ReturnSetup(interp, ret, DB_RETOK_STD(ret),
 			"env get_region_dir")) == TCL_OK)
-			res = NewStringObj(strval, strlen(strval));
+			res = NewStringObj(strval,
+				strval != NULL ? strlen(strval) : 0);
 		break;
 	case ENVGETREPSITE:
 		if (objc != 2) {
@@ -1415,7 +1420,8 @@ env_Cmd(clientData, interp, objc, objv)
 		ret = dbenv->get_tmp_dir(dbenv, &strval);
 		if ((result = _ReturnSetup(interp, ret, DB_RETOK_STD(ret),
 		    "env get_tmp_dir")) == TCL_OK)
-			res = NewStringObj(strval, strlen(strval));
+			res = NewStringObj(strval,
+				strval != NULL ? strlen(strval) : 0);
 		break;
 	case ENVGETTXINIT:
 		if (objc != 2) {
@@ -1942,6 +1948,7 @@ tcl_EnvBackup(interp, objc, objv, dbenv)
 	static const char *buwhich[] = {
 		"-clean",
 		"-create",
+		"-deep_copy",
 		"-excl",
 		"-files",
 		"-no_logs",
@@ -1952,6 +1959,7 @@ tcl_EnvBackup(interp, objc, objv, dbenv)
 	enum buwhich {
 		BKUPCLEAN,
 		BKUPCREATE,
+		BKUPDEEPCOPY,
 		BKUPEXCL,
 		BKUPFILES,
 		BKUPNOLOGS,
@@ -1981,6 +1989,9 @@ tcl_EnvBackup(interp, objc, objv, dbenv)
 			break;
 		case BKUPCREATE:
 			flags |= DB_CREATE;
+			break;
+		case BKUPDEEPCOPY:
+			flags |= DB_BACKUP_DEEP_COPY;
 			break;
 		case BKUPEXCL:
 			flags |= DB_EXCL;

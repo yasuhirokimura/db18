@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 1996, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 1996, 2019 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *
@@ -98,6 +98,8 @@ __log_put(env, lsnp, udbt, flags)
 	int lock_held, need_free, ret;
 	u_int8_t *key;
 
+	COMPQUIET(rep, NULL);
+	
 	dblp = env->lg_handle;
 	lp = dblp->reginfo.primary;
 	db_cipher = env->crypto_handle;

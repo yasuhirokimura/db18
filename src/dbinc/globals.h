@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 1996, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 1996, 2019 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *
@@ -61,9 +61,14 @@ typedef struct __db_globals {
 	u_long rand_next;		/* next rand value for clib/rand.c */
 #endif
 
+	time_t start_time;		/* Approximate start time of the
+					 * process. Set by the first DB API call
+					 * which requests it.
+					 * Used by DB_REGISTER fix in #27100.
+					 */
 	u_int32_t fid_serial;		/* file id counter */
 
-	int db_errno;			/* Errno value if not available */
+	int db_errno;			/* Value for "errno" if not available */
 
 	char *saved_errstr;		/* saved error string from backup */
 

@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 1996, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 1996, 2019 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  */
@@ -617,6 +617,8 @@ __bamc_start_decompress(dbc)
 
 	/* Unmarshal the first data */
 	cp->compcursor += __db_decompress_int32(cp->compcursor, &datasize);
+	if (cp->compcursor + datasize > cp->compend)
+		return (DBC_ERR(dbc, DB_NOTFOUND));
 	ret = __bam_compress_set_dbt(dbc->dbp,
 	    cp->currentData, cp->compcursor, datasize);
 

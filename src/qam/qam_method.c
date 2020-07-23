@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 1999, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 1999, 2019 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *
@@ -70,7 +70,7 @@ __qam_db_close(dbp, flags)
 	array = &t->array1;
 again:
 	mpfp = array->mpfarray;
-	if (mpfp != NULL) {
+	if (mpfp != NULL && mpfp->mpf != NULL) {
 		for (i = array->low_extent;
 		    i <= array->hi_extent; i++, mpfp++) {
 			mpf = mpfp->mpf;

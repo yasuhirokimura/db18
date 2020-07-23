@@ -1,4 +1,4 @@
-# Copyright (c) 2018 Oracle and/or its affiliates. All rights
+# Copyright (c) 2018, 2019 Oracle and/or its affiliates. All rights
 # reserved.
 # 
 # This copyrighted work includes portions of SQLite received 

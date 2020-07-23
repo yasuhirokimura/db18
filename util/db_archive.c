@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 1996, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 1996, 2019 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *
@@ -12,7 +12,7 @@
 
 #ifndef lint
 static const char copyright[] =
-    "Copyright (c) 1996, 2018 Oracle and/or its affiliates.  All rights reserved.\n";
+    "Copyright (c) 1996, 2019 Oracle and/or its affiliates.  All rights reserved.\n";
 #endif
 
 int main __P((int, char *[]));
@@ -37,9 +37,10 @@ main(argc, argv)
 	if ((ret = __db_util_version_check(progname)) != 0)
 		return (ret);
 
+	COMPQUIET(verbose, 0);
+	
 	dbenv = NULL;
 	flags = 0;
-	verbose = 0;
 	exitval = EXIT_SUCCESS;
 	home = msgpfx = passwd = NULL;
 	file = list = NULL;

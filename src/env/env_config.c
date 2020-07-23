@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 1996, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 1996, 2019 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *
@@ -450,9 +450,12 @@ __config_set_param(dbenv, desc, nf, argv, lc)
 	u_long uv1, uv2;
 	long lv1, lv2;
 	u_int port;
-	int i, onoff, bad, ret, t_ret;
-
+	int i, onoff, ret, t_ret;
+	
+#ifdef HAVE_REPLICATION_THREADS
+	int bad;
 	bad = 0;
+#endif
 	env = dbenv->env;
 	/* Handle simple configuration lines here. */
 	if (desc != NULL) {

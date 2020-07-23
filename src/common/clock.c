@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 1996, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 1996, 2019 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *
@@ -54,4 +54,19 @@ __clock_expired(env, now, timespecp)
 		__os_gettime(env, now, 1);
 
 	return (timespeccmp(now, timespecp, >=));
+}
+
+/*
+ * __clock_get_start --
+ *	Return the time of the first call made to this function by this process,
+ *	in seconds since the epoch for this system.
+ *
+ * PUBLIC: time_t __clock_get_start __P((void));
+ */
+time_t
+__clock_get_start(void)
+{
+	if (DB_GLOBAL(start_time) == 0)
+		(void)time(&DB_GLOBAL(start_time));
+	return (DB_GLOBAL(start_time));
 }

@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2002, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 2002, 2019 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *
@@ -34,7 +34,7 @@ import static java.lang.System.out;
  */
 public class BdbServer {
     /** Version number. */
-    public static final String VERSION = "18.1.25";
+    public static final String VERSION = "18.1.32";
 
     public static void main(String[] args) {
         try {

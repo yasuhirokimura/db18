@@ -3,6 +3,7 @@
 TOP=`dirname $0`
 TOP=`cd $TOP && /bin/pwd`
 SQLITE=$TOP/../../lang/sql/sqlite
+OS_NAME=`uname -s`
 
 # Excluded Tests
 #
@@ -762,8 +763,16 @@ while [ $PROCESS -lt $NPROCESS ] ; do
 
 		# bdb_sqlthreadtest is C, not tcl. Look for it in ..
 		if [ "$t" = "bdb_sqlthreadtest" ]; then
-			(cd .. && make $t)
-			alarm $TIMEOUT ../$t > $LOG 2>&1
+			case "$OS_NAME" in
+				Win*|win*|Cygwin*|CYGWIN*|cygwin*)
+				alarm $TIMEOUT ./$t > $LOG 2>&1
+				;;
+				*)
+				(cd .. && make $t)
+				alarm $TIMEOUT ../$t > $LOG 2>&1
+				;;
+			esac
+			
 		else 
 			alarm $TIMEOUT $TESTFIXTURE $tpath > $LOG 2>&1
 		fi

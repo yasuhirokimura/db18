@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 1999, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 1999, 2019 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *
@@ -68,15 +68,18 @@ __db_compact_int(dbp, ip, txn, start, stop, c_data, flags, end)
 	DB_COMPACT save_data;
 	DB_TXN *txn_orig;
 	ENV *env;
-	u_int32_t empty_buckets, factor, retry;
+	u_int32_t factor, retry;
 	int deadlock, have_freelist, isdone, ret, span, t_ret, txn_local;
+
+#ifdef HAVE_HASH
+	u_int32_t empty_buckets;
+#endif
 
 #ifdef HAVE_FTRUNCATE
 	db_pglist_t *list;
 	db_pgno_t last_pgno;
 	u_int32_t nelems, truncated;
 #endif
-
 	env = dbp->env;
 
 	memset(&current, 0, sizeof(current));
@@ -102,8 +105,9 @@ __db_compact_int(dbp, ip, txn, start, stop, c_data, flags, end)
 	     &current, start->data, start->size,
 	     &current.data, &current.ulen)) != 0)
 		return (ret);
-
+#ifdef HAVE_HASH
 	empty_buckets = c_data->compact_empty_buckets;
+#endif
 
 	if (IS_DB_AUTO_COMMIT(dbp, txn)) {
 		txn_local = 1;
@@ -421,6 +425,8 @@ __db_exchange_page(dbc, pgp, opg, newpgno, flags, pgs_donep)
 	db_pgno_t oldpgno, *pgnop;
 	int ret;
 
+	COMPQUIET(oldpgno, 0);
+	
 	DB_ASSERT(NULL, dbc != NULL);
 	dbp = dbc->dbp;
 	LOCK_INIT(lock);

@@ -105,6 +105,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_sql_index", "VS15\ex_sql
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_sql_load", "VS15\ex_sql_load.vcxproj", "{67965312-072A-11DF-8A39-0800200C9A66}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bdb_sqlthreadtest", "VS15\bdb_sqlthreadtest.vcxproj", "{fb1d496c-ad03-11e8-a5b8-0800279fde64}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_sql_multi_thread", "VS15\ex_sql_multi_thread.vcxproj", "{67965313-072A-11DF-8A39-0800200C9A66}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_sql_rtree", "VS15\ex_sql_rtree.vcxproj", "{9CBFC33A-027B-4A58-8059-2E3C29489E64}"
@@ -1389,6 +1391,30 @@ Global
 		{67965312-072A-11DF-8A39-0800200C9A66}.Static Release|Win32.Build.0 = Release|Win32
 		{67965312-072A-11DF-8A39-0800200C9A66}.Static Release|x64.ActiveCfg = Release|x64
 		{67965312-072A-11DF-8A39-0800200C9A66}.Static Release|x64.Build.0 = Release|x64
+		{fb1d496c-ad03-11e8-a5b8-0800279fde64}.Debug|ARM.ActiveCfg = Debug|ARM
+		{fb1d496c-ad03-11e8-a5b8-0800279fde64}.Debug|ARM.Build.0 = Debug|ARM
+		{fb1d496c-ad03-11e8-a5b8-0800279fde64}.Debug|Win32.ActiveCfg = Debug|Win32
+		{fb1d496c-ad03-11e8-a5b8-0800279fde64}.Debug|Win32.Build.0 = Debug|Win32
+		{fb1d496c-ad03-11e8-a5b8-0800279fde64}.Debug|x64.ActiveCfg = Debug|x64
+		{fb1d496c-ad03-11e8-a5b8-0800279fde64}.Debug|x64.Build.0 = Debug|x64
+		{fb1d496c-ad03-11e8-a5b8-0800279fde64}.Release|ARM.ActiveCfg = Release|ARM
+		{fb1d496c-ad03-11e8-a5b8-0800279fde64}.Release|ARM.Build.0 = Release|ARM
+		{fb1d496c-ad03-11e8-a5b8-0800279fde64}.Release|Win32.ActiveCfg = Release|Win32
+		{fb1d496c-ad03-11e8-a5b8-0800279fde64}.Release|Win32.Build.0 = Release|Win32
+		{fb1d496c-ad03-11e8-a5b8-0800279fde64}.Release|x64.ActiveCfg = Release|x64
+		{fb1d496c-ad03-11e8-a5b8-0800279fde64}.Release|x64.Build.0 = Release|x64
+		{fb1d496c-ad03-11e8-a5b8-0800279fde64}.Static Debug|ARM.ActiveCfg = Debug|ARM
+		{fb1d496c-ad03-11e8-a5b8-0800279fde64}.Static Debug|ARM.Build.0 = Debug|ARM
+		{fb1d496c-ad03-11e8-a5b8-0800279fde64}.Static Debug|Win32.ActiveCfg = Debug|Win32
+		{fb1d496c-ad03-11e8-a5b8-0800279fde64}.Static Debug|Win32.Build.0 = Debug|Win32
+		{fb1d496c-ad03-11e8-a5b8-0800279fde64}.Static Debug|x64.ActiveCfg = Debug|x64
+		{fb1d496c-ad03-11e8-a5b8-0800279fde64}.Static Debug|x64.Build.0 = Debug|x64
+		{fb1d496c-ad03-11e8-a5b8-0800279fde64}.Static Release|ARM.ActiveCfg = Release|ARM
+		{fb1d496c-ad03-11e8-a5b8-0800279fde64}.Static Release|ARM.Build.0 = Release|ARM
+		{fb1d496c-ad03-11e8-a5b8-0800279fde64}.Static Release|Win32.ActiveCfg = Release|Win32
+		{fb1d496c-ad03-11e8-a5b8-0800279fde64}.Static Release|Win32.Build.0 = Release|Win32
+		{fb1d496c-ad03-11e8-a5b8-0800279fde64}.Static Release|x64.ActiveCfg = Release|x64
+		{fb1d496c-ad03-11e8-a5b8-0800279fde64}.Static Release|x64.Build.0 = Release|x64
 		{67965313-072A-11DF-8A39-0800200C9A66}.Debug|ARM.ActiveCfg = Debug|ARM
 		{67965313-072A-11DF-8A39-0800200C9A66}.Debug|ARM.Build.0 = Debug|ARM
 		{67965313-072A-11DF-8A39-0800200C9A66}.Debug|Win32.ActiveCfg = Debug|Win32

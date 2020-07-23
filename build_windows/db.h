@@ -1,6 +1,6 @@
 /* DO NOT EDIT: automatically built by dist/s_windows. */
 /*
- * Copyright (c) 1996, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 1996, 2019 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *
@@ -59,9 +59,9 @@ extern "C" {
  */
 #define	DB_VERSION_MAJOR	18
 #define	DB_VERSION_MINOR	1
-#define	DB_VERSION_PATCH	25
-#define	DB_VERSION_STRING	"Berkeley DB 18.1.25: (May 29, 2018)"
-#define	DB_VERSION_FULL_STRING	"Berkeley DB Release 18.1, library version 18.1.25: (May 29, 2018)"
+#define	DB_VERSION_PATCH	32
+#define	DB_VERSION_STRING	"Berkeley DB 18.1.32: (February 19, 2019)"
+#define	DB_VERSION_FULL_STRING	"Berkeley DB Release 18.1, library version 18.1.32: (February 19, 2019)"
 
 /*
  * These two version numbers are deprecated and will be removed in a future
@@ -3126,10 +3126,11 @@ typedef struct entry {
 #define	DB_ARCH_REMOVE				0x00000008
 #define	DB_AUTO_COMMIT				0x00000100
 #define	DB_BACKUP_CLEAN				0x00000002
-#define	DB_BACKUP_FILES				0x00000008
-#define	DB_BACKUP_NO_LOGS			0x00000010
-#define	DB_BACKUP_SINGLE_DIR			0x00000020
-#define	DB_BACKUP_UPDATE			0x00000040
+#define	DB_BACKUP_DEEP_COPY			0x00000008
+#define	DB_BACKUP_FILES				0x00000010
+#define	DB_BACKUP_NO_LOGS			0x00000020
+#define	DB_BACKUP_SINGLE_DIR			0x00000040
+#define	DB_BACKUP_UPDATE			0x00000080
 #define	DB_BOOTSTRAP_HELPER			0x00000001
 #define	DB_CDB_ALLDB				0x00000040
 #define	DB_CHKSUM				0x00000008

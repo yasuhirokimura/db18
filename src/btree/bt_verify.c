@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 1999, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 1999, 2019 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *
@@ -311,7 +311,7 @@ __ram_vrfy_leaf(dbp, vdp, h, pgno, flags)
 		    "Page %lu: invalid page type %u for %s database",
 		    "%lu %u %s"), (u_long)pgno, TYPE(h),
 		    __db_dbtype_to_string(dbp->type)));
-		return DB_VERIFY_BAD;
+		return DB_VERIFY_FATAL;
 	}
 
 	if ((ret = __db_vrfy_getpageinfo(vdp, pgno, &pip)) != 0)
@@ -422,7 +422,7 @@ __bam_vrfy(dbp, vdp, h, pgno, flags)
 		    "Page %lu: invalid page type %u for %s database",
 		    "%lu %u %s"), (u_long)pgno, TYPE(h),
 		    __db_dbtype_to_string(dbp->type)));
-		return DB_VERIFY_BAD;
+		return DB_VERIFY_FATAL;
 	}
 
 	if ((ret = __db_vrfy_getpageinfo(vdp, pgno, &pip)) != 0)
@@ -539,7 +539,7 @@ __ram_vrfy_inp(dbp, vdp, h, pgno, nentriesp, flags)
 	memset(pagelayout, 0, dbp->pgsize);
 	inp = P_INP(dbp, h);
 	for (i = 0; i < NUM_ENT(h); i++) {
-		if ((u_int8_t *)inp + i >= (u_int8_t *)h + himark) {
+		if ((u_int8_t *)(inp + i) >= (u_int8_t *)h + himark) {
 			EPRINT((env, DB_STR_A("0563",
 			    "Page %lu: entries listing %lu overlaps data",
 			    "%lu %lu"), (u_long)pgno, (u_long)i));
@@ -552,7 +552,7 @@ __ram_vrfy_inp(dbp, vdp, h, pgno, nentriesp, flags)
 		 * somewhere after the inp array and before the end of the
 		 * page.
 		 */
-		if (offset <= (u_int32_t)((u_int8_t *)inp + i -
+		if (offset <= (u_int32_t)((u_int8_t *)(inp + i) -
 		    (u_int8_t *)h) ||
 		    offset > (u_int32_t)(dbp->pgsize - RINTERNAL_SIZE)) {
 			isbad = 1;
@@ -755,17 +755,9 @@ __bam_vrfy_inp(dbp, vdp, h, pgno, nentriesp, flags)
 				endoff = offset + BINTERNAL_SIZE(bk->len) - 1;
 			else
 				endoff = offset + BKEYDATA_SIZE(bk->len) - 1;
-			if (endoff >= dbp->pgsize) {
-				isbad = 1;
-				goto err;
-			}
 			break;
 		case B_BLOB:
 			endoff = offset + BBLOB_SIZE - 1;
-			if (endoff >= dbp->pgsize) {
-				isbad = 1;
-				goto err;
-			}
 			break;
 		case B_DUPLICATE:
 			/*
@@ -792,6 +784,11 @@ __bam_vrfy_inp(dbp, vdp, h, pgno, nentriesp, flags)
 			 */
 			endoff = offset + BKEYDATA_SIZE(0) - 1;
 			break;
+		}
+
+		if (endoff >= dbp->pgsize) {
+			isbad = 1;
+			goto err;
 		}
 
 		/*
@@ -1129,7 +1126,15 @@ __bam_vrfy_itemorder(dbp, vdp, ip, h, pgno, nentries, ovflok, hasdups, flags)
 				 */
 				mpf = dbp->mpf;
 				child = h;
+				cpgno = pgno;
 				while (TYPE(child) == P_IBTREE) {
+					if (NUM_ENT(child) == 0) {
+						EPRINT((env, DB_STR_A("1088",
+		    "Page %lu: internal page is empty and should not be",
+					    "%lu"), (u_long)cpgno));
+						ret = DB_VERIFY_BAD;
+						goto err;
+					}
 					bi = GET_BINTERNAL(dbp, child, 0);
 					cpgno = bi->pgno;
 					if (child != h &&
@@ -1507,6 +1512,13 @@ __bam_vrfy_structure(dbp, vdp, meta_pgno, lp, rp, flags)
 		break;
 	case P_IRECNO:
 	case P_LRECNO:
+		if (dbp->type != DB_RECNO) {
+			EPRINT((env, DB_STR_A("1215",
+		    	"Page %lu: invalid page type %u for %s database",
+		   	 "%lu %u %s"), (u_long)meta_pgno, rip->type,
+		   	 __db_dbtype_to_string(dbp->type)));
+			return DB_VERIFY_BAD;
+		}
 		stflags =
 		    flags | DB_ST_RECNUM | DB_ST_IS_RECNO | DB_ST_TOPLEVEL;
 		if (mip->re_len > 0)
@@ -1892,9 +1904,10 @@ bad_prev:				isbad = 1;
 			if ((ret = __bam_vrfy_subtree(dbp, vdp, child->pgno,
 			    NULL, NULL, flags, &child_level, &child_nrecs,
 			    &child_relen)) != 0) {
-				if (ret == DB_VERIFY_BAD)
+				if (ret == DB_VERIFY_BAD) {
 					isbad = 1;
-				else
+					break;
+				} else
 					goto done;
 			}
 

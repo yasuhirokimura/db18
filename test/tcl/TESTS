@@ -8,7 +8,8 @@ backup
 	Do all the of the following tests with and without 
 	the -c (checkpoint) option; and with and without the
 	transactional bulk loading optimization; and with
-	and without BLOB. Make sure that -c and -d (data_dir)
+	and without BLOB, with and without -deepcopy.
+	Make sure that -c and -d (data_dir)
 	are not allowed together; and backing up with BLOB
 	but without -log_blob is not allowed.  If slices are
 	enabled, run some of the tests with the -sliced
@@ -4273,3 +4274,10 @@ txn014
 
 	Commit the child, verify that the parent can write again.
 	Check contents of database with a second child.
+
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+txn015
+	Test the thread-switching problem with Go interface.[#26945]
+	Start a multi-thread test to perform cursor operations, 
+	transaction begin, transaction commit and transaction 
+	abort.

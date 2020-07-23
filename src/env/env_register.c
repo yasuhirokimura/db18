@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2004, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 2004, 2019 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *
@@ -12,11 +12,13 @@
 
 #define	REGISTER_FILE	"__db.register"
 
-#define	PID_EMPTY	"X                      0\n"	/* Unused PID entry */
-#define	PID_FMT		"%24lu\n"			/* PID entry format */
-							/* Unused PID test */
-#define	PID_ISEMPTY(p)	(memcmp(p, PID_EMPTY, PID_LEN) == 0)
-#define	PID_LEN		(25)				/* PID entry length */
+#define	SLOT_EMPTY	"E         :          0:0\n"	/* Empty slot entry */
+#define	SLOT_FMT	"%-10lu:%13lu\n"		/* Active slot entry */
+
+#define SLOT_PID_LEN	10
+#define	SLOT_ISEMPTY(p)					/* Empty slot test */ \
+	(memcmp(p, SLOT_EMPTY, SLOT_PID_LEN) == 0)
+#define	SLOT_LEN	25				/* Slot entry length */
 
 #define	REGISTRY_LOCK(env, pos, nowait)					\
 	__os_fdlock(env, (env)->dbenv->registry, (off_t)(pos),		\
@@ -35,32 +37,30 @@ static	int __envreg_add_active_pid __P((ENV*, char *));
 
 /*
  * Support for portable, multi-process database environment locking, based on
- * the Subversion SR (#11511).
+ * the Subversion SR (#11511). Added Docker support in #27100 by appending the
+ * 'start time' of the process to the slot, and changing the "slot is unused"
+ * indicator in the first character from 'X' to 'E'(empty).
  *
  * The registry feature is configured by specifying the DB_REGISTER flag to the
- * DbEnv.open method.  If DB_REGISTER is specified, DB opens the registry file
- * in the database environment home directory.  The registry file is formatted
- * as follows:
+ * DB_ENV.open method.  If DB_REGISTER is specified, DB opens the registry file
+ * in the database environment home directory.  The registry file contains lines
+ * of text, with 24 bytes of data plus a newline. The lines contain either an
+ * empty slot indicator of "E  <...> 0", or a "<pid> : <time>"
  *
- *	                    12345		# process ID slot 1
- *	X		# empty slot
- *	                    12346		# process ID slot 2
- *	X		# empty slot
- *	                    12347		# process ID slot 3
- *	                    12348		# process ID slot 4
- *	X                   12349		# empty slot
- *	X		# empty slot
+ *  1...5...1....1....2....2	Column position
+ *          0    5    0    4
+ *
+ *  12345    :    1541786902	# pid 12345 starting at Nov 9 10:08:22 2018
+ *  E        :             0	# empty slot
+ *  13333    :    1541787000	# pid 13333 starting at Nov 9 10:10:00 2018
+ *  E        :             0	# empty slot
+ *  12347    :    1541786902	# pid 12347 starting at Nov 9 10:08:22 2018
+ *  12348    :    1541786902	# pid 12348 starting at Nov 9 10:08:22 2018
+ *  E        :             0	# empty slot
+ *  E        :             0	# empty slot
  *
  * All lines are fixed-length.  All lines are process ID slots.  Empty slots
- * are marked with leading non-digit characters.
- *
- * To modify the file, you get an exclusive lock on the first byte of the file.
- *
- * While holding any DbEnv handle, each process has an exclusive lock on the
- * first byte of a process ID slot.  There is a restriction on having more
- * than one DbEnv handle open at a time, because Berkeley DB uses per-process
- * locking to implement this feature, that is, a process may never have more
- * than a single slot locked.
+ * start with a non-numeric character ('X' up through DB 6.3, 'E' afterwards.)
  *
  * This work requires that if a process dies or the system crashes, locks held
  * by the dying processes will be dropped.  (We can't use system shared
@@ -71,10 +71,39 @@ static	int __envreg_add_active_pid __P((ENV*, char *));
  *
  * We could implement the same solution with flock locking instead of fcntl,
  * but flock would require a separate file for each process of control (and
- * probably each DbEnv handle) in the database environment, which is fairly
+ * probably each DB_ENV handle) in the database environment, which is fairly
  * ugly.
  *
- * Whenever a process opens a new DbEnv handle, it walks the registry file and
+ * We use fcntl() file locking for the register file, because it is widely
+ * available.  Unfortunately one of fcntl()'s mandated characteristics prevent
+ * it from being easily used by concurrent file descriptors in a process.
+ * Whenever a file descriptor is closed, *every* fcntl() lock owned by the
+ * process on the underlying file is removed -- including locks set by *other
+ * file descriptors*. This makes it difficult to safely permit more than one
+ * DB_REGISTER-protected DB_ENV handle per process.  It would be nice to
+ * eliminate that restriction, but for now:
+ *	A process may have at most one DB_REGISTER-using DB_ENV handle, and so:
+ *	A process will never have more than a single slot locked.
+ *
+ * Docker support was provided by adding the starting date of the process to
+ * each valid slot.  Restarting a docker container resets the process ID seed
+ * back to 1.  After a restart a new process could easily be assigned the same
+ * process id that was used by the previous docker instance.  This caused
+ * __envreg_add() to return the "DB_REGISTER limits processes to one handle"
+ * error instead of determining that recovery was necessary.  By adding the
+ * start time of the process to the slot, it distinguishes this instance of
+ * process id 1 from the previous "boot"'s instance, as long as the container
+ * last for at least one second.  
+ *
+ * To modify the file, use REGISTRY_EXCL_LOCK() to get an exclusive lock on the
+ * second byte of the file. This lock is released quickly, once the __env_open()
+ * either succeeds or fails.
+ *
+ * To modify a single slot, use REGISTRY_LOCK() to get an exclusive lock on the
+ * first byte of the slot. This lock is held for the entire lifespan of the
+ * DB_REGISTER-protected DB_ENV handle.
+ *
+ * Whenever a process opens a new DB_ENV handle, it walks the registry file and
  * verifies it CANNOT acquire the lock for any non-empty slot.  If a lock for
  * a non-empty slot is available, we know a process died holding an open handle,
  * and recovery needs to be run.
@@ -205,7 +234,7 @@ __envreg_add(env, need_recoveryp, flags)
 	u_int lcnt;
 	u_int32_t bytes, mbytes, orig_flags;
 	int need_failchk, ret, t_ret;
-	char *p, buf[PID_LEN + 10], pid_buf[PID_LEN + 10];
+	char *p, buf[SLOT_LEN + 10], my_slot[SLOT_LEN + 10];
 
 	dbenv = env->dbenv;
 	need_failchk = t_ret = 0;
@@ -214,11 +243,12 @@ __envreg_add(env, need_recoveryp, flags)
 	ip = NULL;
 
 	pid = env->pid_cache;
-	snprintf(pid_buf, sizeof(pid_buf), PID_FMT, (u_long)pid);
+	snprintf(my_slot, sizeof(my_slot),
+	    SLOT_FMT, (u_long)pid, (u_long)__clock_get_start());
 
 	if (FLD_ISSET(dbenv->verbose, DB_VERB_REGISTER))
 		__db_msg(env, DB_STR_A("1526",
-		    "%lu: adding self to registry", "%lu"), (u_long)pid);
+		    "adding self to registry: \"%s\"", "%s"), my_slot);
 
 #if DB_ENVREG_KILL_ALL
 	if (0) {
@@ -239,7 +269,7 @@ kill_all:	/*
 	 */
 	for (lcnt = 0;; ++lcnt) {
 		if ((ret = __os_read(
-		    env, dbenv->registry, buf, PID_LEN, &nr)) != 0)
+		    env, dbenv->registry, buf, SLOT_LEN, &nr)) != 0)
 			return (ret);
 		if (nr == 0)
 			break;
@@ -249,15 +279,15 @@ kill_all:	/*
 		 * previously un-registered process was interrupted while
 		 * registering.
 		 */
-		if (nr != PID_LEN) {
+		if (nr != SLOT_LEN) {
 			need_failchk = 1;
 			break;
 		}
 
-		if (PID_ISEMPTY(buf)) {
+		if (SLOT_ISEMPTY(buf)) {
 			if (FLD_ISSET(dbenv->verbose, DB_VERB_REGISTER))
 				__db_msg(env, DB_STR_A("1527",
-				    "%02u: EMPTY", "%02u"), lcnt);
+				    "%02u: EMPTY (%s)", "%02u %s"), lcnt, buf);
 			continue;
 		}
 
@@ -267,7 +297,7 @@ kill_all:	/*
 		 * a single ENV handle may be open per process.  Enforce
 		 * that restriction.
 		 */
-		if (memcmp(buf, pid_buf, PID_LEN) == 0) {
+		if (memcmp(buf, my_slot, SLOT_LEN) == 0) {
 			__db_errx(env, DB_STR("1528",
 "DB_REGISTER limits processes to one open DB_ENV handle per environment"));
 			return (EINVAL);
@@ -290,7 +320,7 @@ kill_all:	/*
 			continue;
 		}
 #endif
-		pos = (off_t)lcnt * PID_LEN;
+		pos = (off_t)lcnt * SLOT_LEN;
 		if (REGISTRY_LOCK(env, pos, 1) == 0) {
 			if ((ret = REGISTRY_UNLOCK(env, pos)) != 0)
 				return (ret);
@@ -340,7 +370,7 @@ kill_all:	/*
 				    "%lu: performing failchk", (u_long)pid);
 
 			if (LF_ISSET(DB_FAILCHK_ISALIVE) && (ret =
-			    __envreg_create_active_pid(env, pid_buf)) != 0)
+			    __envreg_create_active_pid(env, my_slot)) != 0)
 				goto sig_proc;
 
 			/*
@@ -387,7 +417,7 @@ kill_all:	/*
 				if ((ret = __os_seek(env, dbenv->registry,
 				    0, 0, (u_int32_t)dead)) != 0 ||
 				    (ret = __os_write(env, dbenv->registry,
-				    PID_EMPTY, PID_LEN, &nw)) != 0)
+				    SLOT_EMPTY, SLOT_LEN, &nw)) != 0)
 					return (ret);
 				need_failchk = 0;
 				goto add;
@@ -431,14 +461,14 @@ sig_proc:
 		 */
 		if ((ret = __os_seek(env, dbenv->registry, 0, 0, 0)) != 0)
 			return (ret);
-		for (lcnt = 0; lcnt < ((u_int)end / PID_LEN +
-		    ((u_int)end % PID_LEN == 0 ? 0 : 1)); ++lcnt) {
+		for (lcnt = 0; lcnt < ((u_int)end / SLOT_LEN +
+		    ((u_int)end % SLOT_LEN == 0 ? 0 : 1)); ++lcnt) {
 
 			if ((ret = __os_read(
-			    env, dbenv->registry, buf, PID_LEN, &nr)) != 0)
+			    env, dbenv->registry, buf, SLOT_LEN, &nr)) != 0)
 				return (ret);
 
-			pos = (off_t)lcnt * PID_LEN;
+			pos = (off_t)lcnt * SLOT_LEN;
 			/* do not notify on dead process */
 			if (pos != dead) {
 				pid = (pid_t)strtoul(buf, NULL, 10);
@@ -448,7 +478,7 @@ sig_proc:
 			if ((ret = __os_seek(env,
 			    dbenv->registry, 0, 0, (u_int32_t)pos)) != 0 ||
 			    (ret = __os_write(env,
-			    dbenv->registry, PID_EMPTY, PID_LEN, &nw)) != 0)
+			    dbenv->registry, SLOT_EMPTY, SLOT_LEN, &nw)) != 0)
 				return (ret);
 		}
 		/* wait one last time to get everyone out */
@@ -463,11 +493,11 @@ add:	if ((ret = __os_seek(env, dbenv->registry, 0, 0, 0)) != 0)
 		return (ret);
 	for (lcnt = 0;; ++lcnt) {
 		if ((ret = __os_read(
-		    env, dbenv->registry, buf, PID_LEN, &nr)) != 0)
+		    env, dbenv->registry, buf, SLOT_LEN, &nr)) != 0)
 			return (ret);
-		if (nr == PID_LEN && !PID_ISEMPTY(buf))
+		if (nr == SLOT_LEN && !SLOT_ISEMPTY(buf))
 			continue;
-		pos = (off_t)lcnt * PID_LEN;
+		pos = (off_t)lcnt * SLOT_LEN;
 		if (REGISTRY_LOCK(env, pos, 1) == 0) {
 			if (FLD_ISSET(dbenv->verbose, DB_VERB_REGISTER))
 				__db_msg(env, DB_STR_A("1532",
@@ -478,10 +508,10 @@ add:	if ((ret = __os_seek(env, dbenv->registry, 0, 0, 0)) != 0)
 			if ((ret = __os_seek(env,
 			    dbenv->registry, 0, 0, (u_int32_t)pos)) != 0 ||
 			    (ret = __os_write(env,
-			    dbenv->registry, pid_buf, PID_LEN, &nw)) != 0)
+			    dbenv->registry, my_slot, SLOT_LEN, &nw)) != 0)
 				return (ret);
 			/* Add the entry for this process. */
-			if ((ret = __envreg_add_active_pid(env, pid_buf)) != 0)
+			if ((ret = __envreg_add_active_pid(env, my_slot)) != 0)
 				return (ret);
 			dbenv->registry_off = (u_int32_t)pos;
 			break;
@@ -499,7 +529,7 @@ add:	if ((ret = __os_seek(env, dbenv->registry, 0, 0, 0)) != 0)
  *	Unregister a process by pid, optionally with its offset in the registry.
  *
  * Parameters:
- *	If the caller knows the entry's loation in the registry, they can pass
+ *	If the caller knows the entry's location in the registry, they can pass
  *	it in via 'offset'. If not known, pass in 0.
  *
  * PUBLIC: int __envreg_unregister_pid __P((ENV *, pid_t, u_int32_t));
@@ -513,16 +543,16 @@ __envreg_unregister_pid(env, pid, offset)
 	DB_FH *registry;
 	size_t nbytes;
 	int ret, t_ret;
-	char buf[PID_LEN];
+	char buf[SLOT_LEN];
 
 	registry = env->dbenv->registry;
 	if (offset != 0) {
 		/* Verify that the pid is at the specified offset. */
 		if ((ret = __os_io(env, DB_IO_READ,
-		    registry, 0, 0, offset, PID_LEN,
+		    registry, 0, 0, offset, SLOT_LEN,
 		    (u_int8_t *)buf, &nbytes)) != 0)
 			goto err;
-		if (nbytes != PID_LEN || pid != (pid_t)strtoul(buf, NULL, 10)) {
+		if (nbytes != SLOT_LEN || pid != (pid_t)strtoul(buf, NULL, 10)) {
 not_found:
 			ret = USR_ERR(env, DB_NOTFOUND);
 			__db_errx(env, "__envreg_unregister_pid: %lu not found",
@@ -538,21 +568,21 @@ not_found:
 			goto err;
 		for (;;) {
 			if ((ret = __os_read(
-			    env, registry, buf, PID_LEN, &nbytes)) != 0)
+			    env, registry, buf, SLOT_LEN, &nbytes)) != 0)
 				goto err;
 			/*
 			 * A too-short record means that we reached EOF without
 			 * finding the process.
 			 */
-			if (nbytes != PID_LEN)
+			if (nbytes != SLOT_LEN)
 				goto not_found;
 			if (pid == (pid_t)strtoul(buf, NULL, 10))
 				break;
-			offset += PID_LEN;
+			offset += SLOT_LEN;
 		}
 	}
 	ret = __os_io(env, DB_IO_WRITE,
-	    registry, 0, 0, offset, PID_LEN, (u_int8_t *)PID_EMPTY, &nbytes);
+	    registry, 0, 0, offset, SLOT_LEN, (u_int8_t *)SLOT_EMPTY, &nbytes);
 err:
 	if ((t_ret = __envreg_registry_close(env)) != 0 && ret == 0)
 		ret = t_ret;
@@ -791,7 +821,7 @@ __envreg_create_active_pid(env, my_pid)
 	char *my_pid;
 {
 	DB_ENV *dbenv;
-	char buf[PID_LEN + 10];
+	char buf[SLOT_LEN + 10];
 	int    ret;
 	off_t  pos;
 	size_t nr;
@@ -819,16 +849,16 @@ __envreg_create_active_pid(env, my_pid)
 		return (ret);
 	for (lcnt = 0;; ++lcnt) {
 		if ((ret = __os_read(
-		    env, dbenv->registry, buf, PID_LEN, &nr)) != 0)
+		    env, dbenv->registry, buf, SLOT_LEN, &nr)) != 0)
 			return (ret);
 
 		/* all done is read nothing, or get a partial record */
-		if (nr == 0 || nr != PID_LEN)
+		if (nr == 0 || nr != SLOT_LEN)
 			break;
-		if (PID_ISEMPTY(buf))
+		if (SLOT_ISEMPTY(buf))
 			continue;
 
-		pos = (off_t)lcnt * PID_LEN;
+		pos = (off_t)lcnt * SLOT_LEN;
 		if (REGISTRY_LOCK(env, pos, 1) == 0) {
 			/* got lock, so process died. Do not add to array */
 			if ((ret = REGISTRY_UNLOCK(env, pos)) != 0)

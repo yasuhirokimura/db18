@@ -14,7 +14,7 @@
   <body>
     <div xmlns="" class="navheader">
       <div class="libver">
-        <p>Library Version 18.1.25</p>
+        <p>Library Version 18.1.32</p>
       </div>
       <table width="100%" summary="Navigation header">
         <tr>
@@ -28,7 +28,7 @@
       </table>
       <hr />
     </div>
-    <div class="sect1" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="upgrade_11gr2_53_sql_rep"></a>Replication for Existing Databases in the SQL API</h2></div></div></div><div class="toc"><dl><dt><span class="sect2"><a href="upgrade_11gr2_53_sql_rep.html#idm140164926475744">PRAGMAs With Permanent Effects</a></span></dt><dt><span class="sect2"><a href="upgrade_11gr2_53_sql_rep.html#idm140164926468464">PRAGMAs That Can Now Operate on Existing Databases</a></span></dt></dl></div><p> 
+    <div class="sect1" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="upgrade_11gr2_53_sql_rep"></a>Replication for Existing Databases in the SQL API</h2></div></div></div><div class="toc"><dl><dt><span class="sect2"><a href="upgrade_11gr2_53_sql_rep.html#idm140089945292720">PRAGMAs With Permanent Effects</a></span></dt><dt><span class="sect2"><a href="upgrade_11gr2_53_sql_rep.html#idm140089945285024">PRAGMAs That Can Now Operate on Existing Databases</a></span></dt></dl></div><p> 
         Replication can now be enabled on existing SQL databases,
         and replication is now disabled permanently instead of
         temporarily. Replication is enabled on an existing database
@@ -37,7 +37,7 @@
         the initial master of a new replication group. To disable
         replication on a database permanently, use <code class="literal">pragma
         replication=OFF;</code>. 
-    </p><div class="sect2" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="idm140164926475744"></a>PRAGMAs With Permanent Effects</h3></div></div></div><div class="itemizedlist"><ul type="disc"><li><code class="literal">pragma replication=OFF;</code></li></ul></div></div><div class="sect2" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="idm140164926468464"></a>PRAGMAs That Can Now Operate on Existing Databases</h3></div></div></div><div class="itemizedlist"><ul type="disc"><li><code class="literal">pragma
+    </p><div class="sect2" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="idm140089945292720"></a>PRAGMAs With Permanent Effects</h3></div></div></div><div class="itemizedlist"><ul type="disc"><li><code class="literal">pragma replication=OFF;</code></li></ul></div></div><div class="sect2" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="idm140089945285024"></a>PRAGMAs That Can Now Operate on Existing Databases</h3></div></div></div><div class="itemizedlist"><ul type="disc"><li><code class="literal">pragma
                     replication_local_site="host:port";</code></li><li><code class="literal">pragma
                     replication_initial_master=ON;</code></li><li><code class="literal">pragma replication=ON;</code></li></ul></div></div>\
 </div>

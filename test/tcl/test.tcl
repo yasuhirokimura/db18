@@ -1,4 +1,4 @@
-# Copyright (c) 1996, 2018 Oracle and/or its affiliates.  All rights reserved.
+# Copyright (c) 1996, 2019 Oracle and/or its affiliates.  All rights reserved.
 #
 # See the file LICENSE for license information.
 #
@@ -144,7 +144,7 @@ global valid_releases
 array set valid_releases [list 44 "db-4.4.20" 45 "db-4.5.20" 46 "db-4.6.21" \
     47 "db-4.7.25" 48 "db-4.8.30" 50 "db-5.0.32" 51 "db-5.1.29" \
     52 "db-5.2.42" 53 "db-5.3.28" 60 "db-6.0.30" 61 "db-6.1.36" \
-    62 "db-6.2.32" 181 "db-18.1.19" ]
+    62 "db-6.2.32" 181 "db-18.1.25" ]
 
 # The variable test_recopts controls whether we open envs in
 # replication tests with the -recover flag.   The default is
@@ -611,6 +611,7 @@ proc check_output { file } {
 		^Test\ssuite\srun\s.*|
                 ^Test\s.*rep.*|
 		^To\sreproduce\sthis\scase:.*|
+		^Turning\sSSL\stesting\sON*|
 		^Unlinking\slog:\serror\smessage\sOK$|
 		^Verifying\s.*|
 		^\t*\.\.\.dbc->get.*$|

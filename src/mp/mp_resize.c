@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2006, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 2006, 2019 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *
@@ -342,7 +342,7 @@ __memp_add_bucket(dbmp)
 	MPOOL *mp;
 	u_int32_t high_mask, new_bucket, old_bucket;
 
-	env = dbmp->env;
+	COMPQUIET(env, dbmp->env);
 	mp = dbmp->reginfo[0].primary;
 
 	new_bucket = mp->nbuckets;

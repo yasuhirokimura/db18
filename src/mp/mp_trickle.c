@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 1996, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 1996, 2019 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *
@@ -50,12 +50,11 @@ __memp_trickle(env, pct, nwrotep)
 	int pct, *nwrotep;
 {
 	DB_MPOOL *dbmp;
-	MPOOL *c_mp, *mp;
-	u_int32_t clean, dirty, i, need_clean, total, dtmp, wrote;
+	u_int32_t clean, dirty, need_clean, total, wrote;
 	int ret;
 
 	dbmp = env->mp_handle;
-	mp = dbmp->reginfo[0].primary;
+	dirty = total = 0;
 
 	if (nwrotep != NULL)
 		*nwrotep = 0;
@@ -67,12 +66,9 @@ __memp_trickle(env, pct, nwrotep)
 		return (EINVAL);
 	}
 
-	/* First we purge all dead files and their buffers. */
-	if ((ret = __memp_purge_dead_files(env)) != 0)
-		return (ret);
-
 	/*
-	 * Loop through the caches counting total/dirty buffers.
+	 * Purge all dead files and their buffers while counting total/dirty
+	 * buffers.
 	 *
 	 * Note:
 	 * Using hash_page_dirty is our only choice at the moment, but it's not
@@ -80,12 +76,8 @@ __memp_trickle(env, pct, nwrotep)
 	 * than one page size, as a free 512B buffer may not be equivalent to
 	 * having a free 8KB buffer.
 	 */
-	for (ret = 0, i = dirty = total = 0; i < mp->nreg; ++i) {
-		c_mp = dbmp->reginfo[i].primary;
-		total += c_mp->pages;
-		__memp_stat_hash(&dbmp->reginfo[i], c_mp, &dtmp);
-		dirty += dtmp;
-	}
+	if ((ret = __memp_purge_dead(env, &total, &dirty)) != 0)
+		return (ret);
 
 	/*
 	 * If there are sufficient clean buffers, no buffers or no dirty
@@ -108,7 +100,11 @@ __memp_trickle(env, pct, nwrotep)
 	need_clean -= clean;
 	ret = __memp_sync_int(env, NULL,
 	    need_clean, DB_SYNC_TRICKLE | DB_SYNC_INTERRUPT_OK, &wrote, NULL);
-	STAT((mp->stat.st_page_trickle += wrote));
+#ifdef HAVE_STATISTICS
+	((MPOOL *)dbmp->reginfo->primary)->stat.st_page_trickle += wrote;
+#else
+	COMPQUIET(dbmp, NULL);
+#endif
 	if (nwrotep != NULL)
 		*nwrotep = (int)wrote;
 

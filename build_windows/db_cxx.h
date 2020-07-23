@@ -1,6 +1,6 @@
 /* DO NOT EDIT: automatically built by dist/s_windows. */
 /*-
- * Copyright (c) 1997, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 1997, 2019 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *

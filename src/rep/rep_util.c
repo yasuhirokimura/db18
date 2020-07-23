@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2001, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 2001, 2019 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *
@@ -1005,7 +1005,7 @@ __env_rep_enter(env, checklock)
 		 * the timestamp.
 		 */
 		if (F_ISSET(renv, DB_REGENV_REPLOCKED))
-			return (EINVAL);
+			return (DB_REP_LOCKOUT);
 	}
 
 	REP_SYSTEM_LOCK(env);
@@ -1178,7 +1178,7 @@ __db_rep_enter(dbp, checkgen, checklock, return_now)
 		 * the timestamp.
 		 */
 		if (F_ISSET(renv, DB_REGENV_REPLOCKED))
-			return (EINVAL);
+			return (DB_REP_LOCKOUT);
 	}
 
 	/*

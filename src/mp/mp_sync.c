@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 1996, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 1996, 2019 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *
@@ -356,7 +356,7 @@ __memp_sync_int(env, dbmfp, trickle_max, flags, wrote_totalp, interruptedp)
 			 * we started.
 			 */
 #ifdef DIAGNOSTIC
-			if (SH_TAILQ_FIRST(&hp->hash_bucket, __bh) == NULL)
+			if (SH_TAILQ_EMPTY(&hp->hash_bucket))
 #else
 			if (atomic_read(&hp->hash_page_dirty) == 0)
 #endif
@@ -986,7 +986,10 @@ __bhcmp(p1, p2)
  * __memp_purge_dead_files --
  *	Remove all dead files and their buffers from the mpool. The caller
  *	cannot hold any lock on the dead MPOOLFILE handles, their buffers
- *	or their hash buckets.
+ *	or their hash buckets. 
+ *	
+ *	Use this wrapper over __memp_purge_dead when the number of buffers
+ *	and dirty buffers is not of interest to the caller.
  *
  * PUBLIC: int __memp_purge_dead_files __P((ENV *));
  */
@@ -994,13 +997,31 @@ int
 __memp_purge_dead_files(env)
 	ENV *env;
 {
+	return __memp_purge_dead(env, NULL, NULL);
+}
+
+/*
+ * __memp_purge_dead --
+ *	Remove all dead files and their buffers from the mpool. The caller
+ *	cannot hold any lock on the dead MPOOLFILE handles, their buffers
+ *	or their hash buckets.  Optionally return the total and dirty
+ *	buffer counts.
+ *
+ * PUBLIC: int __memp_purge_dead __P((ENV *, u_int32_t *, u_int32_t *));
+ */
+int
+__memp_purge_dead(env, totalp, dirtyp)
+	ENV *env;
+	u_int32_t *totalp;
+	u_int32_t *dirtyp;
+{
 	BH *bhp;
 	DB_MPOOL *dbmp;
 	DB_MPOOL_HASH *hp, *hp_end;
 	REGINFO *infop;
 	MPOOL *c_mp, *mp;
 	MPOOLFILE *mfp;
-	u_int32_t i_cache;
+	u_int32_t i_cache, dirty, total;
 	int ret, t_ret, h_lock;
 
 	if (!MPOOL_ON(env))
@@ -1009,6 +1030,7 @@ __memp_purge_dead_files(env)
 	dbmp = env->mp_handle;
 	mp = dbmp->reginfo[0].primary;
 	ret = t_ret = h_lock = 0;
+	dirty = total = 0;
 
 	/*
 	 * Walk each cache's list of buffers and free all buffers whose
@@ -1017,13 +1039,16 @@ __memp_purge_dead_files(env)
 	for (i_cache = 0; i_cache < mp->nreg; i_cache++) {
 		infop = &dbmp->reginfo[i_cache];
 		c_mp = infop->primary;
+		total += c_mp->pages;
 
 		hp = R_ADDR(infop, c_mp->htab);
 		hp_end = &hp[c_mp->htab_buckets];
 		for (; hp < hp_end; hp++) {
 			/* Skip empty buckets. */
-			if (SH_TAILQ_FIRST(&hp->hash_bucket, __bh) == NULL)
+			if (SH_TAILQ_EMPTY(&hp->hash_bucket))
 				continue;
+
+			dirty += (u_int32_t)atomic_read(&hp->hash_page_dirty);
 
 			/*
 			 * Search for a dead buffer. Other places that call
@@ -1088,6 +1113,11 @@ __memp_purge_dead_files(env)
 			}
 		}
 	}
+
+	if (dirtyp != NULL)
+		*dirtyp = dirty;
+	if (totalp != NULL)
+		*totalp = total;
 
 	return (ret);
 }

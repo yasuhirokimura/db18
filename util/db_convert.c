@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2016, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 2016, 2019 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *
@@ -12,7 +12,7 @@
 
 #ifndef lint
 static const char copyright[] =
-    "Copyright (c) 2016, 2018 Oracle and/or its affiliates.  All rights reserved.\n";
+    "Copyright (c) 2016, 2019 Oracle and/or its affiliates.  All rights reserved.\n";
 #endif
 
 int main __P((int, char *[]));
@@ -27,10 +27,11 @@ main(argc, argv)
 {
 	extern char *optarg;
 	extern int optind;
-	DB *dbp;
+	DB *dbp, *dbvp;
 	DB_ENV *dbenv;
+	u_int32_t vflag;
 	int ch, exitval, lorder, ret, t_ret, verbose;
-	char *home, *msgpfx, *passwd;
+	char *home, *msgpfx, *passwd, *vopt;
 
 	progname = __db_util_arg_progname(argv[0]);
 
@@ -40,9 +41,10 @@ main(argc, argv)
 	dbenv = NULL;
 	verbose = 0;
 	exitval = EXIT_SUCCESS;
-	home = msgpfx = passwd = NULL;
+	vflag = 0;
+	home = msgpfx = passwd = vopt = NULL;
 	lorder = __db_isbigendian() ? 4321 : 1234;
-	while ((ch = getopt(argc, argv, "bh:lm:P:Vv")) != EOF)
+	while ((ch = getopt(argc, argv, "bh:lm:P:S:Vv")) != EOF)
 		switch (ch) {
 		case 'b':
 			lorder = 4321;
@@ -60,6 +62,20 @@ main(argc, argv)
 			if (__db_util_arg_password(progname, 
 			    optarg, &passwd) != 0)
 				goto err;
+			break;
+		case 'S':
+			vopt = optarg;
+			switch (*vopt) {
+			case 'o':
+				vflag = DB_NOORDERCHK;
+				break;
+			case 'v':
+				vflag = 0;
+				break;
+			default:
+				(void)usage();
+				goto err;
+			}
 			break;
 		case 'V':
 			printf("%s\n", db_version(NULL, NULL, NULL));
@@ -87,6 +103,11 @@ main(argc, argv)
 		goto err;
 
 	for (; !__db_util_interrupted() && argv[0] != NULL; ++argv) {
+
+		if (vopt != NULL && (db_create(&dbvp, dbenv, 0) != 0 
+		    || dbvp->verify(dbvp, argv[0], NULL, stdout, vflag) != 0))
+			goto err;
+
 		if ((ret = db_create(&dbp, dbenv, 0)) != 0) {
 			fprintf(stderr,
 			    "%s: db_create: %s\n", progname, db_strerror(ret));
@@ -136,5 +157,5 @@ void
 usage()
 {
 	fprintf(stderr, "usage: %s %s\n", progname,
-	    "[-blVv] [-m msg_pfx] [-h home] [-P password] db_file ...");
+	    "[-blVv] [-m msg_pfx] [-h home] [-P password] [-S vo] db_file ...");
 }

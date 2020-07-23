@@ -108,6 +108,7 @@ int __mp_xxx_fh __P((DB_MPOOLFILE *, DB_FH **));
 int __memp_sync_int __P((ENV *, DB_MPOOLFILE *, u_int32_t, u_int32_t, u_int32_t *, int *));
 int __memp_mf_sync __P((DB_MPOOL *, MPOOLFILE *, int));
 int __memp_purge_dead_files __P((ENV *));
+int __memp_purge_dead __P((ENV *, u_int32_t *, u_int32_t *));
 int __memp_trickle_pp __P((DB_ENV *, int, int *));
 
 #if defined(__cplusplus)

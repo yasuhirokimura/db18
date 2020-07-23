@@ -1,4 +1,4 @@
-# Copyright (c) 2012, 2018 Oracle and/or its affiliates.  All rights reserved.
+# Copyright (c) 2012, 2019 Oracle and/or its affiliates.  All rights reserved.
 #
 # See the file LICENSE for license information.
 #
@@ -172,7 +172,7 @@ proc repmgr035scr_starttest { role oplist envid mydir markerdir\
 	}
 	if { $dbopt == "diskandinmem" && $role == "CLIENT" } {
 		# Need an open in-memory db handle on client to dump it.
-		set imdb [eval "berkdb_open_noerr -unknown $sslargs\
+		set imdb [eval "berkdb_open_noerr -unknown \
 		    -env $repenv -rdonly $inmemdbname"]
 	}
 	if { $dbopt == "diskandinmem" } {

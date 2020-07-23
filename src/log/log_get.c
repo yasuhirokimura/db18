@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 1996, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 1996, 2019 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *
@@ -1295,7 +1295,8 @@ __logc_io(logc, fnum, offset, p, nrp, eofp)
 
 	env = logc->env;
 	dblp = env->lg_handle;
-	lp = dblp->reginfo.primary;
+	
+	COMPQUIET(lp, dblp->reginfo.primary);
 
 	/*
 	 * If we've switched files, discard the current file handle and acquire

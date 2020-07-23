@@ -1,4 +1,4 @@
-# Copyright (c) 2000, 2018 Oracle and/or its affiliates.  All rights reserved.
+# Copyright (c) 2000, 2019 Oracle and/or its affiliates.  All rights reserved.
 #
 # See the file LICENSE for license information.
 #
@@ -120,7 +120,7 @@ set test_names(test)	[list test001 test002 test003 test004 test005 \
     test155 test156 test157]
 
 set test_names(txn)	[list txn001 txn002 txn003 txn004 txn005 txn006 \
-    txn007 txn008 txn009 txn010 txn011 txn012 txn013 txn014]
+    txn007 txn008 txn009 txn010 txn011 txn012 txn013 txn014 txn015]
 
 # Set up a list of rep tests to run before committing changes to the
 # replication system.  By default, all tests in test_names(rep) are

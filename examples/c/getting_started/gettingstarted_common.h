@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2004, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 2004, 2019 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file EXAMPLES-LICENSE for license information.
  */
@@ -28,6 +28,12 @@ extern char *optarg;
 #define PRIMARY_DB	0
 #define SECONDARY_DB	1
 #define VENDORDB	"vendorDB.db"
+
+#define COMPQUIET(n, v) do {                \
+    (n) = (v);                              \
+    (n) = (n);                              \
+} while (0)
+
 
 typedef struct stock_dbs {
     DB *inventory_dbp; /* Database containing inventory information */

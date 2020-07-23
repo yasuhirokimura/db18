@@ -24,13 +24,64 @@
 #include "sqlite3.h"
 #include <assert.h>
 #include <errno.h>
-#include <pthread.h>
-#include <sched.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#ifdef _WIN32
+#include <windows.h>
+extern int getopt(int, char * const *, const char *);
+extern int optind;
+extern char *optarg;
+
+/* Wrap Windows thread API to make it look POSIXey. */
+typedef HANDLE thread_t;
+#define thread_create(thrp, attr, func, arg)                                \
+    (((*(thrp) = CreateThread(NULL, 0,                                      \
+        (LPTHREAD_START_ROUTINE)(func), (arg), 0, NULL)) == NULL) ? -1 : 0) 
+#define thread_self()  GetCurrentThreadId()
+#define thread_detach(m)    CloseHandle(m)
+
+typedef HANDLE mutex_t;
+#define mutex_init(m, attr)                                                 \
+    (((*(m) = CreateMutex(NULL, FALSE, NULL)) != NULL) ? 0 : -1)
+#define mutex_lock(m)                                                       \
+    ((WaitForSingleObject(*(m), INFINITE) == WAIT_OBJECT_0) ? 0 : -1)
+#define mutex_unlock(m)       (ReleaseMutex(*(m)) ? 0 : -1)
+
+typedef HANDLE cond_t;
+#define cond_signal(m)      SetEvent(*(m))
+#define cond_wait(m, n)     SignalObjectAndWait(*(n), *(m), INFINITE, FALSE)
+
+mutex_t Lock;
+cond_t Cond;
+
+#define snprintf _snprintf
+
+#else
+#include <pthread.h>
 #include <unistd.h>
+#include <sched.h>
+
+typedef pthread_t thread_t;
+#define thread_create(thrp, attr, func, arg)                                   \
+    pthread_create((thrp), (attr), (func), (arg))
+#define thread_self()         pthread_self()
+#define thread_detach(m)      pthread_detach(m)
+
+typedef pthread_mutex_t mutex_t;
+#define mutex_init(m, attr)   pthread_mutex_init((m), (attr))
+#define mutex_lock(m)         pthread_mutex_lock(m)
+#define mutex_unlock(m)       pthread_mutex_unlock(m)
+
+typedef pthread_cond_t cond_t;
+#define cond_signal(m)          pthread_cond_signal(m)
+#define cond_wait(m, n)             pthread_cond_wait(m, n)
+
+pthread_mutex_t Lock = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t Cond = PTHREAD_COND_INITIALIZER;
+#endif
 
 			/* Command line options and default values. */
 int DbShareFactor = 2;	/* -d	threads sharing each db	*/
@@ -40,8 +91,6 @@ int Queries = 20;	/* -q	#queries performed in each iteration */
 int Threads = 10;	/* -t	total number of threads started */
 int Verbose = 0;	/* -v	vebose messages, default is none  */
 
-pthread_mutex_t Lock = PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t Cond = PTHREAD_COND_INITIALIZER;
 int Threads_active = 0;
 
 /*
@@ -63,7 +112,11 @@ db_is_locked(void *NotUsed, int iCount)
 	/* sched_yield(); */
 	if (Verbose)
 		printf("BUSY %s #%d\n", (char *)NotUsed, iCount);
+#ifdef _WIN32
+	Sleep(100);
+#else
 	usleep(100);
+#endif
 	return iCount < 25;
 }
 
@@ -237,20 +290,20 @@ worker_bee(void *pArg)
 	char	**az, *s;
 	char	z1[30], z2[30];
 
-	pthread_mutex_lock(&Lock);
+	mutex_lock(&Lock);
 	/* Skip over the thread number to get the table name. */
 	s = strchr(zFilename, '.');
 	assert(s != NULL);
 	sqlite3_open(s + 1, &db);
 	if (Verbose)
 		system("ls -lR testdb-*");
-	pthread_mutex_unlock(&Lock);
+	mutex_unlock(&Lock);
 	if (db == NULL) {
 		printf("%s: can't open\n", zFilename);
 		Exit(1);
 	}
 	sqlite3_busy_handler(db, db_is_locked, zFilename);
-	printf("Thread %lx %s: START\n", (long)pthread_self(), zFilename);
+	printf("Thread %lx %s: START\n", (long)thread_self(), zFilename);
 	fflush(stdout);
 
 	/* Each iterations does
@@ -316,16 +369,16 @@ worker_bee(void *pArg)
 	}
 	if (Verbose) {
 		printf("%lx %s: END iterations, about to sqlite3_close()\n",
-		    (long)pthread_self(), zFilename);
+		    (long)thread_self(), zFilename);
 		fflush(stdout);
 	}
-	pthread_mutex_lock(&Lock);
+	mutex_lock(&Lock);
 	sqlite3_close(db);
 	Threads_active--;
 	if (Threads_active <= 0)
-		pthread_cond_signal(&Cond);
-	pthread_mutex_unlock(&Lock);
-	printf("Thread %lx: success %s\n", (long)pthread_self(), zFilename);
+		cond_signal(&Cond);
+	mutex_unlock(&Lock);
+	printf("Thread %lx: success %s\n", (long)thread_self(), zFilename);
 	return 0;
 }
 
@@ -367,10 +420,16 @@ main(int argc, char **argv)
 {
 	char           *zFile;
 	int		i;
-	pthread_t	id;
+	thread_t	id;
+	
 
+#ifdef _WIN32
+	setvbuf(stdout, NULL, _IONBF, 0);
+	setvbuf(stderr, NULL, _IONBF, 0);
+#else
 	setlinebuf(stdout);
 	setlinebuf(stderr);
+#endif
 	while ((i = getopt(argc, argv, "d:i:m:q:t:v")) != EOF) {
 		switch (i) {
 		case 'd':
@@ -412,8 +471,16 @@ main(int argc, char **argv)
 	printf("%s -d%d -i%d -m%d -q%d -t%d%s\n",
 	    argv[0], DbShareFactor, Iterations,
 	    MaxSeconds, Queries, Threads, Verbose ? " -v" : "");
+	/* Initialize Mutex and Cond Handle for Windows. */
+#ifdef _WIN32
+	Lock = CreateMutex(NULL, FALSE, NULL);
+	Cond = CreateEvent(NULL, FALSE, FALSE, NULL);
+#endif
+    /* SIGALRM is not available on Windows */
+#ifndef _WIN32
 	signal(SIGALRM, timedout);
 	alarm(MaxSeconds);
+#endif
 	for (i = 0; i < Threads; i++) {
 		zFile = sqlite3_mprintf("%d.testdb-%d",
 		    i % DbShareFactor + 1, (i + DbShareFactor) / DbShareFactor);
@@ -428,28 +495,44 @@ main(int argc, char **argv)
 			if (unlink(zDb) < 0 && errno != ENOENT)
 				fprintf(stderr, "%s: unlink %s: %s\n",
 				    argv[0], zDb, strerror(errno));
+#ifdef _WIN32
+			/* 
+			 * Use Windows-specific command line here,
+			 * to avoid delete error on Windows.
+			 */
+			rmJournal = sqlite3_mprintf("IF NOT EXIST %s-journal\\ (exit -1)", zDb);
+			if (system(rmJournal) == 0) {
+				rmJournal = sqlite3_mprintf("rd /s /q %s-journal\\", zDb);
+				if (system(rmJournal) != 0) {
+					fprintf(stderr, "%s: %s: %s\n",
+						argv[0], rmJournal, strerror(errno));
+					exit(1);
+				}
+			}
+#else
 			rmJournal = sqlite3_mprintf("rm -rf %s-journal/", zDb);
 			if (system(rmJournal) != 0) {
 				fprintf(stderr, "%s: %s: %s\n",
-				    argv[0], rmJournal, strerror(errno));
+					argv[0], rmJournal, strerror(errno));
 				exit(1);
 			}
+#endif	
 			sqlite3_free(rmJournal);
 		}
-		pthread_mutex_lock(&Lock);
+		mutex_lock(&Lock);
 		Threads_active++;
-		pthread_mutex_unlock(&Lock);
-		pthread_create(&id, 0, worker_bee, (void *)zFile);
-		pthread_detach(id);
+		mutex_unlock(&Lock);
+		thread_create(&id, 0, worker_bee, (void *)zFile);
+		thread_detach(id);
 	}
-	pthread_mutex_lock(&Lock);
+	mutex_lock(&Lock);
 	while (Threads_active > 0) {
-		if ((i = pthread_cond_wait(&Cond, &Lock)) != 0)
+		if ((i = cond_wait(&Cond, &Lock)) != 0)
 			fprintf(stderr,
-			    "pthread_cond_wait with %d threads left: %s\n",
+			    "thread_cond_wait with %d threads left: %s\n",
 			    Threads_active, strerror(i));
 	}
-	pthread_mutex_unlock(&Lock);
+	mutex_unlock(&Lock);
 	for (i = 0; i < Threads; i++) {
 		char	zBuf[200];
 		sprintf(zBuf, "testdb-%d", (i + 1) / DbShareFactor);

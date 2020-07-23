@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2005, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 2005, 2019 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *
@@ -2894,6 +2894,7 @@ err_cleanup:
 	if (ssl_ctx)
 		SSL_CTX_free(ssl_ctx);
 
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
 	if (repmgr_ssl_mutex_arr != NULL) {
 		for (i = 0; i < CRYPTO_num_locks(); i++) {
 			if (repmgr_ssl_mutex_arr[i] != NULL)
@@ -2902,6 +2903,7 @@ err_cleanup:
 		
 		repmgr_ssl_mutex_arr = NULL;
 	}
+#endif
 
 	return (1);
 }

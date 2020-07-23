@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 1996, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 1996, 2019 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  */
@@ -108,6 +108,8 @@ __db_new(dbc, type, lockp, pagepp)
 	PAGE *h;
 	db_pgno_t last, *list, pgno, newnext;
 	int extend, hash, ret;
+
+	COMPQUIET(last, 0);
 
 	meta = NULL;
 	dbp = dbc->dbp;

@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 1999, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 1999, 2019 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *
@@ -96,7 +96,7 @@ __ham_vrfy_meta(dbp, vdp, m, pgno, flags)
 			 * error rather than database corruption, so we want to
 			 * avoid extraneous errors.
 			 */
-			ret = USR_ERR(env, DB_VERIFY_FATAL);
+			ret = USR_ERR(env, DB_VERIFY_BAD);
 			goto err;
 		}
 
@@ -456,6 +456,13 @@ __ham_vrfy_item(dbp, vdp, pgno, h, i, flags)
 		len = LEN_HKEYDATA(dbp, h, dbp->pgsize, i);
 		databuf = HKEYDATA_DATA(P_ENTRY(dbp, h, i));
 		for (offset = 0; offset < len; offset += DUP_SIZE(dlen)) {
+			if (offset + sizeof(db_indx_t) > len) {
+				EPRINT((dbp->env, DB_STR_A("1105",
+			    "Page %lu: duplicate item %lu has bad length",
+				    "%lu %lu"), (u_long)pip->pgno, (u_long)i));
+				ret = DB_VERIFY_BAD;
+				goto err;
+			}
 			memcpy(&dlen, databuf + offset, sizeof(db_indx_t));
 
 			/* Make sure the length is plausible. */

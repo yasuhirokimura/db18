@@ -8,6 +8,7 @@ extern "C" {
 
 void __clock_set_expires __P((ENV *, db_timespec *, db_timeout_t));
 int __clock_expired __P((ENV *, db_timespec *, db_timespec *));
+time_t __clock_get_start __P((void));
 int __crypto_region_init __P((ENV *));
 int __db_isbigendian __P((void));
 int __db_byteorder __P((ENV *, int));
@@ -48,6 +49,7 @@ int __db_unknown_path __P((ENV *, char *));
 int __db_check_txn __P((DB *, DB_TXN *, DB_LOCKER *, int));
 int __db_txn_deadlock_err __P((ENV *, DB_TXN *));
 int __db_not_txn_env __P((ENV *));
+int __db_not_log_env __P((ENV *));
 int __db_rec_toobig __P((ENV *, u_int32_t, u_int32_t));
 int __db_rec_repl __P((ENV *, u_int32_t, u_int32_t));
 int __dbc_logging __P((DBC *));

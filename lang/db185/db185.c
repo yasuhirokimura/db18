@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 1996, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 1996, 2019 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *
@@ -12,7 +12,7 @@
 
 #ifndef lint
 static const char copyright[] =
-    "Copyright (c) 1996, 2018 Oracle and/or its affiliates.  All rights reserved.\n";
+    "Copyright (c) 1996, 2019 Oracle and/or its affiliates.  All rights reserved.\n";
 #endif
 
 #include "db185_int.h"
@@ -546,7 +546,7 @@ db185_compare(dbp, a, b, locp)
 {
 	DBT185 a185, b185;
 
-	locp = NULL;
+	COMPQUIET(locp, NULL);
 	a185.data = a->data;
 	a185.size = a->size;
 	b185.data = b->data;

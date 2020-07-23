@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2005, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 2005, 2019 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file EXAMPLES-LICENSE for license information.
  *
@@ -22,6 +22,12 @@ extern "C" {
 #else
 #include <unistd.h>
 #endif
+
+// Suppress unused variable warnings
+#define COMPQUIET(n, v) do {     \
+    (n) = (v);                  \
+    (n) = (n);                  \
+} while (0)
 
 // Forward declarations
 void loadInventoryDB(MyDb &, std::string &);
@@ -136,6 +142,8 @@ loadInventoryDB(MyDb &inventoryDB, std::string &inventoryFile)
     InventoryData inventoryData;
     std::string substring;
     size_t nextPound;
+
+    COMPQUIET(nextPound, 0);
 
     std::ifstream inFile(inventoryFile.c_str(), std::ios::in);
     if ( !inFile )

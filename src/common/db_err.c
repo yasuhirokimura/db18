@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 1996, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 1996, 2019 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *
@@ -1088,6 +1088,23 @@ __db_not_txn_env(env)
 	return (ret);
 }
 
+/*
+ * __db_not_log_env --
+ *	DB handle must be in an environment that supports logging.
+ *
+ * PUBLIC: int __db_not_log_env __P((ENV *));
+ */
+int
+__db_not_log_env(env)
+	ENV *env;
+{
+	int ret;
+
+	ret = USR_ERR(env, EINVAL);
+	__db_errx(env, DB_STR("5536",
+	    "DB environment not configured for logging"));
+	return (ret);
+}
 /*
  * __db_rec_toobig --
  *	Fixed record length exceeded error message.

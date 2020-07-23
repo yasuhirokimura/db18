@@ -1,73 +1,122 @@
 = Berkeley DB 18.1 Changelog =
 
+== Changes between version 18.1.25 and version 18.1.32 ==
+
+Fixed a few null pointer crashes in the Tcl API when a function 
+returned a null value.  [#26331]
+
+Automatically copy any databases in sub-directories when using the
+utility db_hotbackup or the ENV->backup() function by including
+the -C command line argument or the flag DB_BACKUP_DEEP_COPY,
+respectively [#26736].
+
+Fixed a "malformed disk error" caused by not properly refreshing the 
+thread info. [#26945]
+
+If a database rename or remove operation fails due to replication lockout,
+DB_REP_LOCKOUT will now be returned instead of EINVAL. [#27010]
+
+Fixed an "invalid page format" error when performing a key_range search
+on an empty database. [#27011]
+
+Fixed a bug in the JNI API involving the function Environment.lockVector(). 
+[#27068]
+
+Added the option -S to the db_convert and db_tuner utilities, which causes
+db_verify to verify the database before running the utility. [#27080]
+
+Improved stability with several changes that prevent crashes when 
+running db_verify against corrupt files. [#27088]
+
+Improved the reliability of DB_ENV->open(DB_REGISTER) when the Berkeley DB
+application is the principal process of a Docker container which is stopped
+and restarted. [#27100]
+
+Fixed build failure in repmgr ssl support for openssl version 1.1.0. [#27152]
+
+Added support for Java 10. [#27154]
+
+Added the db_sqlthreadtest project to Windows. [#27170]
+
+Fixed a possible crash when running db_verify on a corrupted DB_QUEUE
+database. [#27179]
+
+Improved the performance of the purging process performed when the number
+of free mutexes is low. [#27219]
+
+Fixed an error in the repmgr035.tcl test. [#27392]
+
+The Berkeley DB client-server architecture has been updated to use
+Thrift 0.11.0. [#27407]
+
 == Database or Log File On-Disk Format Changes ==
 
-The log file format did not change in library version 18.1.
+The log file format did not change in library version 18.1
 
 The database file formats did not change in library version 18.1.
 
 == New Features/Improvements ==
 
-Multiversion concurrency control and snapshot isolation are now supported
-on replication clients. [#21968]
+Multiversion concurrency control and snapshot isolation are now 
+supported on replication clients. [#21968]
 
-Several new types of objects have been added to the DB_ENV->set_memory_init()
-method to enable an application to account for any additional environment
-region memory needed for replication. [#24153]
+Several new types of objects have been added to the 
+DB_ENV->set_memory_init() method to enable an application to account 
+for any additional environment region memory needed for replication. [#24153]
 
-There are several new pieces of information available to replicated
-applications.  The DB_EVENT_REP_AUTOTAKEOVER event indicates which
-subordinate process has taken over as the new replication process.
-The st_group_stable_log_file Replication Manager statistic indicates
-the earliest log file that is still needed by any site in the replication
-group.  The DB_REPMGR_SITE structure now contains a max_ack_lsn field
-that indicates to a master site the most recently acknowledged LSN on
-each replica.  The DB_REPMGR_SITE structure now also sets a new flag
-value DB_REPMGR_ISELECTABLE. [#25073]
+There are several new pieces of information available to replicated 
+applications. The DB_EVENT_REP_AUTOTAKEOVER event indicates which 
+subordinate process has taken over as the new replication process. 
+The st_group_stable_log_file Replication Manager statistic indicates 
+the earliest log file that is still needed by any site in the replication 
+group. The DB_REPMGR_SITE structure now contains a max_ack_lsn field that 
+indicates to a master site the most recently acknowledged LSN on each 
+replica. The DB_REPMGR_SITE structure now also sets a new flag value 
+DB_REPMGR_ISELECTABLE. [#25073]
 
-Added a utility program "db_convert" to convert between big-endian (e.g. SPARC)
-and little-endian (e.g., X86) machines.  This supports multi-platform
-applications which standardize on one endianness, even when both big-endian
-and little-endian machines are used.  Since db_upgrade requires the database
-to be in the local machine's endianness, such applications can use db_convert
-to translate the byte order of the database into the local format.  Then, the
-application can run db_upgrade.  [#25086]
+Added a utility program "db_convert" to convert between big-endian 
+(e.g. SPARC) and little-endian (e.g., X86) machines. This supports 
+multi-platform applications which standardize on one endianness, even 
+when both big-endian and little-endian machines are used. Since db_upgrade 
+requires the database to be in the local machine's endianness, such 
+applications can use db_convert to translate the byte order of the 
+database into the local format. Then, the application can run db_upgrade. 
+[#25086]
 
-Increased the number of instances in which failchk can successfully
-clean the environment without requiring full recovery after a thread
+Increased the number of instances in which failchk can successfully 
+clean the environment without requiring full recovery after a thread 
 crashes while using Berkeley DB. [#25087]
 
 Added DPL APIs to Berkeley DB Java client driver. [#25089]
 
 Added support for the C11/C++11 standards. [#25416]
 
-Added a graphical user interface "db_gui" to Berkeley DB that allows easy 
-browsing of database data and execution of some administrative tasks such as 
-running recovery. [#25496]
+Added a graphical user interface "db_gui" to Berkeley DB that allows 
+easy browsing of database data and execution of some administrative 
+tasks such as running recovery. [#25496]
 
-The replication manager has been changed to use poll() and epoll() in 
-preference to select() to manage connections. This scales better for 
-applications with a very large number of databases, network connections, 
-or files. [#25795]
+The replication manager has been changed to use poll() and epoll() 
+in preference to select() to manage connections. This scales better 
+for applications with a very large number of databases, network 
+connections, or files. [#25795]
 
-Starting with this release, Berkeley DB products are licensed in two
-ways depending on the source of the package. Packages downloaded from the 
-Oracle Technology Network (OTN) are licensed under the GNU AFFERO GENERAL 
-PUBLIC LICENSE (AGPL), version 3. Packages downloaded from the Oracle
-Software Data Cloud (OSDC) are licensed under the Oracle Master Agreement. 
-Example code included in the packages is in all cases licensed under the 
-Universal Permissive License. [#25916]
+Starting with this release, Berkeley DB products are licensed in 
+two ways depending on the source of the package. Packages downloaded 
+from the Oracle Technology Network (OTN) are licensed under the GNU 
+AFFERO GENERAL PUBLIC LICENSE (AGPL), version 3. Packages downloaded 
+from the Oracle Software Data Cloud (OSDC) are licensed under the 
+Oracle Master Agreement. Example code included in the packages is 
+in all cases licensed under the Universal Permissive License. [#25916]
 
-Added the -S commandline option to db_stat, db_dump, and db_upgrade,
-which verifies the correctness of the database before executing the
-utilities. [#26207]
+Added the -S command line option to db_stat, db_dump, and db_upgrade, 
+which verifies the correctness of the database before executing the utilities. [#26207]
 
-The version numbering scheme for Berkeley DB changed from a five-part number
-to a three-part number of the form <year>.<release>.<build>.  This release is
-numbered 18.1.x, indicating that it is the first release of the year 2018.
-18.1.x is the successor to the 6.2.x (also known as 12.2.6.2.x) releases.
-The third and fourth parameters of db_full_version() are no longer meaningful
-and are now deprecated; if present, they are are set to zero.  [#26743]
+The version numbering scheme for Berkeley DB changed from a five-part 
+number to a three-part number of the form <year>.<release>.<build>. This 
+release is numbered 18.1.x, indicating that it is the first release of the 
+year 2018. 18.1.x is the successor to the 6.2.x (also known as 12.2.6.2.x) 
+releases. The third and fourth parameters of db_full_version() are no longer 
+meaningful and are now deprecated; if present, they are are set to zero. [#26743]
 
 == Database Environment Changes ==
 
@@ -140,7 +189,7 @@ previously non-existing on-disk environment. [#26708]
 
 == Tcl-specific API Changes ==
 
-None.
+None. 
 
 == Java-specific API Changes ==
 
@@ -334,4 +383,7 @@ The Solaris Studio 12.5 C++ compiler can fail to build Berkeley DB
 because of our support for built-in atomic functions. Falling back 
 to Solaris Studio 12.4 should be a successful workaround. 
  
+Some Java tests ported from Berkeley DB JE, used to test the Direct Persistence
+Layer, fail when run in enhanced mode. 
+
 Asynchronous loggers cannot be used.

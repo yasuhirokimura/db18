@@ -69,8 +69,8 @@ TAR=star
 START_DIR=`pwd`
 D=`pwd`/../release
 R="$D/db-${VERSION}"
-DOCS=`pwd`/../../docs_books-18.1
-DB_ADDONS=`pwd`/../../db_addons-18.1
+DOCS=`pwd`/../../docs_books
+DB_ADDONS=`pwd`/../../db_addons
 
 if [ ! -d $DB_ADDONS ]; then
 	echo "buildpkg requires a db_addons repository at the same level as the db repository."
@@ -127,13 +127,13 @@ else
 		rm -rf $R
 		die "Failed updating the docs_books repository."
 	fi
-#	has_tag=`hg tags | grep "db-${VERSION}"`
-#	if [ "$has_tag" = "" ]; then
-#		hg tag "db-${VERSION}"
-#		TAG_CREATED="true"
-#	else
-#		hg up -r "db-${VERSION}"
-#	fi
+	has_tag=`hg tags | grep "db-${VERSION}"`
+	if [ "$has_tag" = "" ]; then
+		hg tag "db-${VERSION}"
+		TAG_CREATED="true"
+	else
+		hg up -r "db-${VERSION}"
+	fi
 
 	# Build a copy of the documentation in the release tree.
 	cd $R/dist
@@ -193,7 +193,7 @@ cd $R && rm -rf test/tcl/TODO test/upgrade test/scr036 test/erlang
 cd $R && rm -rf test/perf test/purify test/repmgr
 cd $R && rm -rf test/server test/stl test/vxworks
 cd $R && rm -rf malware_scans
-cd $R && rm -rf static_analysis 
+cd $R && rm -rf static_analysis
 cd $R && rm -rf lang/sql/jdbc
 cd $R && rm -rf lang/sql/sqlite/art lang/sql/sqlite/autoconf
 cd $R && rm -rf lang/sql/sqlite/autom4te.cache lang/sql/sqlite/contrib
@@ -261,7 +261,7 @@ rm -f $T
 cd $R/.. && rm -f $T && zip -q -r $T db-$VERSION
 chmod 444 $T
 
-rm -rf $R 
+rm -rf $R
 
 if [ "$TAG_CREATED" = "true" ]; then
 	echo "Created a tag in docs_books repository. Please push."

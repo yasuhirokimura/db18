@@ -14,7 +14,7 @@
   <body>
     <div xmlns="" class="navheader">
       <div class="libver">
-        <p>Library Version 18.1.25</p>
+        <p>Library Version 18.1.32</p>
       </div>
       <table width="100%" summary="Navigation header">
         <tr>
@@ -38,7 +38,7 @@
           </div>
         </div>
       </div>
-      <pre class="programlisting">db_convert [-blVv] [-h home] [-P password] file ...  </pre>
+      <pre class="programlisting">db_convert [-blVv] [-h home] [-P password] [-S o | v] file ...  </pre>
       <p>
          The <span class="command"><strong>db_convert</strong></span> utility converts one or more
          files and the databases they contain to a specified byte order.
@@ -97,6 +97,39 @@
           </li>
           <li>
             <p>
+                 <span class="bold"><strong>-S</strong></span>
+            </p>
+            <p>
+                Verify the specified database before performing db_convert. The conversion
+                is not performed if the database is corrupted. Use this option when you
+                are not sure about the integrity of the database.
+            </p>
+            <div class="itemizedlist">
+              <ul type="circle">
+                <li>
+                  <p>
+                         <span class="bold"><strong>o</strong></span>
+                    </p>
+                  <p>
+                        Skip the database checks for btree and duplicate sort order and
+                        for hashing. See also the <span class="bold"><strong>-o</strong></span>
+                        option for db_verify.
+                    </p>
+                </li>
+                <li>
+                  <p>
+                         <span class="bold"><strong>v</strong></span>
+                    </p>
+                  <p>
+                        Perform the standard verification on the database as performed by
+                        db_verify without options.
+                    </p>
+                </li>
+              </ul>
+            </div>
+          </li>
+          <li>
+            <p>
                  <span class="bold"><strong>-v</strong></span>
             </p>
             <p>
@@ -132,7 +165,7 @@
         <div class="titlepage">
           <div>
             <div>
-              <h3 class="title"><a id="idm140481927776224"></a>Environment Variables</h3>
+              <h3 class="title"><a id="idm140113479345904"></a>Environment Variables</h3>
             </div>
           </div>
         </div>
@@ -140,7 +173,7 @@
           <div class="titlepage">
             <div>
               <div>
-                <h4 class="title"><a id="idm140481927775840"></a>DB_HOME</h4>
+                <h4 class="title"><a id="idm140113479374784"></a>DB_HOME</h4>
               </div>
             </div>
           </div>

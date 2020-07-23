@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 1996, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 1996, 2019 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *
@@ -64,6 +64,7 @@ __db_apprec(env, ip, max_lsn, trunclsn, update, flags)
 	char *p, *pass;
 	char t1[CTIME_BUFLEN], t2[CTIME_BUFLEN], time_buf[CTIME_BUFLEN];
 
+	COMPQUIET(low, 0);
 	COMPQUIET(nfiles, (double)0.001);
 
 	dbenv = env->dbenv;

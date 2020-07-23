@@ -1,4 +1,4 @@
-# Copyright (c) 2004, 2018 Oracle and/or its affiliates.  All rights reserved.
+# Copyright (c) 2004, 2019 Oracle and/or its affiliates.  All rights reserved.
 #
 # See the file LICENSE for license information.
 #
@@ -209,14 +209,14 @@ proc rep031_sub { method niter tnum logset recargs clean largs } {
 		set stat [catch {$masterenv dbrename -auto_commit $old $new} ret]
 	}
 	error_check_good rename_fail $stat 1
-	error_check_good rename_err [is_substr $ret "invalid"] 1
+	error_check_good rename_err [is_substr $ret "LOCKOUT"] 1
 	if { $databases_in_memory } {
 		set stat [catch {$masterenv dbremove -auto_commit "" $old} ret]
 	} else {
 		set stat [catch {$masterenv dbremove -auto_commit $old} ret]
 	}
 	error_check_good remove_fail $stat 1
-	error_check_good remove_err [is_substr $ret "invalid"] 1
+	error_check_good remove_err [is_substr $ret "LOCKOUT"] 1
 
 	# The fileid_reset and lsn_reset operations work on physical files 
 	# so we do not need to test them for in-memory databases.
@@ -224,10 +224,10 @@ proc rep031_sub { method niter tnum logset recargs clean largs } {
 		puts "\tRep$tnum.h: Try to reset LSNs and fileid on the database."
 		set stat [catch {$masterenv id_reset $old} ret]
 		error_check_good id_reset $stat 1
-		error_check_good id_err [is_substr $ret "invalid"] 1
+		error_check_good id_err [is_substr $ret "LOCKOUT"] 1
 		set stat [catch {$masterenv lsn_reset $old} ret]
 		error_check_good lsn_reset $stat 1
-		error_check_good lsn_err [is_substr $ret "invalid"] 1
+		error_check_good lsn_err [is_substr $ret "LOCKOUT"] 1
 	}
 
 	#

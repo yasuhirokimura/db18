@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2001, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 2001, 2019 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file EXAMPLES-LICENSE for license information.
  *
@@ -210,6 +210,8 @@ machtab_getinfo(machtab, eid, hostaddr, portp)
 	int ret;
 	member_t *member;
 
+	COMPQUIET(hostaddr, hostaddr);
+
 	if ((ret = mutex_lock(&machtab->mtmutex)) != 0) {
 		fprintf(stderr, "can't lock mutex\n");
 		return (ret);
@@ -244,7 +246,7 @@ machtab_rem(machtab, eid, lock)
 	int eid;
 	int lock;
 {
-	int found, ret;
+	int ret;
 	member_t *member;
 
 	ret = 0;
@@ -253,11 +255,10 @@ machtab_rem(machtab, eid, lock)
 		return (ret);
 	}
 
-	for (found = 0, member = LIST_FIRST(&machtab->machlist);
+	for (member = LIST_FIRST(&machtab->machlist);
 	    member != NULL;
 	    member = LIST_NEXT(member, links))
 		if (member->eid == eid) {
-			found = 1;
 			LIST_REMOVE(member, links);
 			(void)closesocket(member->fd);
 			free(member);
@@ -378,7 +379,7 @@ listen_socket_init(progname, host, port, machtab)
 	char portstr[10];
 	int ret, sockopt;
 
-	COMPQUIET(progname, NULL);
+	COMPQUIET(progname, progname);
 
 	/* Look for host address for local site. */
 	memset(&hints, 0, sizeof(hints));
@@ -444,7 +445,7 @@ listen_socket_accept(machtab, progname, s, eidp)
 	socket_t ns;
 	u_int16_t port;
 
-	COMPQUIET(progname, NULL);
+	COMPQUIET(progname, progname);
 
 accept_wait:
 	memset(&sa, 0, sizeof(sa));
@@ -679,7 +680,8 @@ quote_send(dbenv, control, rec, lsnp, eid, flags)
 	machtab_t *machtab;
 	member_t *m;
 
-	COMPQUIET(lsnp, NULL);
+	COMPQUIET(lsnp, lsnp);
+
 	machtab =
 	    (machtab_t *)((APP_DATA*)dbenv->app_private)->comm_infrastructure;
 
@@ -786,7 +788,7 @@ quote_send_one(rec, control, fd, flags)
 	ssize_t bytes_left, nw;
 	u_int8_t *wp;
 
-	COMPQUIET(flags, 0);
+	COMPQUIET(flags, flags);
 
 	/*
 	 * The protocol is simply: write rec->size, write rec->data,

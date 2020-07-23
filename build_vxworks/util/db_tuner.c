@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2011, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 2011, 2019 Oracle and/or its affiliates.  All rights reserved.
  * 
  * See the file LICENSE for license information.
  * 
@@ -54,7 +54,7 @@
 
 #ifndef lint
 static const char copyright[] =
-    "Copyright (c) 2011, 2018 Oracle and/or its affiliates.  All rights reserved.\n";
+    "Copyright (c) 2011, 2019 Oracle and/or its affiliates.  All rights reserved.\n";
 #endif
 
 /*
@@ -153,12 +153,12 @@ db_tuner_main(argc, argv)
 {
 	extern char *optarg;
 	extern int optind, __db_getopt_reset;
-	DB *dbp;
+	DB *dbp, *dbvp;
 	DB_ENV *dbenv;
 	DBTYPE dbtype;
-	char *dbname, *home, *subdb;
+	char *dbname, *home, *subdb, *vopt;
 	int ch, is_set_dbfile, ret;
-	u_int32_t cachesize, verbose;
+	u_int32_t cachesize, verbose, vflag;
 
 	progname = __db_util_arg_progname(argv[0]);
 
@@ -166,14 +166,14 @@ db_tuner_main(argc, argv)
 		return (ret);
 
 	dbenv = NULL;
-	dbp = NULL;
+	dbp = dbvp = NULL;
 	cachesize = 0;
-	dbname = home = subdb = NULL;
-	is_set_dbfile = verbose = 0;
+	dbname = home = subdb = vopt = NULL;
+	is_set_dbfile = verbose = vflag = 0;
 	dbtype = DB_UNKNOWN;
 
 	__db_getopt_reset = 1;
-	while ((ch = getopt(argc, argv, "c:d:h:vs:")) != EOF)
+	while ((ch = getopt(argc, argv, "c:d:h:vs:S:")) != EOF)
 		switch (ch) {
 		case 'c':
 			cachesize = atoi(optarg);
@@ -184,6 +184,20 @@ db_tuner_main(argc, argv)
 			break;
 		case 'h':
 			home = optarg;
+			break;
+		case 'S':
+			vopt = optarg;
+			switch (*vopt) {
+			case 'o':
+				vflag = DB_NOORDERCHK;
+				break;
+			case 'v':
+				vflag = 0;
+				break;
+			default:
+				(void)db_tuner_usage();
+				goto err;
+			}
 			break;
 		case 's':
 			subdb = optarg;
@@ -214,6 +228,10 @@ db_tuner_main(argc, argv)
 
 	if ((ret = __db_util_env_open(dbenv, home, 0,
 	    1, DB_INIT_MPOOL, 0, NULL)) != 0)
+		goto err;
+
+	if (vopt != NULL && (db_create(&dbvp, dbenv, 0) != 0
+	    || dbvp->verify(dbvp, dbname, NULL, stdout, vflag) != 0 ))
 		goto err;
 
 	if ((ret = db_tuner_open_db(&dbp, dbenv, dbname, subdb)) != 0) {
@@ -1313,6 +1331,6 @@ static int
 db_tuner_usage()
 {
 	fprintf(stderr, "usage: %s %s\n", progname,
-	    "[-c cachesize] -d file [-h home] [-s database] [-v verbose]");
+"[-c cachesize] -d file [-h home] [-s database] [-S vo] [-v verbose]");
 	exit(EXIT_FAILURE);
 }

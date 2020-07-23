@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 1999, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 1999, 2019 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *
@@ -40,6 +40,7 @@ DB_GLOBALS __db_global_values = {
 #endif
 	0,				/* fid_serial */
 	0,				/* db_errno */
+	0,				/* start_time */
 	NULL,                           /* saved_errstr */
 	"%m/%d %H:%M:%S",		/* strftime format for dates */
 #if defined(HAVE_ERROR_HISTORY)

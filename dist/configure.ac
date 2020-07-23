@@ -464,7 +464,7 @@ if test "$db_cv_java" = "yes" -o "$db_cv_jdbc" = "yes" -o "$db_cv_server" = "yes
 	esac
 	AC_MSG_RESULT($JAVA_VERSION)
 	case "$JAVA_VERSION" in
-	1.[[3456789]]* | 1.[[1-9]][[0-9]]* | [[23456789]]* ) ;;
+	1.[[3456789]]* | 1.[[1-9]][[0-9]]* | [[23456789]]* | [[1-9]][[0-9]]*.*.* ) ;;
 	* )
 		AC_MSG_ERROR([Java version 1.3 or higher required, got $JAVA_VERSION]) ;;
 	esac

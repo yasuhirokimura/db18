@@ -19,9 +19,9 @@
 
 # Versions of 3rd party libraries. Versions of slf4j and log4j depend on
 # the version of thrift.
-THRIFT_VERSION=0.10.0
-SLF4J_VERSION=1.7.22
-LOG4J_VERSION=2.8.2
+THRIFT_VERSION=0.11.0
+SLF4J_VERSION=1.7.25
+LOG4J_VERSION=2.11.1
 
 die()
 {

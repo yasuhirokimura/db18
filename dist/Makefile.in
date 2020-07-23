@@ -334,8 +334,11 @@ JAVA_DBSRCS=\
 	$(JAVA_SLEEPYCAT)/asm/Attribute.java \
 	$(JAVA_SLEEPYCAT)/asm/ByteVector.java \
 	$(JAVA_SLEEPYCAT)/asm/ClassReader.java \
+	$(JAVA_SLEEPYCAT)/asm/ClassTooLargeException.java \
 	$(JAVA_SLEEPYCAT)/asm/ClassVisitor.java \
 	$(JAVA_SLEEPYCAT)/asm/ClassWriter.java \
+	$(JAVA_SLEEPYCAT)/asm/ConstantDynamic.java \
+	$(JAVA_SLEEPYCAT)/asm/Constants.java \
 	$(JAVA_SLEEPYCAT)/asm/Context.java \
 	$(JAVA_SLEEPYCAT)/asm/CurrentFrame.java \
 	$(JAVA_SLEEPYCAT)/asm/Edge.java \
@@ -344,15 +347,18 @@ JAVA_DBSRCS=\
 	$(JAVA_SLEEPYCAT)/asm/Frame.java \
 	$(JAVA_SLEEPYCAT)/asm/Handle.java \
 	$(JAVA_SLEEPYCAT)/asm/Handler.java \
-	$(JAVA_SLEEPYCAT)/asm/Item.java \
 	$(JAVA_SLEEPYCAT)/asm/Label.java \
+	$(JAVA_SLEEPYCAT)/asm/MethodTooLargeException.java \
 	$(JAVA_SLEEPYCAT)/asm/MethodVisitor.java \
 	$(JAVA_SLEEPYCAT)/asm/MethodWriter.java \
 	$(JAVA_SLEEPYCAT)/asm/ModuleVisitor.java \
 	$(JAVA_SLEEPYCAT)/asm/ModuleWriter.java \
 	$(JAVA_SLEEPYCAT)/asm/Opcodes.java \
+	$(JAVA_SLEEPYCAT)/asm/Symbol.java \
+	$(JAVA_SLEEPYCAT)/asm/SymbolTable.java \
 	$(JAVA_SLEEPYCAT)/asm/Type.java \
 	$(JAVA_SLEEPYCAT)/asm/TypePath.java \
+	$(JAVA_SLEEPYCAT)/asm/TypeReference.java \
 	$(JAVA_SLEEPYCAT)/bind/ByteArrayBinding.java \
 	$(JAVA_SLEEPYCAT)/bind/EntityBinding.java \
 	$(JAVA_SLEEPYCAT)/bind/EntryBinding.java \
@@ -1152,7 +1158,6 @@ $(libj_demojarfile): $(libj_jarfile) $(JAVA_DEMOSRCS)
 db_gui:	$(libj_guijarfile)
 
 $(libj_guijarfile): $(libj_jarfile) $(JAVA_GUISRCS)
-	@if test $(JDK_VERSION) -gt 7 ; then \
 		test -d $(JAVA_GUICLASSTOP) || \
 	   	    ($(MKDIR) -p $(JAVA_GUICLASSTOP) && \
 			$(CHMOD) $(dmode) $(JAVA_GUICLASSTOP)) ; \
@@ -1161,24 +1166,18 @@ $(libj_guijarfile): $(libj_jarfile) $(JAVA_GUISRCS)
 		$(CP) $(JAVA_GUIDATAFXML) $(JAVA_GUICLASSTOP)/db_gui/datapage ; \
 		$(CP) $(JAVA_GUIDBFXML) $(JAVA_GUICLASSTOP)/db_gui/dbpage ; \
 		$(CP) $(JAVA_GUIDATAFXML) $(JAVA_GUICLASSTOP)/db_gui/envpage ; \
-		cd $(JAVA_GUICLASSTOP) && $(JAR) cf ../$(libj_guijarfile) . ; \
-	else \
-		echo "$(libj_guijarfile) requires JDK 8 or above." ; \
-	fi
+		cd $(JAVA_GUICLASSTOP) && $(JAR) cf ../$(libj_guijarfile) . ; 
 
 db_guitest: $(libj_guitestjarfile)
 
 $(libj_guitestjarfile): $(libj_guijarfile) $(JAVA_GUITESTSRCS)
-	@if test $(JDK_VERSION) -gt 7 ; then \
 		test -d $(JAVA_GUITESTCLASSTOP) || \
 	   	    ($(MKDIR) -p $(JAVA_GUITESTCLASSTOP) && \
 			$(CHMOD) $(dmode) $(JAVA_GUICLASSTOP)) ; \
 		@JAVAC@ -classpath "$(libj_jarfile):$(libj_guijarfile):"$(GUITESTCLASSPATH) -d $(JAVA_GUITESTCLASSTOP) \
 			$(JAVACFLAGS) $(JAVA_GUITESTSRCS) ; \
-		cd $(JAVA_GUITESTCLASSTOP) && $(JAR) cf ../$(libj_guitestjarfile) . ; \
-	else \
-		echo "$(libj_guitestjarfile) requires JDK 8 or above." ; \
-	fi
+		cd $(JAVA_GUITESTCLASSTOP) && $(JAR) cf ../$(libj_guitestjarfile) . ;
+
 
 ##################################################
 # Utilities

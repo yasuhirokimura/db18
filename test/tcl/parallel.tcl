@@ -1,4 +1,4 @@
-# Copyright (c) 1996, 2018 Oracle and/or its affiliates.  All rights reserved.
+# Copyright (c) 1996, 2019 Oracle and/or its affiliates.  All rights reserved.
 #
 # See the file LICENSE for license information.
 #
@@ -97,6 +97,7 @@ proc init_runqueue { {dbdir RUNQUEUE} nitems list} {
 proc run_parallel { nprocs {list run_all} {nitems ALL} } {
 	global num_serial
 	global num_parallel
+	global ssl_test_enabled
 
 	# Forcibly remove stuff from prior runs, if it's still there.
 	fileremove -f ./RUNQUEUE
@@ -129,7 +130,9 @@ proc run_parallel { nprocs {list run_all} {nitems ALL} } {
 	for { set i 1 } { $i <= $nprocs } { incr i } {
 		set ret [catch {
 			set p [exec $tclsh_path << \
-			    "source $test_path/test.tcl; run_queue $i \
+			    "global ssl_test_enabled; \
+			    set ssl_test_enabled $ssl_test_enabled; \
+			    source $test_path/test.tcl; run_queue $i \
 			    $basename.$i $queuedir parallel $num_parallel" &]
 			lappend pidlist $p
 			set f [open $testdir/begin.$p w]

@@ -705,6 +705,7 @@
 #endif
 #define	__clock_set_expires __clock_set_expires@DB_VERSION_UNIQUE_NAME@
 #define	__clock_expired __clock_expired@DB_VERSION_UNIQUE_NAME@
+#define	__clock_get_start __clock_get_start@DB_VERSION_UNIQUE_NAME@
 #define	__crypto_region_init __crypto_region_init@DB_VERSION_UNIQUE_NAME@
 #define	__db_isbigendian __db_isbigendian@DB_VERSION_UNIQUE_NAME@
 #define	__db_byteorder __db_byteorder@DB_VERSION_UNIQUE_NAME@
@@ -745,6 +746,7 @@
 #define	__db_check_txn __db_check_txn@DB_VERSION_UNIQUE_NAME@
 #define	__db_txn_deadlock_err __db_txn_deadlock_err@DB_VERSION_UNIQUE_NAME@
 #define	__db_not_txn_env __db_not_txn_env@DB_VERSION_UNIQUE_NAME@
+#define	__db_not_log_env __db_not_log_env@DB_VERSION_UNIQUE_NAME@
 #define	__db_rec_toobig __db_rec_toobig@DB_VERSION_UNIQUE_NAME@
 #define	__db_rec_repl __db_rec_repl@DB_VERSION_UNIQUE_NAME@
 #define	__dbc_logging __dbc_logging@DB_VERSION_UNIQUE_NAME@
@@ -1694,6 +1696,7 @@
 #define	__memp_sync_int __memp_sync_int@DB_VERSION_UNIQUE_NAME@
 #define	__memp_mf_sync __memp_mf_sync@DB_VERSION_UNIQUE_NAME@
 #define	__memp_purge_dead_files __memp_purge_dead_files@DB_VERSION_UNIQUE_NAME@
+#define	__memp_purge_dead __memp_purge_dead@DB_VERSION_UNIQUE_NAME@
 #define	__memp_trickle_pp __memp_trickle_pp@DB_VERSION_UNIQUE_NAME@
 #define	__mutex_alloc __mutex_alloc@DB_VERSION_UNIQUE_NAME@
 #define	__mutex_alloc_int __mutex_alloc_int@DB_VERSION_UNIQUE_NAME@

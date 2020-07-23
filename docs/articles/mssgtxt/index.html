@@ -11,7 +11,7 @@
   <body>
     <div xmlns="" class="navheader">
       <div class="libver">
-        <p>Library Version 18.1.25</p>
+        <p>Library Version 18.1.32</p>
       </div>
       <table width="100%" summary="Navigation header">
         <tr>
@@ -24,16 +24,16 @@
       <div class="titlepage">
         <div>
           <div>
-            <h1 class="title"><a id="idm140576494264320"></a>Berkeley DB Message Reference Guide</h1>
+            <h1 class="title"><a id="idm140331387028176"></a>Berkeley DB Message Reference Guide</h1>
           </div>
           <div>
             <div class="legalnotice">
-              <a id="idm140576494346528"></a>
+              <a id="idm140331387008896"></a>
               <p class="legalnotice-title">
                 <b>Legal Notice</b>
               </p>
               <p>
-            Copyright © 2002 - 2018 Oracle and/or its affiliates. All rights
+            Copyright © 2002 - 2019 Oracle and/or its affiliates. All rights
             reserved.
         </p>
               <p>
@@ -125,7 +125,7 @@
             </div>
           </div>
           <div>
-            <p class="pubdate">29-May-2018</p>
+            <p class="pubdate">19-Feb-2019</p>
           </div>
         </div>
         <hr />
@@ -500,7 +500,7 @@
               </tr>
               <tr>
                 <td>1017</td>
-                <td>compression support has not been compiled in</td>
+                <td>%s: compression support has not been compiled in</td>
               </tr>
               <tr>
                 <td>1018</td>
@@ -1161,6 +1161,18 @@
               <tr>
                 <td>5508</td>
                 <td>Page %lu: invalid offset.</td>
+              </tr>
+              <tr>
+                <td>5537</td>
+                <td>Invalid record length of 0.</td>
+              </tr>
+              <tr>
+                <td>5538</td>
+                <td>Invalid first_recno value of 0.</td>
+              </tr>
+              <tr>
+                <td>5539</td>
+                <td>Invalid cur_recno value of 0.</td>
               </tr>
             </tbody>
           </table>
@@ -1976,6 +1988,10 @@
                 <td>5511</td>
                 <td>fileops: flock %s %s %s returns %s</td>
               </tr>
+              <tr>
+                <td>5536</td>
+                <td>DB environment not configured for logging</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -2623,7 +2639,7 @@
               </tr>
               <tr>
                 <td>0667</td>
-                <td>Attempt to convert an encrypted database without providing a password.</td>
+                <td>Attempt to upgrade an encrypted database without providing a password.</td>
               </tr>
               <tr>
                 <td>0669</td>
@@ -3009,6 +3025,14 @@
                 <td>5502</td>
                 <td>Page %lu: invalid pgno found in hash bucket</td>
               </tr>
+              <tr>
+                <td>5540</td>
+                <td>%s: Invalid database type for a partitioned database.</td>
+              </tr>
+              <tr>
+                <td>5541</td>
+                <td>DB_BACKUP_DEEP_COPY and external file support cannot be used together.</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -3124,11 +3148,11 @@
               </tr>
               <tr>
                 <td>1526</td>
-                <td>%lu: adding self to registry</td>
+                <td>adding self to registry: "%s"</td>
               </tr>
               <tr>
                 <td>1527</td>
-                <td>%02u: EMPTY</td>
+                <td>%02u: EMPTY (%s)</td>
               </tr>
               <tr>
                 <td>1528</td>

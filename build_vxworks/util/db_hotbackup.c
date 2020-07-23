@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 1996, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 1996, 2019 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *
@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char copyright[] =
-    "Copyright (c) 1996, 2018 Oracle and/or its affiliates.  All rights reserved.\n";
+    "Copyright (c) 1996, 2019 Oracle and/or its affiliates.  All rights reserved.\n";
 #endif
 
 enum which_open { OPEN_ORIGINAL, OPEN_HOT_BACKUP };
@@ -88,7 +88,7 @@ db_hotbackup_main(argc, argv)
 	time_t now;
 	DB_ENV *dbenv;
 	u_int data_cnt, data_next;
-	int ch, checkpoint, db_config, debug, env_copy, exitval;
+	int ch, checkpoint, db_config, debug, deep_copy, env_copy, exitval;
 	int ret, update, verbose;
 	char *backup_dir, **data_dir;
 	char *home, *home_blob_dir, *log_dir, *msgpfx, *passwd;
@@ -117,15 +117,18 @@ db_hotbackup_main(argc, argv)
 	env_copy = 1;
 
 	checkpoint = db_config = data_cnt = data_next = debug = 
-	    exitval = update = verbose = 0;
+	    deep_copy = exitval = update = verbose = 0;
 	data_dir = NULL;
 	backup_dir = home = home_blob_dir = msgpfx = passwd = NULL;
 	log_dir = NULL;
 	__db_getopt_reset = 1;
-	while ((ch = getopt(argc, argv, "b:cDd:Fgh:i:l:m:P:uVv")) != EOF)
+	while ((ch = getopt(argc, argv, "b:CcDd:Fgh:i:l:m:P:uVv")) != EOF)
 		switch (ch) {
 		case 'b':
 			backup_dir = optarg;
+			break;
+		case 'C':
+			deep_copy = 1;
 			break;
 		case 'c':
 			checkpoint = 1;
@@ -325,6 +328,8 @@ db_hotbackup_main(argc, argv)
 	flags = DB_CREATE | DB_BACKUP_CLEAN | DB_BACKUP_FILES;
 	if (update)
 		LF_SET(DB_BACKUP_UPDATE);
+	if (deep_copy) 
+		LF_SET(DB_BACKUP_DEEP_COPY);
 
 	if (!db_config)
 		LF_SET(DB_BACKUP_SINGLE_DIR);
@@ -582,7 +587,7 @@ db_hotbackup_env_init(dbenvp, home, blob_dir, log_dirp, data_dirp, msgpfx, passw
 int
 db_hotbackup_usage()
 {
-	(void)fprintf(stderr, "usage: %s [-cDuVv]\n\t%s\n", progname,
+	(void)fprintf(stderr, "usage: %s [-cCDuVv]\n\t%s\n", progname,
 	    "[-d data_dir ...] [-i home_blob_dir] [-h home] [-l log_dir] "
 	    "[-m msg_pfx] [-P password] -b backup_dir");
 	return (EXIT_FAILURE);

@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 1996, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 1996, 2019 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *
@@ -2048,10 +2048,22 @@ __part_verify(dbp, vdp, fname, handle, callback, flags)
 			goto err;
 	}
 #ifdef HAVE_HASH
-	else if ((ret = __ham_open(dbp, ip,
-	    NULL, fname, PGNO_BASE_MD, flags)) != 0)
-		goto err;
+	else if (dbp->type == DB_HASH) {
+		if ((ret = __ham_open(dbp, ip,
+	    	    NULL, fname, PGNO_BASE_MD, flags)) != 0)
+			goto err;
+	}
 #endif
+	/*
+	 * Only the BTree and Hash access methods are supported for
+	 * partitioned databases.
+	 */
+	else {
+		__db_errx(env, DB_STR_A("5540",
+			"%s: Invalid database type for a partitioned database."
+			, "%s"), fname);
+		return (DB_VERIFY_BAD);
+	}
 
 	/*
 	 * Initalize partition db handles and get the names. Set DB_RDWRMASTER

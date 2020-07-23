@@ -1,4 +1,4 @@
-# Copyright (c) 2017, 2018 Oracle and/or its affiliates.  All rights reserved.
+# Copyright (c) 2017, 2019 Oracle and/or its affiliates.  All rights reserved.
 #
 # See the file LICENSE for license information.
 #
@@ -136,6 +136,8 @@ proc env031_body { { pagesize 512 } { duplicate 0 } { overflow 0 } } {
 	# -h home: Specify a home directory for the database environment.
 	# -s database: Display page size recommendation for the specified
 	# database.
+	# -S o: Verify database with flag DB_NOORDERCHK specified.
+	# -S v: Verify database with flag 0 specified.
 	# -v verbose: Display verbose information.
 	#
 	set binname db_tuner
@@ -153,12 +155,18 @@ proc env031_body { { pagesize 512 } { duplicate 0 } { overflow 0 } } {
 		    duplicate: $duplicate, \
 		    overflow: $overflow, \
 		    verbose: $verbose."
-		env031_execmd "$binname $tunargs $std_redirect"
+		puts "\t\tEnv031.a:\
+		    Verify database (skip btree) before performing db_tuner."
+		env031_execmd "$binname $tunargs -S o $std_redirect"
+		
+		puts "\t\tEnv031.b:\
+		    Verify database before performing db_tuner."
+		env031_execmd "$binname $tunargs -S v $std_redirect"
 	}
 }
 proc env031_execmd { execmd } {
 	source ./include.tcl
-	puts "\t\tEnv031:$util_path/$execmd"
+	puts "\t\t\tEnv031:$util_path/$execmd"
 	if { [catch {eval exec $util_path/$execmd} result] } {
 		puts "FAIL: got $result while executing '$execmd'"
 	}

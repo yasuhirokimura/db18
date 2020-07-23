@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2000, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 2000, 2019 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *
@@ -896,6 +896,8 @@ err1:			if (ret == 0)
 			 */
 			if (ret == DB_VERIFY_BAD)
 				isbad = 1;
+			else if (ret == DB_VERIFY_FATAL)
+				return (DB_VERIFY_FATAL);
 			else if (ret != 0)
 				goto err;
 

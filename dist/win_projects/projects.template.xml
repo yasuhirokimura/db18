@@ -2100,6 +2100,17 @@ echo Java example build finished</command>
       <file name="examples/sql/c/ex_sql_load.c"/>
     </files>
   </project>
+  <project name="bdb_sqlthreadtest" guid="fb1d496c-ad03-11e8-a5b8-0800279fde64">
+    <type>app</type>
+    <configuration></configuration>
+    <depends>db_sql</depends>
+    <references>db_sql</references>
+    <include type="ref">db_sql</include>
+    <files>
+      <file name="src\clib\getopt.c"/>
+      <file name="test\sql\bdb_sqlthreadtest.c"/>
+    </files>
+  </project>
   <project name="ex_sql_multi_thread" guid="67965313-072A-11DF-8A39-0800200C9A66">
     <type>app</type>
     <configuration></configuration>

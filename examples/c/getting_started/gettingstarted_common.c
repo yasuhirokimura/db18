@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2004, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 2004, 2019 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file EXAMPLES-LICENSE for license information.
  */
@@ -18,8 +18,8 @@ get_item_name(DB *dbp, const DBT *pkey, const DBT *pdata, DBT *skey)
 {
     u_int offset;
 
-    dbp = NULL;                         /* Not needed, unused. */
-    pkey = NULL;
+    COMPQUIET(dbp, NULL);                         /* Not needed, unused. */
+    COMPQUIET(pkey, NULL);
 
     /*
      * First, obtain the buffer location where we placed the

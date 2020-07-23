@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 1997, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 1997, 2019 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file EXAMPLES-LICENSE for license information.
  *
@@ -732,6 +732,6 @@ void
 onint(signo)
 	int signo;
 {
-	signo = 0;		/* Quiet compiler. */
+	COMPQUIET(signo, 0);		/* Quiet compiler. */
 	Quit = 1;
 }

@@ -4,6 +4,7 @@ db_env_create
 DbEnv.backup
 	# Remove all files from the target directory tree first.
 	DB_BACKUP_CLEAN
+	DB_BACKUP_DEEP_COPY		# Copy databases in sub-directories.
 	DB_BACKUP_FILES			# Copy plain files too.
 	DB_BACKUP_NO_LOGS		# Don't backup log files.
 	DB_BACKUP_SINGLE_DIR		# All files go to a single directory.

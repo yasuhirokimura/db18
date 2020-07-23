@@ -1,5 +1,5 @@
 /*
-** Copyright (c) 2018 Oracle and/or its affiliates. All rights
+** Copyright (c) 2018, 2019 Oracle and/or its affiliates. All rights
 ** reserved.
 ** 
 ** This copyrighted work includes portions of SQLite received 
@@ -8519,7 +8519,7 @@ SQLITE_API LPWSTR sqlite3_win32_utf8_to_unicode(const char *zText);
 
 /******** Begin file sqlite3rtree.h *********/
 /*
-** Copyright (c) 2018 Oracle and/or its affiliates. All rights
+** Copyright (c) 2018, 2019 Oracle and/or its affiliates. All rights
 ** reserved.
 ** 
 ** This copyrighted work includes portions of SQLite received 
@@ -9934,7 +9934,7 @@ int sqlite3changegroup_output_strm(sqlite3_changegroup*,
 /******** End of sqlite3session.h *********/
 /******** Begin file fts5.h *********/
 /*
-** Copyright (c) 2018 Oracle and/or its affiliates. All rights
+** Copyright (c) 2018, 2019 Oracle and/or its affiliates. All rights
 ** reserved.
 ** 
 ** This copyrighted work includes portions of SQLite received 
@@ -10522,7 +10522,7 @@ struct fts5_api {
 /******** End of fts5.h *********/
 /******** Begin file sqlite3userauth.h *********/
 /*
-** Copyright (c) 2018 Oracle and/or its affiliates. All rights
+** Copyright (c) 2018, 2019 Oracle and/or its affiliates. All rights
 ** reserved.
 ** 
 ** This copyrighted work includes portions of SQLite received 

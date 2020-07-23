@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2010, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 2010, 2019 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *
@@ -182,7 +182,7 @@ __heap_vrfy(dbp, vdp, h, pgno, flags)
 		    "Page %lu: invalid page type %u for %s database",
 		    "%lu %u %s"), (u_long)pgno, TYPE(h),
 		    __db_dbtype_to_string(dbp->type)));
-		return (DB_VERIFY_BAD);
+		return (DB_VERIFY_FATAL);
 	}
 
 	if ((ret = __db_vrfy_datapage(dbp, vdp, h, pgno, flags)) != 0)

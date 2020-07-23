@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 1996, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 1996, 2019 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *
@@ -137,7 +137,7 @@ __db_upgrade(dbp, fname, flags)
 	const char *fname;
 	u_int32_t flags;
 {
-	DBMETA *meta;
+	DBMETA *meta, *dbmeta;
 	DB_FH *fhp;
 	ENV *env;
 	size_t n;
@@ -171,9 +171,10 @@ __db_upgrade(dbp, fname, flags)
 	if ((ret = __os_read(env, fhp, mbuf, sizeof(mbuf), &n)) != 0)
 		goto err;
 
-	switch (((DBMETA *)mbuf)->magic) {
+	dbmeta = (DBMETA *)mbuf;
+	switch (dbmeta->magic) {
 	case DB_BTREEMAGIC:
-		switch (((DBMETA *)mbuf)->version) {
+		switch (dbmeta->version) {
 		case 6:
 			/*
 			 * Before V7 not all pages had page types, so we do the
@@ -236,13 +237,13 @@ __db_upgrade(dbp, fname, flags)
 		default:
 			__db_errx(env, DB_STR_A("1009",
 			    "%s: unsupported btree version: %lu", "%s %lu"),
-			    real_name, (u_long)((DBMETA *)mbuf)->version);
+			    real_name, (u_long)dbmeta->version);
 			ret = DB_OLD_VERSION;
 			goto err;
 		}
 		break;
 	case DB_HASHMAGIC:
-		switch (((DBMETA *)mbuf)->version) {
+		switch (dbmeta->version) {
 		case 4:
 		case 5:
 			/*
@@ -392,13 +393,13 @@ __db_upgrade(dbp, fname, flags)
 		default:
 			__db_errx(env, DB_STR_A("1126",
 			    "%s: unsupported hash version: %lu", "%s %lu"),
-			    real_name, (u_long)((DBMETA *)mbuf)->version);
+			    real_name, (u_long)dbmeta->version);
 			ret = DB_OLD_VERSION;
 			goto err;
 		}
 		break;
 	case DB_HEAPMAGIC:
-		switch (((DBMETA *)mbuf)->version) {
+		switch (dbmeta->version) {
 		case 1:
 			/*
 			 * Various blob ids and size use two u_int32_t values
@@ -433,13 +434,13 @@ __db_upgrade(dbp, fname, flags)
 			__db_errx(env, DB_STR_A("0776",
 			    "%s: unsupported heap version: %lu",
 			    "%s %lu"), real_name,
-			    (u_long)((DBMETA *)mbuf)->version);
+			    (u_long)dbmeta->version);
 			ret = DB_OLD_VERSION;
 			goto err;
 		}
 		break;
 	case DB_QAMMAGIC:
-		switch (((DBMETA *)mbuf)->version) {
+		switch (dbmeta->version) {
 		case 1:
 			/*
 			 * If we're in a Queue database, the only page that
@@ -464,14 +465,14 @@ __db_upgrade(dbp, fname, flags)
 			__db_errx(env, DB_STR_A("0669",
 			    "%s: unsupported queue version: %lu",
 			    "%s %lu"), real_name,
-			    (u_long)((DBMETA *)mbuf)->version);
+			    (u_long)dbmeta->version);
 			ret = DB_OLD_VERSION;
 			goto err;
 		}
 		break;
 	default:
-		M_32_SWAP(((DBMETA *)mbuf)->magic);
-		switch (((DBMETA *)mbuf)->magic) {
+		M_32_SWAP(dbmeta->magic);
+		switch (dbmeta->magic) {
 		case DB_BTREEMAGIC:
 		case DB_HASHMAGIC:
 		case DB_HEAPMAGIC:

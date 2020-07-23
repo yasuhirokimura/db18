@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 1996, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 1996, 2019 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *
@@ -41,6 +41,9 @@ __log_verify_pp(dbenv, lvconfig)
 	lsnrg = ret = timerg = 0;
 	phome = NULL;
 
+	if (!LOGGING_ON(dbenv->env)) {
+		return (__db_not_log_env(dbenv->env));
+	}
 	if (lvconfig == NULL) {
 		ret = USR_ERR(dbenv->env, EINVAL);
 		__db_errx(dbenv->env, DB_STR("2584",

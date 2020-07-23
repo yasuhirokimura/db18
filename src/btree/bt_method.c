@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 1999, 2018 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 1999, 2019 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *
@@ -161,11 +161,13 @@ __bam_set_flags(dbp, flagsp)
 	DB *dbp;
 	u_int32_t *flagsp;
 {
-	BTREE *t;
 	u_int32_t flags;
 
+#ifdef HAVE_COMPRESSION
+	BTREE *t;
 	t = dbp->bt_internal;
-
+#endif
+	
 	flags = *flagsp;
 	if (LF_ISSET(DB_DUP | DB_DUPSORT | DB_RECNUM | DB_REVSPLITOFF))
 		DB_ILLEGAL_AFTER_OPEN(dbp, "DB->set_flags");

@@ -14,7 +14,7 @@
   <body>
     <div xmlns="" class="navheader">
       <div class="libver">
-        <p>Library Version 18.1.25</p>
+        <p>Library Version 18.1.32</p>
       </div>
       <table width="100%" summary="Navigation header">
         <tr>
@@ -38,7 +38,7 @@
           </div>
         </div>
       </div>
-      <pre class="programlisting">db_hotbackup [-cDEguVv] [-d data_dir ...] [-h home] 
+      <pre class="programlisting">db_hotbackup [-CcDEguVv] [-d data_dir ...] [-h home] 
         [-l log_dir] [-P password] -b backup_dir  </pre>
       <p>
          The <span class="command"><strong>db_hotbackup</strong></span> utility creates "hot backup" or "hot failover"
@@ -171,6 +171,22 @@
               <p>
                     This option cannot be used when backing up
                     environments replicated using the base replication API.
+                </p>
+            </div>
+          </li>
+          <li>
+            <p>
+                 <span class="bold"><strong>-C</strong></span>
+            </p>
+            <p>
+                Copy databases in any sub-directories in the environment home and
+	        any supplied data directories.
+            </p>
+            <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
+              <h3 class="title">Note</h3>
+              <p>
+                  This option cannot be used in environments or with databases that
+		  support external files.
                 </p>
             </div>
           </li>
@@ -368,7 +384,7 @@
         <div class="titlepage">
           <div>
             <div>
-              <h3 class="title"><a id="idm140315882624320"></a>Environment Variables</h3>
+              <h3 class="title"><a id="idm140176762545520"></a>Environment Variables</h3>
             </div>
           </div>
         </div>
@@ -376,7 +392,7 @@
           <div class="titlepage">
             <div>
               <div>
-                <h4 class="title"><a id="idm140315882637904"></a>DB_HOME</h4>
+                <h4 class="title"><a id="idm140176762509792"></a>DB_HOME</h4>
               </div>
             </div>
           </div>
