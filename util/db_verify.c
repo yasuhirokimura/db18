@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 1996, 2019 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 1996, 2020 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *
@@ -12,7 +12,7 @@
 
 #ifndef lint
 static const char copyright[] =
-    "Copyright (c) 1996, 2019 Oracle and/or its affiliates.  All rights reserved.\n";
+    "Copyright (c) 1996, 2020 Oracle and/or its affiliates.  All rights reserved.\n";
 #endif
 
 int main __P((int, char *[]));
@@ -107,6 +107,9 @@ main(argc, argv)
 	if (!quiet) {
 		dbenv->set_errfile(dbenv, stderr);
 		dbenv->set_errpfx(dbenv, progname);
+	} else {
+		dbenv->set_errfile(dbenv, NULL);
+		dbenv->set_msgfile(dbenv, NULL);
 	}
 
 	if (blob_dir != NULL &&

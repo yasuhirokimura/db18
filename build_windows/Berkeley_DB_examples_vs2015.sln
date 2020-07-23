@@ -5,12 +5,6 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_access", "VS15\ex_access.vcxproj", "{75DF98AA-25DF-4183-A022-024CF918480D}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_ad_data", "VS15\ex_ad_data.vcxproj", "{284AD08E-DFB8-11E4-8961-0021F6F182E4}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_ad_event", "VS15\ex_ad_event.vcxproj", "{60F1147A-DFB8-11E4-8961-0021F6F182E4}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_advertising", "VS15\ex_advertising.vcxproj", "{811AB226-DFB6-11E4-8961-0021F6F182E4}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_btrec", "VS15\ex_btrec.vcxproj", "{5DD66F4B-EB4A-4453-BC31-3FF7B2240634}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_bulk", "VS15\ex_bulk.vcxproj", "{ABE1ACF6-C375-44AB-A628-80B4A94580FD}"
@@ -55,33 +49,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_sequence", "VS15\ex_sequ
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_servicemgmt", "VS15\ex_servicemgmt.vcxproj", "{57AE2406-DFBA-11E4-8961-0021F6F182E4}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_sql_binding", "VS15\ex_sql_binding.vcxproj", "{67965310-072A-11DF-8A39-0800200C9A66}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_sql_fts3", "VS15\ex_sql_fts3.vcxproj", "{FF1CAD6A-1EDF-4AD3-9A4F-8C76B7214A13}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_sql_index", "VS15\ex_sql_index.vcxproj", "{67965311-072A-11DF-8A39-0800200C9A66}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_sql_load", "VS15\ex_sql_load.vcxproj", "{67965312-072A-11DF-8A39-0800200C9A66}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_sql_multi_thread", "VS15\ex_sql_multi_thread.vcxproj", "{67965313-072A-11DF-8A39-0800200C9A66}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_sql_rtree", "VS15\ex_sql_rtree.vcxproj", "{9CBFC33A-027B-4A58-8059-2E3C29489E64}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_sql_query", "VS15\ex_sql_query.vcxproj", "{67965314-072A-11DF-8A39-0800200C9A66}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_sql_savepoint", "VS15\ex_sql_savepoint.vcxproj", "{67965315-072A-11DF-8A39-0800200C9A66}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_sql_statement", "VS15\ex_sql_statement.vcxproj", "{67965316-072A-11DF-8A39-0800200C9A66}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_sql_transaction", "VS15\ex_sql_transaction.vcxproj", "{67965317-072A-11DF-8A39-0800200C9A66}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_stream", "VS15\ex_stream.vcxproj", "{8F3D872E-C7F5-4C0D-9974-0F0CB9DAA527}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_toll_booth", "VS15\ex_toll_booth.vcxproj", "{FE8AD5D4-DFBF-11E4-8961-0021F6F182E4}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_toll_data", "VS15\ex_toll_data.vcxproj", "{0B797462-DFC0-11E4-8961-0021F6F182E4}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_toll_event", "VS15\ex_toll_event.vcxproj", "{15F97A72-DFC0-11E4-8961-0021F6F182E4}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_tpcb", "VS15\ex_tpcb.vcxproj", "{8632C58A-CC00-4116-B61A-CBE0F2C11CAD}"
 EndProject
@@ -100,8 +68,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "excxx_bulk", "VS15\excxx_bulk.vcxproj", "{5AEBE8D9-4B6D-46AA-B810-30CD7E6BBD5F}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "excxx_env", "VS15\excxx_env.vcxproj", "{E790C029-341D-489B-B987-D35947AD78C3}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "excxx_env_sql", "VS15\excxx_env_sql.vcxproj", "{E790C029-341D-489B-B987-D35947AD78C4}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "excxx_example_database_load", "VS15\excxx_example_database_load.vcxproj", "{A4F42222-FE02-431D-A046-B049E516DEB7}"
 EndProject

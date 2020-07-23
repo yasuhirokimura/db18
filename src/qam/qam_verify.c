@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 1999, 2019 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 1999, 2020 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *
@@ -507,7 +507,12 @@ __qam_vrfy_walkqueue(dbp, vdp, handle, callback, flags)
 	/* Verify/salvage each page. */
 	if ((ret = __db_cursor(dbp, vdp->thread_info, NULL, &dbc, 0)) != 0)
 		return (ret);
-begin:	for (; i <= stop; i++) {
+begin:	if ((stop - i) > 100000) {
+		EPRINT((env, DB_STR_A("5551",
+"Warning, many possible extends files (%lu), will take a long time to verify",
+          "%lu"), (u_long)(stop - i)));
+	}
+	for (; i <= stop; i++) {
 		if (i == UINT32_MAX)
 			break;
 		/*

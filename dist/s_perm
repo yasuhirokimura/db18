@@ -21,14 +21,6 @@ run()
 find $d -type d | xargs chmod 775
 find $d -type f | xargs chmod 644
 
-# Assign execute permissions where necessary.
-# ODBC and JDBC are only present in release packages.
-if [ -d $d/lang/sql/odbc ]; then
-	chmod 755 $d/lang/sql/odbc/conf*
-fi
-if [ -d $d/lang/sql/jdbc ]; then
-	chmod 755 $d/lang/sql/jdbc/conf*
-fi
 chmod 755 $d/dist/s_*
 
 run dist/config.guess 755
@@ -38,7 +30,6 @@ run dist/install-sh 755
 run dist/vx_buildcd 755
 run lang/perl/BerkeleyDB/dbinfo 755
 run lang/perl/BerkeleyDB/mkpod 755
-run lang/sql/sqlite/configure 755
 
 for i in `cd $d && find build_vxworks \
     -name '*.wsp' -o -name '*.cdf' -o -name '*.wpj'`; do

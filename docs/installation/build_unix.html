@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Chapter 6.  Building Berkeley DB for UNIX/POSIX</title>
+    <title>Chapter 5.  Building Berkeley DB for UNIX/POSIX</title>
     <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
     <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
     <link rel="start" href="index.html" title="Berkeley DB Installation and Build Guide" />
@@ -14,11 +14,11 @@
   <body>
     <div xmlns="" class="navheader">
       <div class="libver">
-        <p>Library Version 18.1.32</p>
+        <p>Library Version 18.1.40</p>
       </div>
       <table width="100%" summary="Navigation header">
         <tr>
-          <th colspan="3" align="center">Chapter 6.  Building Berkeley DB for UNIX/POSIX
+          <th colspan="3" align="center">Chapter 5.  Building Berkeley DB for UNIX/POSIX
     </th>
         </tr>
         <tr>
@@ -33,7 +33,7 @@
       <div class="titlepage">
         <div>
           <div>
-            <h2 class="title"><a id="build_unix"></a>Chapter 6.  Building Berkeley DB for UNIX/POSIX
+            <h2 class="title"><a id="build_unix"></a>Chapter 5.  Building Berkeley DB for UNIX/POSIX
     </h2>
           </div>
         </div>
@@ -48,60 +48,11 @@
               <a href="build_unix.html#build_unix_intro">Building for UNIX/POSIX</a>
             </span>
           </dt>
-          <dd>
-            <dl>
-              <dt>
-                <span class="sect2">
-                  <a href="build_unix.html#build_unix_sqlinter">Building the Berkeley DB SQL Interface</a>
-                </span>
-              </dt>
-            </dl>
-          </dd>
           <dt>
             <span class="sect1">
               <a href="build_unix_conf.html">Configuring Berkeley DB</a>
             </span>
           </dt>
-          <dt>
-            <span class="sect1">
-              <a href="build_unix_sql.html">Configuring the SQL
-        Interface</a>
-            </span>
-          </dt>
-          <dd>
-            <dl>
-              <dt>
-                <span class="sect2">
-                  <a href="build_unix_sql.html#config_sql">Changing Compile Options</a>
-                </span>
-              </dt>
-              <dt>
-                <span class="sect2">
-                  <a href="build_unix_sql.html#idm140089946614272">Enabling Extensions</a>
-                </span>
-              </dt>
-              <dt>
-                <span class="sect2">
-                  <a href="build_unix_sql.html#build_unix_jdbc">Building the JDBC Driver</a>
-                </span>
-              </dt>
-              <dt>
-                <span class="sect2">
-                  <a href="build_unix_sql.html#idm140089946567168">Using the JDBC Driver</a>
-                </span>
-              </dt>
-              <dt>
-                <span class="sect2">
-                  <a href="build_unix_sql.html#idm140089946520816">Building the ODBC Driver</a>
-                </span>
-              </dt>
-              <dt>
-                <span class="sect2">
-                  <a href="build_unix_sql.html#bfile">Building the BFILE extension</a>
-                </span>
-              </dt>
-            </dl>
-          </dd>
           <dt>
             <span class="sect1">
               <a href="build_unix_small.html">Building a small memory footprint library</a>
@@ -136,15 +87,6 @@
         UNIX</a>
             </span>
           </dt>
-          <dd>
-            <dl>
-              <dt>
-                <span class="sect2">
-                  <a href="build_unix_test.html#build_unix_test_sql">Building the SQL Test Suite on Unix</a>
-                </span>
-              </dt>
-            </dl>
-          </dd>
           <dt>
             <span class="sect1">
               <a href="build_unix_notes.html">Architecture independent FAQ</a>
@@ -210,19 +152,10 @@
             </div>
           </div>
         </div>
-        <div class="toc">
-          <dl>
-            <dt>
-              <span class="sect2">
-                <a href="build_unix.html#build_unix_sqlinter">Building the Berkeley DB SQL Interface</a>
-              </span>
-            </dt>
-          </dl>
-        </div>
         <p>
         The Berkeley DB distribution builds up to six separate
         libraries: the base C API Berkeley DB library and the optional
-        C++, Java, Tcl, SQL, and JDBC API libraries. For portability
+        C++, Java, and Tcl. For portability
         reasons, each library is standalone and contains the full
         Berkeley DB support necessary to build applications; that is,
         the C++ API Berkeley DB library does not require any other
@@ -279,50 +212,6 @@ make</pre>
         build_unix directory, and then configure and build in that
         directory as described previously.
     </p>
-        <div class="sect2" lang="en" xml:lang="en">
-          <div class="titlepage">
-            <div>
-              <div>
-                <h3 class="title"><a id="build_unix_sqlinter"></a>Building the Berkeley DB SQL Interface</h3>
-              </div>
-            </div>
-          </div>
-          <p> 
-            To perform a standard UNIX build of the Berkeley DB SQL
-            interface, go to the <span class="bold"><strong>build_unix</strong></span>
-            directory and then enter the following two commands:
-        </p>
-          <pre class="programlisting">../dist/configure --enable-sql
-make </pre>
-          <p> 
-            This creates a library, <code class="literal">libdb_sql</code>,
-            and a command line tool, <code class="literal">dbsql</code>. You can
-            create and manipulate SQL databases using the
-            <code class="literal">dbsql</code> shell.
-        </p>
-          <p>
-            You can optionally provide the
-            <code class="literal">--enable-sql_compat</code> argument to the
-            <code class="literal">configure</code> script. In addition to
-            creating <code class="literal">libdb_sql</code> and
-            <code class="literal">dbsql</code> this causes a thin wrapper
-            library called <code class="literal">libsqlite3</code> and a command
-            line tool called <code class="literal">sqlite3</code> to be built.
-            This library can be used as a drop-in replacement for
-            SQLite. The <code class="literal">sqlite3</code> command line tool
-            is identical to the <code class="literal">dbsql</code> executable
-            but is named so that existing scripts for SQLite can
-            easily work with Berkeley DB.
-        </p>
-          <pre class="programlisting">
-../dist/configure --enable-sql_compat
-make </pre>
-          <p>
-            There are several arguments you can specify when
-            configuring the Berkeley DB SQL Interface. See <a class="xref" href="build_unix_sql.html" title="Configuring the SQL Interface">Configuring the SQL
-        Interface</a> for more information.
-        </p>
-        </div>
       </div>
     </div>
     <div class="navfooter">

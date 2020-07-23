@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 1996, 2019 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 1996, 2020 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *
@@ -587,6 +587,16 @@ __partition_chk_meta(dbp, ip, txn, flags)
 		ret = USR_ERR(env, EINVAL);
 		__db_errx(env, DB_STR("0656",
 		    "Number of partitions does not match."));
+		goto err;
+	}
+	/*
+	 * There is no limit on the number of partitions, but I cannot imagine a real
+	 * database having more than 10000.
+	 */
+	if (meta->nparts > 10000) {
+		ret = USR_ERR(env, EINVAL);
+		__db_errx(env, DB_STR_A("5553",
+			"Too many partitions %lu", "%lu"), meta->nparts);
 		goto err;
 	}
 
@@ -2106,10 +2116,13 @@ __part_verify(dbp, vdp, fname, handle, callback, flags)
 			memcpy(rp->data, key->data, key->size);
 			B_TSET(rp->type, B_KEYDATA);
 		}
-vrfy:		if ((t_ret = __db_verify(*pdbp, ip, (*pdbp)->fname,
-		    NULL, handle, callback,
-		    lp, rp, flags | DB_VERIFY_PARTITION)) != 0 && ret == 0)
-			ret = t_ret;
+vrfy:   if ((t_ret = __db_verify(*pdbp, ip, (*pdbp)->fname,
+	      NULL, handle, callback,
+	      lp, rp, flags | DB_VERIFY_PARTITION)) != 0 && ret == 0) {
+	        ret = t_ret;
+            if (ret == ENOENT)
+                break;
+	    }
 	}
 
 err:	if (lp != NULL)

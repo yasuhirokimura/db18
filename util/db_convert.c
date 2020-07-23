@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2016, 2019 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 2016, 2020 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *
@@ -12,7 +12,7 @@
 
 #ifndef lint
 static const char copyright[] =
-    "Copyright (c) 2016, 2019 Oracle and/or its affiliates.  All rights reserved.\n";
+    "Copyright (c) 2016, 2020 Oracle and/or its affiliates.  All rights reserved.\n";
 #endif
 
 int main __P((int, char *[]));

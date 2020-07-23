@@ -38,12 +38,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "db_verify", "VS12\db_verify
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_access", "VS12\ex_access.vcxproj", "{75DF98AA-25DF-4183-A022-024CF918480D}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_advertising", "VS12\ex_advertising.vcxproj", "{811AB226-DFB6-11E4-8961-0021F6F182E4}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_ad_data", "VS12\ex_ad_data.vcxproj", "{284AD08E-DFB8-11E4-8961-0021F6F182E4}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_ad_event", "VS12\ex_ad_event.vcxproj", "{60F1147A-DFB8-11E4-8961-0021F6F182E4}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_bulk", "VS12\ex_bulk.vcxproj", "{ABE1ACF6-C375-44AB-A628-80B4A94580FD}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_btrec", "VS12\ex_btrec.vcxproj", "{5DD66F4B-EB4A-4453-BC31-3FF7B2240634}"
@@ -86,39 +80,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_rep_mgr", "VS12\ex_rep_m
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_sequence", "VS12\ex_sequence.vcxproj", "{4E43DB5C-D050-4003-A4FF-6294D9F498DD}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_toll_booth", "VS12\ex_toll_booth.vcxproj", "{FE8AD5D4-DFBF-11E4-8961-0021F6F182E4}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_toll_data", "VS12\ex_toll_data.vcxproj", "{0B797462-DFC0-11E4-8961-0021F6F182E4}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_toll_event", "VS12\ex_toll_event.vcxproj", "{15F97A72-DFC0-11E4-8961-0021F6F182E4}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_tpcb", "VS12\ex_tpcb.vcxproj", "{8632C58A-CC00-4116-B61A-CBE0F2C11CAD}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_txnguide", "VS12\ex_txnguide.vcxproj", "{80B961C4-D1D6-48E9-8965-CFCE69BF85E2}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_txnguide_inmem", "VS12\ex_txnguide_inmem.vcxproj", "{925BD215-6680-4FFF-8345-0741E4627B1F}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_sql_binding", "VS12\ex_sql_binding.vcxproj", "{67965310-072A-11DF-8A39-0800200C9A66}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_sql_fts3", "VS12\ex_sql_fts3.vcxproj", "{FF1CAD6A-1EDF-4AD3-9A4F-8C76B7214A13}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_sql_index", "VS12\ex_sql_index.vcxproj", "{67965311-072A-11DF-8A39-0800200C9A66}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_sql_load", "VS12\ex_sql_load.vcxproj", "{67965312-072A-11DF-8A39-0800200C9A66}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bdb_sqlthreadtest", "VS12\bdb_sqlthreadtest.vcxproj", "{fb1d496c-ad03-11e8-a5b8-0800279fde64}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_sql_multi_thread", "VS12\ex_sql_multi_thread.vcxproj", "{67965313-072A-11DF-8A39-0800200C9A66}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_sql_query", "VS12\ex_sql_query.vcxproj", "{67965314-072A-11DF-8A39-0800200C9A66}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_sql_rtree", "VS12\ex_sql_rtree.vcxproj", "{9CBFC33A-027B-4A58-8059-2E3C29489E64}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_sql_savepoint", "VS12\ex_sql_savepoint.vcxproj", "{67965315-072A-11DF-8A39-0800200C9A66}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_sql_statement", "VS12\ex_sql_statement.vcxproj", "{67965316-072A-11DF-8A39-0800200C9A66}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_sql_transaction", "VS12\ex_sql_transaction.vcxproj", "{67965317-072A-11DF-8A39-0800200C9A66}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "example_database_load", "VS12\example_database_load.vcxproj", "{56C01012-66D7-4295-B382-F3815366DB26}"
 EndProject
@@ -131,8 +97,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "excxx_bulk", "VS12\excxx_bulk.vcxproj", "{5AEBE8D9-4B6D-46AA-B810-30CD7E6BBD5F}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "excxx_env", "VS12\excxx_env.vcxproj", "{E790C029-341D-489B-B987-D35947AD78C3}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "excxx_env_sql", "VS12\excxx_env_sql.vcxproj", "{E790C029-341D-489B-B987-D35947AD78C4}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "excxx_example_database_load", "VS12\excxx_example_database_load.vcxproj", "{A4F42222-FE02-431D-A046-B049E516DEB7}"
 EndProject
@@ -172,21 +136,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "exstl_txnguide", "VS12\exst
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ex_stream", "VS12\ex_stream.vcxproj", "{8F3D872E-C7F5-4C0D-9974-0F0CB9DAA527}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "db_sql", "VS12\db_sql.vcxproj", "{4B65E600-064A-11DF-8A39-0800200C9A66}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "db_small", "VS12\db_small.vcxproj", "{B7124116-7A43-4BF1-B727-4C8ADE40FF7F}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "db_log_verify", "VS12\db_log_verify.vcxproj", "{872961A3-877A-4B53-886D-F1FB65073608}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "db_sql_jdbc", "VS12\db_sql_jdbc.vcxproj", "{433EAC30-1CEA-11DF-8A39-0800200C9A66}"
-	ProjectSection(ProjectDependencies) = postProject
-		{4B65E600-064A-11DF-8A39-0800200C9A66} = {4B65E600-064A-11DF-8A39-0800200C9A66}
-		{FD045D60-ABAD-4A6C-9794-9BFB085FC3E7} = {FD045D60-ABAD-4A6C-9794-9BFB085FC3E7}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "db_sql_testfixture", "VS12\db_sql_testfixture.vcxproj", "{5D79B660-0667-11DF-8A39-0800200C9A66}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "db_sql_shell", "VS12\db_sql_shell.vcxproj", "{A5DB89F0-06E5-11DF-8A39-0800200C9A66}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

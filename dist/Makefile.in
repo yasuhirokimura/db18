@@ -329,36 +329,6 @@ JAVA_OBJS=\
 	db_java_wrap@o@
 
 JAVA_DBSRCS=\
-	$(JAVA_SLEEPYCAT)/asm/AnnotationVisitor.java \
-	$(JAVA_SLEEPYCAT)/asm/AnnotationWriter.java \
-	$(JAVA_SLEEPYCAT)/asm/Attribute.java \
-	$(JAVA_SLEEPYCAT)/asm/ByteVector.java \
-	$(JAVA_SLEEPYCAT)/asm/ClassReader.java \
-	$(JAVA_SLEEPYCAT)/asm/ClassTooLargeException.java \
-	$(JAVA_SLEEPYCAT)/asm/ClassVisitor.java \
-	$(JAVA_SLEEPYCAT)/asm/ClassWriter.java \
-	$(JAVA_SLEEPYCAT)/asm/ConstantDynamic.java \
-	$(JAVA_SLEEPYCAT)/asm/Constants.java \
-	$(JAVA_SLEEPYCAT)/asm/Context.java \
-	$(JAVA_SLEEPYCAT)/asm/CurrentFrame.java \
-	$(JAVA_SLEEPYCAT)/asm/Edge.java \
-	$(JAVA_SLEEPYCAT)/asm/FieldVisitor.java \
-	$(JAVA_SLEEPYCAT)/asm/FieldWriter.java \
-	$(JAVA_SLEEPYCAT)/asm/Frame.java \
-	$(JAVA_SLEEPYCAT)/asm/Handle.java \
-	$(JAVA_SLEEPYCAT)/asm/Handler.java \
-	$(JAVA_SLEEPYCAT)/asm/Label.java \
-	$(JAVA_SLEEPYCAT)/asm/MethodTooLargeException.java \
-	$(JAVA_SLEEPYCAT)/asm/MethodVisitor.java \
-	$(JAVA_SLEEPYCAT)/asm/MethodWriter.java \
-	$(JAVA_SLEEPYCAT)/asm/ModuleVisitor.java \
-	$(JAVA_SLEEPYCAT)/asm/ModuleWriter.java \
-	$(JAVA_SLEEPYCAT)/asm/Opcodes.java \
-	$(JAVA_SLEEPYCAT)/asm/Symbol.java \
-	$(JAVA_SLEEPYCAT)/asm/SymbolTable.java \
-	$(JAVA_SLEEPYCAT)/asm/Type.java \
-	$(JAVA_SLEEPYCAT)/asm/TypePath.java \
-	$(JAVA_SLEEPYCAT)/asm/TypeReference.java \
 	$(JAVA_SLEEPYCAT)/bind/ByteArrayBinding.java \
 	$(JAVA_SLEEPYCAT)/bind/EntityBinding.java \
 	$(JAVA_SLEEPYCAT)/bind/EntryBinding.java \
@@ -646,8 +616,6 @@ JAVA_DBSRCS=\
 	$(JAVA_SLEEPYCAT)/persist/impl/VisitedObjects.java \
 	$(JAVA_SLEEPYCAT)/persist/impl/WidenerInput.java \
 	$(JAVA_SLEEPYCAT)/persist/model/AnnotationModel.java \
-	$(JAVA_SLEEPYCAT)/persist/model/BytecodeEnhancer.java \
-	$(JAVA_SLEEPYCAT)/persist/model/ClassEnhancer.java \
 	$(JAVA_SLEEPYCAT)/persist/model/ClassMetadata.java \
 	$(JAVA_SLEEPYCAT)/persist/model/DeleteAction.java \
 	$(JAVA_SLEEPYCAT)/persist/model/Entity.java \
@@ -907,26 +875,6 @@ JAVA_GUITESTSRCS=\
 	$(JAVA_GUITESTDIR)/DisplayAccessPageTask.java \
 	$(JAVA_GUITESTDIR)/EnvironmentPageTests.java
 
-THRIFT_JARDIR=$(langdir)/thrift/jars
-THRIFT_JARS=$(THRIFT_JARDIR)/log4j-core.jar \
-	$(THRIFT_JARDIR)/log4j-api.jar \
-	$(THRIFT_JARDIR)/log4j-1.2-api.jar \
-	$(THRIFT_JARDIR)/log4j-slf4j-impl.jar \
-	$(THRIFT_JARDIR)/slf4j-api.jar \
-	$(THRIFT_JARDIR)/libthrift.jar \
-	$(THRIFT_JARDIR)/db_thrift_interface.jar \
-	$(THRIFT_JARDIR)/db_thrift_server.jar \
-	$(THRIFT_JARDIR)/db_thrift_client.jar
-libthrift=log4j-core.jar \
-	log4j-api.jar \
-	log4j-1.2-api.jar \
-	log4j-slf4j-impl.jar \
-	slf4j-api.jar \
-	libthrift.jar \
-	db_thrift_interface.jar \
-	db_thrift_server.jar \
-	db_thrift_client.jar
-
 SQL_OBJS=\
 	 sqlite3@o@ $(C_OBJS)
 
@@ -1130,8 +1078,6 @@ $(libj_jarfile): $(JAVA_DBSRCS)
 	   ($(MKDIR) -p $(JAVA_CLASSTOP) && \
 	   $(CHMOD) $(dmode) $(JAVA_CLASSTOP))
 	$(JAVAC) -d $(JAVA_CLASSTOP) $(JAVACFLAGS) $(JAVA_DBSRCS)
-	$(JAVA) -classpath $(JAVA_CLASSTOP) \
-	    com.sleepycat.persist.model.ClassEnhancer $(JAVA_CLASSTOP)
 	cd $(JAVA_CLASSTOP) && \
 	     $(JAR) cfm ../$(libj_jarfile) ../$(JAVA_MANIFEST) ./com/sleepycat
 
@@ -1350,24 +1296,6 @@ uninstall_utilities:
 		test -f $$i.exe && i=$$i.exe; \
 		$(RM) $$i; \
 	done)
-
-install_server:
-	@echo "Installing DB Thrift Server: ..."
-	@for f in $(THRIFT_JARS); do \
-	    basef=`echo $$f | $(SED) 's,.*/,,'` ; \
-	    $(RM) $(DESTDIR)$(libdir)/$$basef ; \
-	    $(CP) -p $$f $(DESTDIR)$(libdir) ; \
-	    $(CHMOD) $(fmode) $(DESTDIR)$(libdir)/$$basef ; \
-	done
-	$(CP) -f $(langdir)/thrift/bin/start_server.sh $(DESTDIR)$(bindir)
-	$(CP) -f $(langdir)/thrift/server/bdb.properties $(DESTDIR)$(bindir)
-	$(CP) -f $(langdir)/thrift/server/log4j2.xml $(DESTDIR)$(bindir)
-	$(CHMOD) $(emode) $(DESTDIR)$(bindir)/start_server.sh
-	$(CHMOD) 400 $(DESTDIR)$(bindir)/bdb.properties
-
-uninstall_server:
-	@cd $(DESTDIR)$(libdir) && $(RM) $(libthrift)
-	@cd $(DESTDIR)$(bindir) && $(RM) start_server.sh bdb.properties log4j2.xml
 
 # We install csharp docs even on UNIX so we don't have a 
 # broken link on the landing page.

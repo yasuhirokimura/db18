@@ -3,26 +3,26 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Berkeley DB Library Version 18.1.32 Change Log</title>
+    <title>Berkeley DB Library Version 18.1.40 Change Log</title>
     <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
     <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
     <link rel="start" href="index.html" title="Berkeley DB Installation and Build Guide" />
-    <link rel="up" href="upgrade_181_toc.html" title="Chapter 9.  Upgrading Berkeley DB 12.1.6.2 applications to Berkeley DB 18.1" />
+    <link rel="up" href="upgrade_181_toc.html" title="Chapter 8.  Upgrading Berkeley DB 12.1.6.2 applications to Berkeley DB 18.1" />
     <link rel="prev" href="remove_support.html" title="Removed QNX Support" />
-    <link rel="next" href="upgrade_62_toc.html" title="Chapter 10.  Upgrading Berkeley DB 12.1.6.1 applications to Berkeley DB 12.1.6.2" />
+    <link rel="next" href="upgrade_62_toc.html" title="Chapter 9.  Upgrading Berkeley DB 12.1.6.1 applications to Berkeley DB 12.1.6.2" />
   </head>
   <body>
     <div xmlns="" class="navheader">
       <div class="libver">
-        <p>Library Version 18.1.32</p>
+        <p>Library Version 18.1.40</p>
       </div>
       <table width="100%" summary="Navigation header">
         <tr>
-          <th colspan="3" align="center">Berkeley DB Library Version 18.1.32 Change Log</th>
+          <th colspan="3" align="center">Berkeley DB Library Version 18.1.40 Change Log</th>
         </tr>
         <tr>
           <td width="20%" align="left"><a accesskey="p" href="remove_support.html">Prev</a> </td>
-          <th width="60%" align="center">Chapter 9.  Upgrading Berkeley DB 12.1.6.2 applications to 
+          <th width="60%" align="center">Chapter 8.  Upgrading Berkeley DB 12.1.6.2 applications to 
 Berkeley DB 18.1 </th>
           <td width="20%" align="right"> <a accesskey="n" href="upgrade_62_toc.html">Next</a></td>
         </tr>
@@ -33,7 +33,7 @@ Berkeley DB 18.1 </th>
       <div class="titlepage">
         <div>
           <div>
-            <h2 class="title" style="clear: both"><a id="changelog_18_1"></a>Berkeley DB Library Version 18.1.32 Change Log</h2>
+            <h2 class="title" style="clear: both"><a id="changelog_18_1"></a>Berkeley DB Library Version 18.1.40 Change Log</h2>
           </div>
         </div>
       </div>
@@ -41,135 +41,188 @@ Berkeley DB 18.1 </th>
         <dl>
           <dt>
             <span class="sect2">
-              <a href="changelog_18_1.html#idm140089945952032">Changes between version 18.1.25 and version 18.1.32</a>
+              <a href="changelog_18_1.html#idm140649573000992">Changes between version 18.1.32 and version 18.1.40</a>
             </span>
           </dt>
           <dt>
             <span class="sect2">
-              <a href="changelog_18_1.html#idm140089945950304">Database or Log File On-Disk Format Changes</a>
+              <a href="changelog_18_1.html#idm140649573044560">Changes between version 18.1.25 and version 18.1.32</a>
             </span>
           </dt>
           <dt>
             <span class="sect2">
-              <a href="changelog_18_1.html#idm140089946008064">New Features/Improvements</a>
+              <a href="changelog_18_1.html#idm140649573043792">Database or Log File On-Disk Format Changes</a>
             </span>
           </dt>
           <dt>
             <span class="sect2">
-              <a href="changelog_18_1.html#idm140089945948320">Database Environment Changes</a>
+              <a href="changelog_18_1.html#idm140649572997344">New Features/Improvements</a>
             </span>
           </dt>
           <dt>
             <span class="sect2">
-              <a href="changelog_18_1.html#idm140089945982240">Concurrent Data Store Changes</a>
+              <a href="changelog_18_1.html#idm140649572996576">Database Environment Changes</a>
             </span>
           </dt>
           <dt>
             <span class="sect2">
-              <a href="changelog_18_1.html#idm140089945950176">Access Method Changes</a>
+              <a href="changelog_18_1.html#idm140649573004240">Concurrent Data Store Changes</a>
             </span>
           </dt>
           <dt>
             <span class="sect2">
-              <a href="changelog_18_1.html#idm140089945947504">API Changes</a>
+              <a href="changelog_18_1.html#idm140649572978608">Access Method Changes</a>
             </span>
           </dt>
           <dt>
             <span class="sect2">
-              <a href="changelog_18_1.html#idm140089945920800">SQL-specific API Changes</a>
+              <a href="changelog_18_1.html#idm140649572969760">API Changes</a>
             </span>
           </dt>
           <dt>
             <span class="sect2">
-              <a href="changelog_18_1.html#idm140089945919360">Tcl-specific API Changes</a>
+              <a href="changelog_18_1.html#idm140649572965584">SQL-specific API Changes</a>
             </span>
           </dt>
           <dt>
             <span class="sect2">
-              <a href="changelog_18_1.html#idm140089945917200">Java-specific API Changes</a>
+              <a href="changelog_18_1.html#idm140649572964144">Tcl-specific API Changes</a>
             </span>
           </dt>
           <dt>
             <span class="sect2">
-              <a href="changelog_18_1.html#idm140089945921296">C#-specific API Changes</a>
+              <a href="changelog_18_1.html#idm140649572961792">Java-specific API Changes</a>
             </span>
           </dt>
           <dt>
             <span class="sect2">
-              <a href="changelog_18_1.html#idm140089945910112">Replication Changes</a>
+              <a href="changelog_18_1.html#idm140649572960352">C#-specific API Changes</a>
             </span>
           </dt>
           <dt>
             <span class="sect2">
-              <a href="changelog_18_1.html#idm140089945908672">Locking Subsystem Changes</a>
+              <a href="changelog_18_1.html#idm140649572954576">Replication Changes</a>
             </span>
           </dt>
           <dt>
             <span class="sect2">
-              <a href="changelog_18_1.html#idm140089945905072">Logging Subsystem Changes</a>
+              <a href="changelog_18_1.html#idm140649572953136">Locking Subsystem Changes</a>
             </span>
           </dt>
           <dt>
             <span class="sect2">
-              <a href="changelog_18_1.html#idm140089945944368">Memory Pool Subsystem Changes</a>
+              <a href="changelog_18_1.html#idm140649572949536">Logging Subsystem Changes</a>
             </span>
           </dt>
           <dt>
             <span class="sect2">
-              <a href="changelog_18_1.html#idm140089945979488">Mutex Subsystem Changes</a>
+              <a href="changelog_18_1.html#idm140649572947984">Memory Pool Subsystem Changes</a>
             </span>
           </dt>
           <dt>
             <span class="sect2">
-              <a href="changelog_18_1.html#idm140089945905392">Transaction Subsystem Changes</a>
+              <a href="changelog_18_1.html#idm140649572944560">Mutex Subsystem Changes</a>
             </span>
           </dt>
           <dt>
             <span class="sect2">
-              <a href="changelog_18_1.html#idm140089945896784">Test Suite Changes</a>
+              <a href="changelog_18_1.html#idm140649572942960">Transaction Subsystem Changes</a>
             </span>
           </dt>
           <dt>
             <span class="sect2">
-              <a href="changelog_18_1.html#idm140089945895040">Utility Changes</a>
+              <a href="changelog_18_1.html#idm140649572941520">Test Suite Changes</a>
             </span>
           </dt>
           <dt>
             <span class="sect2">
-              <a href="changelog_18_1.html#idm140089945892368">Configuration, Documentation, Sample Apps, Portability and Build Changes</a>
+              <a href="changelog_18_1.html#idm140649572939888">Utility Changes</a>
             </span>
           </dt>
           <dt>
             <span class="sect2">
-              <a href="changelog_18_1.html#idm140089945889600">Example Changes</a>
+              <a href="changelog_18_1.html#idm140649572937216">Configuration, Documentation, Sample Apps, Portability and Build Changes</a>
             </span>
           </dt>
           <dt>
             <span class="sect2">
-              <a href="changelog_18_1.html#idm140089945888160">Miscellaneous Bug Fixes</a>
+              <a href="changelog_18_1.html#idm140649572934640">Example Changes</a>
             </span>
           </dt>
           <dt>
             <span class="sect2">
-              <a href="changelog_18_1.html#idm140089945935728">Deprecated Features</a>
+              <a href="changelog_18_1.html#idm140649572933200">Miscellaneous Bug Fixes</a>
             </span>
           </dt>
           <dt>
             <span class="sect2">
-              <a href="changelog_18_1.html#idm140089945873488">Known Bugs</a>
+              <a href="changelog_18_1.html#idm140649572929792">Deprecated Features</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="changelog_18_1.html#idm140649572918608">Known Bugs</a>
             </span>
           </dt>
         </dl>
       </div>
       <p>
         This is the changelog for Berkeley DB
-	Release 18.1 (library version 18.1.32).
+	Release 18.1 (library version 18.1.40).
     </p>
       <div class="sect2" lang="en" xml:lang="en">
         <div class="titlepage">
           <div>
             <div>
-              <h3 class="title"><a id="idm140089945952032"></a>Changes between version 18.1.25 and version 18.1.32</h3>
+              <h3 class="title"><a id="idm140649573000992"></a>Changes between version 18.1.32 and version 18.1.40</h3>
+            </div>
+          </div>
+        </div>
+        <div class="orderedlist">
+          <ol type="1">
+            <li>
+              <p>
+ Removed ASM library source files, ASM license from LICENSE file, and DPL test targets with ASM optimizations.
+            </p>
+            </li>
+            <li>
+              <p>
+ The Berkeley DB client-server architecture is no longer supported. If you require the Berkeley DB client-server architecture you must use Berkeley DB 18.1.32 or earlier.
+            </p>
+            </li>
+            <li>
+              <p>
+ The SQL API is no longer supported.  If you require SQL support you must use Berkeley DB 18.1.32 or earlier.
+            </p>
+            </li>
+            <li>
+              <p>
+ Android is no longer supported.  If you require Android support you must use Berkeley DB 18.1.32 or earlier.
+            </p>
+            </li>
+            <li>
+              <p>
+ Fixed several possible crashes when running db_verify on a corrupted database. [#27864]
+            </p>
+            </li>
+            <li>
+              <p>
+ Fixed several possible hangs when running db_verify on a corrupted database. [#27864]
+            </p>
+            </li>
+            <li>
+              <p>
+ Added a warning message when attempting to verify a queue database which has many extent files.  Verification will take a long time if there are many extent files. [#27864]
+            </p>
+            </li>
+          </ol>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idm140649573044560"></a>Changes between version 18.1.25 and version 18.1.32</h3>
             </div>
           </div>
         </div>
@@ -262,7 +315,7 @@ Berkeley DB 18.1 </th>
         <div class="titlepage">
           <div>
             <div>
-              <h3 class="title"><a id="idm140089945950304"></a>Database or Log File On-Disk Format Changes</h3>
+              <h3 class="title"><a id="idm140649573043792"></a>Database or Log File On-Disk Format Changes</h3>
             </div>
           </div>
         </div>
@@ -285,7 +338,7 @@ Berkeley DB 18.1 </th>
         <div class="titlepage">
           <div>
             <div>
-              <h3 class="title"><a id="idm140089946008064"></a>New Features/Improvements</h3>
+              <h3 class="title"><a id="idm140649572997344"></a>New Features/Improvements</h3>
             </div>
           </div>
         </div>
@@ -358,7 +411,7 @@ Berkeley DB 18.1 </th>
         <div class="titlepage">
           <div>
             <div>
-              <h3 class="title"><a id="idm140089945948320"></a>Database Environment Changes</h3>
+              <h3 class="title"><a id="idm140649572996576"></a>Database Environment Changes</h3>
             </div>
           </div>
         </div>
@@ -401,7 +454,7 @@ Berkeley DB 18.1 </th>
         <div class="titlepage">
           <div>
             <div>
-              <h3 class="title"><a id="idm140089945982240"></a>Concurrent Data Store Changes</h3>
+              <h3 class="title"><a id="idm140649573004240"></a>Concurrent Data Store Changes</h3>
             </div>
           </div>
         </div>
@@ -419,7 +472,7 @@ Berkeley DB 18.1 </th>
         <div class="titlepage">
           <div>
             <div>
-              <h3 class="title"><a id="idm140089945950176"></a>Access Method Changes</h3>
+              <h3 class="title"><a id="idm140649572978608"></a>Access Method Changes</h3>
             </div>
           </div>
         </div>
@@ -442,7 +495,7 @@ Berkeley DB 18.1 </th>
         <div class="titlepage">
           <div>
             <div>
-              <h3 class="title"><a id="idm140089945947504"></a>API Changes</h3>
+              <h3 class="title"><a id="idm140649572969760"></a>API Changes</h3>
             </div>
           </div>
         </div>
@@ -460,7 +513,7 @@ Berkeley DB 18.1 </th>
         <div class="titlepage">
           <div>
             <div>
-              <h3 class="title"><a id="idm140089945920800"></a>SQL-specific API Changes</h3>
+              <h3 class="title"><a id="idm140649572965584"></a>SQL-specific API Changes</h3>
             </div>
           </div>
         </div>
@@ -513,7 +566,7 @@ Berkeley DB 18.1 </th>
         <div class="titlepage">
           <div>
             <div>
-              <h3 class="title"><a id="idm140089945919360"></a>Tcl-specific API Changes</h3>
+              <h3 class="title"><a id="idm140649572964144"></a>Tcl-specific API Changes</h3>
             </div>
           </div>
         </div>
@@ -531,7 +584,7 @@ Berkeley DB 18.1 </th>
         <div class="titlepage">
           <div>
             <div>
-              <h3 class="title"><a id="idm140089945917200"></a>Java-specific API Changes</h3>
+              <h3 class="title"><a id="idm140649572961792"></a>Java-specific API Changes</h3>
             </div>
           </div>
         </div>
@@ -569,7 +622,7 @@ Berkeley DB 18.1 </th>
         <div class="titlepage">
           <div>
             <div>
-              <h3 class="title"><a id="idm140089945921296"></a>C#-specific API Changes</h3>
+              <h3 class="title"><a id="idm140649572960352"></a>C#-specific API Changes</h3>
             </div>
           </div>
         </div>
@@ -587,7 +640,7 @@ Berkeley DB 18.1 </th>
         <div class="titlepage">
           <div>
             <div>
-              <h3 class="title"><a id="idm140089945910112"></a>Replication Changes</h3>
+              <h3 class="title"><a id="idm140649572954576"></a>Replication Changes</h3>
             </div>
           </div>
         </div>
@@ -620,7 +673,7 @@ Berkeley DB 18.1 </th>
         <div class="titlepage">
           <div>
             <div>
-              <h3 class="title"><a id="idm140089945908672"></a>Locking Subsystem Changes</h3>
+              <h3 class="title"><a id="idm140649572953136"></a>Locking Subsystem Changes</h3>
             </div>
           </div>
         </div>
@@ -638,7 +691,7 @@ Berkeley DB 18.1 </th>
         <div class="titlepage">
           <div>
             <div>
-              <h3 class="title"><a id="idm140089945905072"></a>Logging Subsystem Changes</h3>
+              <h3 class="title"><a id="idm140649572949536"></a>Logging Subsystem Changes</h3>
             </div>
           </div>
         </div>
@@ -656,7 +709,7 @@ Berkeley DB 18.1 </th>
         <div class="titlepage">
           <div>
             <div>
-              <h3 class="title"><a id="idm140089945944368"></a>Memory Pool Subsystem Changes</h3>
+              <h3 class="title"><a id="idm140649572947984"></a>Memory Pool Subsystem Changes</h3>
             </div>
           </div>
         </div>
@@ -674,7 +727,7 @@ Berkeley DB 18.1 </th>
         <div class="titlepage">
           <div>
             <div>
-              <h3 class="title"><a id="idm140089945979488"></a>Mutex Subsystem Changes</h3>
+              <h3 class="title"><a id="idm140649572944560"></a>Mutex Subsystem Changes</h3>
             </div>
           </div>
         </div>
@@ -702,7 +755,7 @@ Berkeley DB 18.1 </th>
         <div class="titlepage">
           <div>
             <div>
-              <h3 class="title"><a id="idm140089945905392"></a>Transaction Subsystem Changes</h3>
+              <h3 class="title"><a id="idm140649572942960"></a>Transaction Subsystem Changes</h3>
             </div>
           </div>
         </div>
@@ -725,7 +778,7 @@ Berkeley DB 18.1 </th>
         <div class="titlepage">
           <div>
             <div>
-              <h3 class="title"><a id="idm140089945896784"></a>Test Suite Changes</h3>
+              <h3 class="title"><a id="idm140649572941520"></a>Test Suite Changes</h3>
             </div>
           </div>
         </div>
@@ -743,7 +796,7 @@ Berkeley DB 18.1 </th>
         <div class="titlepage">
           <div>
             <div>
-              <h3 class="title"><a id="idm140089945895040"></a>Utility Changes</h3>
+              <h3 class="title"><a id="idm140649572939888"></a>Utility Changes</h3>
             </div>
           </div>
         </div>
@@ -776,7 +829,7 @@ Berkeley DB 18.1 </th>
         <div class="titlepage">
           <div>
             <div>
-              <h3 class="title"><a id="idm140089945892368"></a>Configuration, Documentation, Sample Apps, Portability and Build Changes</h3>
+              <h3 class="title"><a id="idm140649572937216"></a>Configuration, Documentation, Sample Apps, Portability and Build Changes</h3>
             </div>
           </div>
         </div>
@@ -894,7 +947,7 @@ Berkeley DB 18.1 </th>
         <div class="titlepage">
           <div>
             <div>
-              <h3 class="title"><a id="idm140089945889600"></a>Example Changes</h3>
+              <h3 class="title"><a id="idm140649572934640"></a>Example Changes</h3>
             </div>
           </div>
         </div>
@@ -912,7 +965,7 @@ Berkeley DB 18.1 </th>
         <div class="titlepage">
           <div>
             <div>
-              <h3 class="title"><a id="idm140089945888160"></a>Miscellaneous Bug Fixes</h3>
+              <h3 class="title"><a id="idm140649572933200"></a>Miscellaneous Bug Fixes</h3>
             </div>
           </div>
         </div>
@@ -965,7 +1018,7 @@ Berkeley DB 18.1 </th>
         <div class="titlepage">
           <div>
             <div>
-              <h3 class="title"><a id="idm140089945935728"></a>Deprecated Features</h3>
+              <h3 class="title"><a id="idm140649572929792"></a>Deprecated Features</h3>
             </div>
           </div>
         </div>
@@ -988,7 +1041,7 @@ Berkeley DB 18.1 </th>
         <div class="titlepage">
           <div>
             <div>
-              <h3 class="title"><a id="idm140089945873488"></a>Known Bugs</h3>
+              <h3 class="title"><a id="idm140649572918608"></a>Known Bugs</h3>
             </div>
           </div>
         </div>
@@ -1033,7 +1086,7 @@ Berkeley DB 18.1 </th>
           <td width="20%" align="center">
             <a accesskey="h" href="index.html">Home</a>
           </td>
-          <td width="40%" align="right" valign="top"> Chapter 10.  Upgrading Berkeley DB 12.1.6.1 applications to Berkeley DB 12.1.6.2 </td>
+          <td width="40%" align="right" valign="top"> Chapter 9.  Upgrading Berkeley DB 12.1.6.1 applications to Berkeley DB 12.1.6.2 </td>
         </tr>
       </table>
     </div>

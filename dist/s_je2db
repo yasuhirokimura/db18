@@ -28,7 +28,7 @@ JEEXAMPLES="$JEDIR/examples"
 DBSRC="$DBDIR/lang/java/src"
 DBTEST="$DBDIR/test/java/compat/src"
 DBEXAMPLES="$DBDIR/examples/java/src"
-DIRMATCH="com/sleepycat/\(\(asm\)\|\(bind\)\|\(collections\)\|\(persist\)\|\(util\)\)/"
+DIRMATCH="com/sleepycat/\(\(bind\)\|\(collections\)\|\(persist\)\|\(util\)\)/"
 EXAMPLESMATCH="^\./\(\(collections\)\|\(persist\)\)"
 
 # mkdirs <src> <dst> <pattern>
@@ -53,7 +53,7 @@ E4='s/LockConflictException/DeadlockException/g'
 E5='s/$Id:.*\$/$Id$/'
 E6='s/TransactionGettingStarted/gsg_txn\/JAVA/'
 E7='s/OperationFailureException/DatabaseException/g'
-EXCLUDESRC="\(\(ClassEnhancerTask\)\|\(DeletedClassException\)\|\(EntityResult\)\|\(IncompatibleClassException\)\|\(StoreExistsException\)\|\(StoreNotFoundException\)\)"
+EXCLUDESRC="\(\(DeletedClassException\)\|\(EntityResult\)\|\(IncompatibleClassException\)\|\(StoreExistsException\)\|\(StoreNotFoundException\)\)"
 EXCLUDETESTS="\(\(ConvertAndAddTest\)\|\(DevolutionTest\)\|\(TestVersionCompatibility\)\|\(XACollectionTest\)\|\(AddNewSecKeyToAbstractClassTest\)\|\(EvolveProxyClassTest\)\|\(CreateAbstractClassData\)\|\(CreateSecDupsWithoutComparator\)\|\(CreateSecDupsWithoutComparatorEvolve\)\|\(CreateOldVersionBigDecimalDb\)\|\(CreateStringDataDB\)\|\(ProxyToSimpleTypeTest\)\|\(SecondaryDupOrderEvolveTest\)\|\(SecondaryDupOrderTest\)\|\(StringFormatCompatibilityTest\)\)"
 
 # transfer <dst> <list>

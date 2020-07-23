@@ -17,8 +17,6 @@ group_java="group.java"
 group_doc="group.doc"
 group_csharp="group.csharp"
 group_cxx="group.cxx"
-group_sql="group.sql"
-group_thrift="group.thrift"
 
 Progress()
 {
@@ -378,7 +376,6 @@ StageSourceComponents() {
     mkdir stage/build_windows/VS10
     mkdir stage/build_windows/VS12
     mkdir stage/build_windows/VS15
-    mkdir stage/sql
     mkdir stage/src
     mkdir stage/src/clib
     mkdir stage/include
@@ -456,8 +453,7 @@ StageRuntimeComponents() {
     mkdir stage/jar
 
     # start clean
-    rm -f stage/$group_runtime stage/$group_java stage/$group_csharp \
-	stage/$group_sql stage/$group_thrift
+    rm -f stage/$group_runtime stage/$group_java stage/$group_csharp
 
     for file in `find . -name "*.exe"`; do
 	cp $file stage/bin
@@ -472,13 +468,6 @@ StageRuntimeComponents() {
 	cp $file stage/jar
     done
 
-    # copy thrift files
-    for file in `find lang/thrift/jars -name "*.jar"`; do
-	cp $file stage/jar
-    done
-    cp lang/thrift/server/bdb.properties stage/bin
-    cp lang/thrift/server/log4j2.xml stage/bin
-    cp lang/thrift/bin/start_server.bat stage/bin
     chmod 400 stage/bin/bdb.properties
 
     # don't need .lib files for Java and C#, nobody
@@ -488,8 +477,6 @@ StageRuntimeComponents() {
 
     # copy library .pdb files by hand
     cp build_windows/$winbuild/Release/libdb*.pdb stage/bin
-    # SQLite header, library .pdb files
-    cp lang/sql/generated/sqlite3.h stage/include
 
     # remove example artifacts -- they are not bundled
     rm -f stage/bin/ex*.exe
@@ -515,10 +502,8 @@ StageRuntimeComponents() {
     cd stage
     # runtime
     # temp rename of dbsql to put it in SQL
-    mv bin/dbsql.exe bin/dbsql.exe.sv
     find bin -name "*.exe" >> $group_runtime
     find bin -name "libdb???.dll" >> $group_runtime
-    mv bin/dbsql.exe.sv bin/dbsql.exe
 
     # core devo
     find lib -name "libdb???.lib" >> $group_devo
@@ -537,21 +522,6 @@ StageRuntimeComponents() {
     find bin -name "libdb_csharp*" >> $group_csharp
     find bin -name "libdb_dotnet*" >> $group_csharp
 
-    # SQL (includes jdbc/odbc)
-    find bin -name "libdb_sql*" >> $group_sql
-    find bin -name "sqlite*" >> $group_sql
-    find lib -name "*sql*" >> $group_sql
-    echo "jar/jdbc.jar" >> $group_sql
-    echo "bin/dbsql.exe" >> $group_sql
-    echo "include/sqlite3.h" >> $group_sql
-
-    # Thrift
-    find jar -name "*thrift*" >> $group_thrift
-    find jar -name "log4j*" >> $group_thrift
-    echo "jar/slf4j-api.jar" >> $group_thrift
-    echo "bin/bdb.properties" >> $group_thrift
-    echo "bin/log4j2.xml" >> $group_thrift
-    echo "bin/start_server.bat" >> $group_thrift
     cd ..
 
     cd $here

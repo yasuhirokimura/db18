@@ -52,8 +52,6 @@ AC_SUBST(DB_PROTO2)
 AC_SUBST(DB_STRUCT_ALIGN8)
 AC_SUBST(DEFAULT_LIB)
 AC_SUBST(DEFAULT_LIB_CXX)
-AC_SUBST(DEFAULT_LIB_SQL)
-AC_SUBST(DEFAULT_LIB_SQLITE)
 AC_SUBST(DEFAULT_LIB_STL)
 AC_SUBST(DEFAULT_LIB_TCL)
 AC_SUBST(DTRACE)
@@ -87,8 +85,6 @@ AC_SUBST(POSTLINK)
 AC_SUBST(PRINTLOG_OBJS)
 AC_SUBST(REPLACEMENT_OBJS)
 AC_SUBST(SOFLAGS)
-AC_SUBST(SQL_FLAGS)
-AC_SUBST(SQL_LIBS)
 AC_SUBST(SWIGCFLAGS)
 AC_SUBST(TEST_LIBS)
 AC_SUBST(db_int_def)
@@ -428,14 +424,8 @@ if test "$db_cv_cxx" = "yes"; then
 	fi
 fi
 
-# Optional Thrift Server and Client Driver.
-if test "$db_cv_server" = "yes"; then
-	ADDITIONAL_INSTALL=install_server
-	ADDITIONAL_UNINSTALL=uninstall_server
-fi
-
 # Optional Java API / JDBC / GUI.
-if test "$db_cv_java" = "yes" -o "$db_cv_jdbc" = "yes" -o "$db_cv_server" = "yes" -o "$db_cv_gui" = "yes"; then
+if test "$db_cv_java" = "yes" -o "$db_cv_jdbc" = "yes" -o "$db_cv_gui" = "yes"; then
 
 	# BDB Java API requires shared libraries.
 	if test "$db_cv_java" = "yes" -a "$enable_shared" = "no"; then
@@ -522,114 +512,6 @@ fi
 if test "$db_cv_slices" = "yes"; then
 	AC_DEFINE(HAVE_SLICES)
 	AH_TEMPLATE(HAVE_SLICES, [Define to 1 if building sliced environment support.])
-fi
-
-# Optional SQL API.
-if test "$db_cv_sql" = "yes"; then
-	ADDITIONAL_INCS="$ADDITIONAL_INCS dbsql.h"
-	ADDITIONAL_PROGS="$ADDITIONAL_PROGS dbsql"
-
-	# Link against libdl, if found. It is only needed for the load
-	# extension, but shouldn't hurt.
-	AC_HAVE_LIBRARY(dl, [
-		SQL_LIBS="$SQL_LIBS -ldl"
-		LIBSQLSO_LIBS=" -ldl"
-	])
-
-	# Link against libedit or readline for command-line editing.
-	if test x"$with_editline" != xno; then
-		LIBS=""
-		AC_SEARCH_LIBS(readline, edit, [with_readline=no])
-		SQL_LIBS="$SQL_LIBS $LIBS"
-	fi
-	if test x"$with_readline" != xno; then
-		header=readline.h
-		for rl_lib in edit readline; do
-			found="yes"
-			save_LIBS=""
-			LIBS=""
-			AS_UNSET(ac_cv_search_tgetent)
-			AC_SEARCH_LIBS(tgetent,
-			    [$rl_lib ncurses curses termcap],
-			    [term_LIBS="$LIBS"], [term_LIBS=""])
-			AC_CHECK_LIB([$rl_lib], [readline],
-			    [SQL_LIBS="$SQL_LIBS -l$rl_lib $term_LIBS"],
-			    [found="no"])
-			LIBS="$save_LIBS"
-			test "$found" = "yes" && break
-		done
-
-		if test x"$rl_lib" = xedit; then
-			header="editline/readline.h"
-		fi
-
-		if test "$found" = "yes"; then
-			AC_CHECK_HEADER($header, [found="yes"], [
-				found="no"
-				if test "$cross_compiling" != yes; then
-					for dir in /usr /usr/local /usr/local/readline /usr/contrib /mingw; do
-						for subdir in include include/readline; do
-							AC_CHECK_FILE($dir/$subdir/$header, found=yes)
-							if test "$found" = "yes"; then
-								SQL_FLAGS="$SQL_FLAGS -I$dir/$subdir"
-								break
-							fi
-						done
-						test "$found" = "yes" && break
-					done
-				fi])
-		fi
-	fi
-
-	if test "$enable_shared" = "no"; then
-		DEFAULT_LIB_SQL="\$(libsql_version)"
-	else
-		DEFAULT_LIB_SQL="\$(libsqlso_target)"
-	fi
-	INSTALL_LIBS="$INSTALL_LIBS $DEFAULT_LIB_SQL"
-	if test "$enable_static" = "yes"; then
-		INSTALL_LIBS="$INSTALL_LIBS \$(libsql)"
-	fi
-
-	if test "$db_cv_test" = "yes"; then
-		subdirs="$subdirs sql"
-		ADDITIONAL_LANG="$ADDITIONAL_LANG sql-test"
-	fi
-
-	if test "$db_cv_jdbc" = "yes"; then
-		subdirs="$subdirs jdbc"
-		ADDITIONAL_LANG="$ADDITIONAL_LANG jdbc"
-	fi
-
-	if test "$db_cv_debug" = "yes"; then
-		SQL_FLAGS="$SQL_FLAGS -DSQLITE_DEBUG=1"
-	fi
-
-	if test "$db_cv_build_cryptography" = "yes"; then
-		SQL_FLAGS="$SQL_FLAGS -DSQLITE_HAS_CODEC=1"
-	fi
-fi
-
-if test "$db_cv_sql_compat" = "yes"; then
-	if test "$enable_shared" = "no"; then
-		DEFAULT_LIB_SQLITE="\$(libsqlite)"
-	else
-		DEFAULT_LIB_SQLITE="\$(libsqliteso_target)"
-	fi
-
-	ADDITIONAL_INCS="$ADDITIONAL_INCS \$(langdir)/sql/generated/sqlite3.h"
-	ADDITIONAL_PROGS="$ADDITIONAL_PROGS sqlite3"
-	INSTALL_LIBS="$INSTALL_LIBS $DEFAULT_LIB_SQLITE"
-
-	# This is different to the other libraries: we need to be very
-	# careful not to delete an existing installation of SQLite unless
-	# we are installing over it.
-	if test "$enable_shared" = "yes"; then
-		INSTALL_LIBS_EXTRA="$INSTALL_LIBS_EXTRA \$(libsqliteso)"
-	fi
-	if test "$enable_static" = "yes"; then
-		INSTALL_LIBS="$INSTALL_LIBS \$(libsqlite)"
-	fi
 fi
 
 # Optional STL API.
@@ -1245,8 +1127,3 @@ fi
 AC_CONFIG_FILES($CREATE_LIST)
 AC_OUTPUT
 
-if test "$db_cv_sql" = "yes"; then
-	# This command runs the configure script from the SQL tree.
-	AC_MSG_NOTICE([Configuring the SQL API])
-	AC_SQL_CONFIG
-fi

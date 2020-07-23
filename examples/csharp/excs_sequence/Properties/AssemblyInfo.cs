@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2009, 2019 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 2009, 2020 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file EXAMPLES-LICENSE for license information.
  *
@@ -17,7 +17,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Oracle Corporation")]
 [assembly: AssemblyProduct("excs_sequence")]
-[assembly: AssemblyCopyright("Copyright © 2008, 2019 Oracle Corporation and/or its affiliates.  All rights reserved.")]
+[assembly: AssemblyCopyright("Copyright © 2008, 2020 Oracle Corporation and/or its affiliates.  All rights reserved.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

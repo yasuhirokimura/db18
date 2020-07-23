@@ -6,7 +6,7 @@
 * use a copy if the original is to be saved.
 *
 * This XQuery script removes <ProjectReference> elements that reference
-* db.vcxproj, db_stl.vcxproj and db_sql.vcxproj because those projects do 
+* db.vcxproj and db_stl.vcxproj because those projects do 
 * not exist in the binary bundle
 *
 * Variables:
@@ -22,7 +22,7 @@ declare variable $inFile as xs:untypedAtomic external;
 (: the main query :)
 
 for $i in doc($inFile)//ItemGroup/ProjectReference[@Include="db.vcxproj" or
-@Include="db_stl.vcxproj" or @Include="db_sql.vcxproj"] return delete node $i
+@Include="db_stl.vcxproj"] return delete node $i
 
 
 

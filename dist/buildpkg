@@ -164,7 +164,6 @@ else
 
 	# Build the Java documentation.
 	cd $R/dist && sh s_javadoc
-	cd $R/dist && sh s_thrift -addons ../../../.. && sh s_javadoc_thrift
 fi
 
 cd $START_DIR
@@ -179,14 +178,6 @@ if [ $? != 0 ]; then
 fi
 
 cd $START_DIR
-SQL_EXT_DIR=$R/lang/sql/sqlite/ext
-if [ ! -d $SQL_EXT_DIR ]; then
-	mkdir -p $SQL_EXT_DIR
-fi
-if [ -d $SQL_EXT_DIR/bfile ]; then
-	rm -rf $SQL_EXT_DIR/bfile
-fi
-cp -rp $DB_ADDONS/bfile $SQL_EXT_DIR
 
 # Remove source directories we don't distribute.
 cd $R && rm -rf test/tcl/TODO test/upgrade test/scr036 test/erlang
@@ -194,16 +185,6 @@ cd $R && rm -rf test/perf test/purify test/repmgr
 cd $R && rm -rf test/server test/stl test/vxworks
 cd $R && rm -rf malware_scans
 cd $R && rm -rf static_analysis
-cd $R && rm -rf lang/sql/jdbc
-cd $R && rm -rf lang/sql/sqlite/art lang/sql/sqlite/autoconf
-cd $R && rm -rf lang/sql/sqlite/autom4te.cache lang/sql/sqlite/contrib
-cd $R && rm -rf lang/sql/sqlite/doc lang/sql/sqlite/mptest
-cd $R && rm -rf lang/sql/sqlite/test lang/sql/sqlite/tool
-cd $R && rm -rf lang/sql/sqlite/ext/fts5/test
-cd $R && rm -rf lang/sql/sqlite/ext/rbu/*.test
-cd $R && rm -rf lang/sql/sqlite/ext/rtree/*.test
-cd $R && rm -rf lang/sql/sqlite/ext/session/*.test
-cd $R && rm -rf lang/sql/sqlite/vsixtest
 cd $R && find . -name '.hg*' | xargs rm -f
 cd $R && find . -name 'tags' | xargs rm -f
 
@@ -226,10 +207,9 @@ cd $R && find . -name 'tags' | xargs rm -f
 # Remove the build directory
 ### cd $R && rm -rf build_run
 
-# Build the Java API and Thrift Server components
+# Build the Java API components
 cd $R && rm -rf build_java && mkdir build_java
 cd $R/build_java && ../dist/configure --enable-java && make -j4 >& mklog
-cd $R/dist && echo `pwd` && sh s_thrift -db $R/build_java/db.jar -addons $DB_ADDONS/..
 rm -rf $R/build_java
 
 (cd $R/dist && ./s_perm)

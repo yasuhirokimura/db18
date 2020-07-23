@@ -2869,16 +2869,6 @@ slice003
 	Test associate and secondary index handling in a sliced environment.
 
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-sql001
-	Test db_replicate using a simple SQL app.
-
-	Start db_replicate on master side and client side,
-	and do various operations using dbsql on master side.
-	After every operation, we will check the records on both sides,
-	to make sure we get same results from both sides.
-	Also try an insert operation on client side; it should fail.
-
-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 test001
 	Small keys/data
 	Put/get per key

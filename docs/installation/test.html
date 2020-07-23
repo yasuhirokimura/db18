@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Chapter 18.  Test Suite</title>
+    <title>Chapter 17.  Test Suite</title>
     <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
     <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
     <link rel="start" href="index.html" title="Berkeley DB Installation and Build Guide" />
@@ -14,11 +14,11 @@
   <body>
     <div xmlns="" class="navheader">
       <div class="libver">
-        <p>Library Version 18.1.32</p>
+        <p>Library Version 18.1.40</p>
       </div>
       <table width="100%" summary="Navigation header">
         <tr>
-          <th colspan="3" align="center">Chapter 18.  Test Suite </th>
+          <th colspan="3" align="center">Chapter 17.  Test Suite </th>
         </tr>
         <tr>
           <td width="20%" align="left"><a accesskey="p" href="changelog_4_8.html">Prev</a> </td>
@@ -32,7 +32,7 @@
       <div class="titlepage">
         <div>
           <div>
-            <h2 class="title"><a id="test"></a>Chapter 18.  Test Suite </h2>
+            <h2 class="title"><a id="test"></a>Chapter 17.  Test Suite </h2>
           </div>
         </div>
       </div>
@@ -46,20 +46,6 @@
               <a href="test.html#test_run">Running the test suite</a>
             </span>
           </dt>
-          <dd>
-            <dl>
-              <dt>
-                <span class="sect2">
-                  <a href="test.html#idm140089944528096">Running SQL Test Suite on Unix</a>
-                </span>
-              </dt>
-              <dt>
-                <span class="sect2">
-                  <a href="test.html#idm140089944541568">Running SQL Test Suite on Windows</a>
-                </span>
-              </dt>
-            </dl>
-          </dd>
           <dt>
             <span class="sect1">
               <a href="test_faq.html">Test suite FAQ</a>
@@ -74,20 +60,6 @@
               <h2 class="title" style="clear: both"><a id="test_run"></a>Running the test suite</h2>
             </div>
           </div>
-        </div>
-        <div class="toc">
-          <dl>
-            <dt>
-              <span class="sect2">
-                <a href="test.html#idm140089944528096">Running SQL Test Suite on Unix</a>
-              </span>
-            </dt>
-            <dt>
-              <span class="sect2">
-                <a href="test.html#idm140089944541568">Running SQL Test Suite on Windows</a>
-              </span>
-            </dt>
-          </dl>
         </div>
         <p>
         Once you have started tclsh and have loaded the test.tcl
@@ -144,84 +116,6 @@
         filesystem (for example, an NFS mounted filesystem) will
         almost certainly cause spurious test failures.
     </p>
-        <div class="sect2" lang="en" xml:lang="en">
-          <div class="titlepage">
-            <div>
-              <div>
-                <h3 class="title"><a id="idm140089944528096"></a>Running SQL Test Suite on Unix</h3>
-              </div>
-            </div>
-          </div>
-          <p>
-            Once the test suite is built (see <a class="xref" href="build_unix_test.html#build_unix_test_sql" title="Building the SQL Test Suite on Unix">Building the SQL Test Suite on Unix</a> for more
-            information), run the entire test suite by executing the
-            following command in the
-            <code class="literal">../build_unix/sql</code> directory:
-        </p>
-          <pre class="programlisting">
-sh ../../sql/adapter/bdb-test.sh
-</pre>
-          <p>
-            This runs a set of tests and lists the errors each test
-            encountered, if any. A detailed list of the test results
-            is written to <code class="literal">test.log</code>. 
-        </p>
-          <p>
-            To run an individual test, such as insert.test, execute
-            the following command in the
-            <code class="literal">../build_unix/sql</code> directory:
-        </p>
-          <pre class="programlisting">
-./textfixture ../../sql/sqlite/test/insert.test 
-</pre>
-        </div>
-        <div class="sect2" lang="en" xml:lang="en">
-          <div class="titlepage">
-            <div>
-              <div>
-                <h3 class="title"><a id="idm140089944541568"></a>Running SQL Test Suite on Windows</h3>
-              </div>
-            </div>
-          </div>
-          <p>
-            After the test suite is built (see <a class="xref" href="build_win_test.html#build_win_test_sql" title="Building the software needed by the SQL tests">Building the software
-            needed by the SQL tests</a> for more
-            information) and before running the entire test suite, go
-            to <code class="literal">../sql/adapter/bdb-test.sh</code> and edit
-            the line: 
-        </p>
-          <pre class="programlisting">
-echo $t: `alarm $TIMEOUT ./testfixture.exe 
-$tpath 2&gt;&amp;1 | tee -a test.log | grep "errors out of" 
-|| echo "failed"`
-</pre>
-          <p>
-            to
-        </p>
-          <pre class="programlisting">
-echo $t: `alarm $TIMEOUT Win32/Debug/testfixture.exe 
-$tpath 2&gt;&amp;1 | tee -a test.log | grep "errors out of" 
-|| echo "failed"`
-</pre>
-          <p>
-            Running the test suite requires an Unix emulator, such
-            as Cygwin. In a Cygwin window go to the
-            <code class="literal">../build_windows</code> directory and
-            execute the command: 
-        </p>
-          <pre class="programlisting">sh ../sql/adapter/bdb-test.sh</pre>
-          <p>
-            This runs a set of tests and lists errors that each test
-            encountered, if any. A detailed list of the test results
-            is written to <code class="literal">test.log</code>.
-        </p>
-          <p>
-            To run an individual test, such as insert.test, execute
-            the following command in the
-            <code class="literal">../build_windows</code> directory:
-        </p>
-          <pre class="programlisting">Win32/Debug/testfixture.exe ../sql/sqlite/test/insert.test </pre>
-        </div>
       </div>
     </div>
     <div class="navfooter">

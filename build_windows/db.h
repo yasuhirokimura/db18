@@ -1,6 +1,6 @@
 /* DO NOT EDIT: automatically built by dist/s_windows. */
 /*
- * Copyright (c) 1996, 2019 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 1996, 2020 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *
@@ -59,9 +59,9 @@ extern "C" {
  */
 #define	DB_VERSION_MAJOR	18
 #define	DB_VERSION_MINOR	1
-#define	DB_VERSION_PATCH	32
-#define	DB_VERSION_STRING	"Berkeley DB 18.1.32: (February 19, 2019)"
-#define	DB_VERSION_FULL_STRING	"Berkeley DB Release 18.1, library version 18.1.32: (February 19, 2019)"
+#define	DB_VERSION_PATCH	40
+#define	DB_VERSION_STRING	"Berkeley DB 18.1.40: (May 29, 2020)"
+#define	DB_VERSION_FULL_STRING	"Berkeley DB Release 18.1, library version 18.1.40: (May 29, 2020)"
 
 /*
  * These two version numbers are deprecated and will be removed in a future

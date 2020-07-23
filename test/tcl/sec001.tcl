@@ -1,4 +1,4 @@
-# Copyright (c) 1999, 2019 Oracle and/or its affiliates.  All rights reserved.
+# Copyright (c) 1999, 2020 Oracle and/or its affiliates.  All rights reserved.
 #
 # See the file LICENSE for license information.
 #
@@ -36,7 +36,7 @@ proc sec001 { {args "" } } {
 	set passwd1_bad "passwd1_bad"
 	set passwd2 "passwd2"
 	set key "key"
-	set data "data"
+	set data "a string of data"
 
 	#
 	# This first group tests bad create scenarios and also
@@ -49,6 +49,7 @@ proc sec001 { {args "" } } {
 	error_check_good db [is_valid_db $db] TRUE
 	error_check_good dbput [$db put $key $data] 0
 	error_check_good dbclose [$db close] 0
+	error_check_good search_db [findstring $data $testfile2] 0
 
 	puts "\tSec001.a.2: Open db without encryption."
 	set stat [catch {berkdb_open_noerr $testfile2} ret]
@@ -62,6 +63,7 @@ proc sec001 { {args "" } } {
 	error_check_good db [is_valid_db $db] TRUE
 	error_check_good dbput [$db put $key $data] 0
 	error_check_good dbclose [$db close] 0
+	error_check_good search_db [findstring $data $testfile2] 1
 
 	puts "\tSec001.b.2: Open db with encryption."
 	set stat [catch {berkdb_open_noerr -encryptaes $passwd1 $testfile2} ret]
@@ -192,6 +194,14 @@ proc sec001 { {args "" } } {
 	    -encryptaes $passwd2 $testfile1} ret]
 	error_check_good db:$passwd2 $stat 1
 	error_check_good env:fail [is_substr $ret "method not permitted"] 1
+	
+	puts "\tSec001.g.8: Open database in encrypted environment."
+	set db [berkdb_open -encrypt -create -btree -env $env $testfile1]
+	error_check_good db [is_valid_db $db] TRUE
+	error_check_good dbput [$db put $key $data] 0
+	error_check_good dbclose [$db close] 0
+	error_check_good search_db [findstring $data $testdir/$testfile1] 0
+	set ret [$env dbremove $testfile1]
 
 	puts "\tSec001.g.8: Close creating env"
 	error_check_good envclose [$env close] 0
@@ -250,6 +260,20 @@ proc sec001 { {args "" } } {
 		error_check_good envclose [$env1 close] 0
 		error_check_good envclose [$env close] 0
 	}
+
+	puts "\tSec001.i.1: Open without encryption."
+	cleanup $testdir NULL
+	set env [berkdb_env_noerr -create -home $testdir]
+	error_check_good env [is_valid_env $env] TRUE
+
+	puts "\tSec001.i.2: Open database in unencrypted environment."
+	set db [berkdb_open -create -env $env -btree $testfile1]
+	error_check_good db [is_valid_db $db] TRUE
+	error_check_good dbput [$db put $key $data] 0
+	error_check_good dbclose [$db close] 0
+	error_check_good search_db [findstring $data $testdir/$testfile1] 1
+	error_check_good envclose [$env close] 0
+	cleanup $testdir NULL
 
 	puts "\tSec001 complete."
 }

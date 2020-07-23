@@ -3,25 +3,25 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Chapter 5.  Building Berkeley DB for Windows</title>
+    <title>Chapter 4.  Building Berkeley DB for Windows</title>
     <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
     <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
     <link rel="start" href="index.html" title="Berkeley DB Installation and Build Guide" />
     <link rel="up" href="index.html" title="Berkeley DB Installation and Build Guide" />
-    <link rel="prev" href="build_android_adfmobile.html" title="Using the JDBC Driver in ADF Mobile for Android" />
+    <link rel="prev" href="debug_printlog.html" title="Reviewing Berkeley DB log files" />
     <link rel="next" href="win_build_cygwin.html" title="Building Berkeley DB with Cygwin" />
   </head>
   <body>
     <div xmlns="" class="navheader">
       <div class="libver">
-        <p>Library Version 18.1.32</p>
+        <p>Library Version 18.1.40</p>
       </div>
       <table width="100%" summary="Navigation header">
         <tr>
-          <th colspan="3" align="center">Chapter 5.  Building Berkeley DB for Windows </th>
+          <th colspan="3" align="center">Chapter 4.  Building Berkeley DB for Windows </th>
         </tr>
         <tr>
-          <td width="20%" align="left"><a accesskey="p" href="build_android_adfmobile.html">Prev</a> </td>
+          <td width="20%" align="left"><a accesskey="p" href="debug_printlog.html">Prev</a> </td>
           <th width="60%" align="center"> </th>
           <td width="20%" align="right"> <a accesskey="n" href="win_build_cygwin.html">Next</a></td>
         </tr>
@@ -32,7 +32,7 @@
       <div class="titlepage">
         <div>
           <div>
-            <h2 class="title"><a id="build_win"></a>Chapter 5.  Building Berkeley DB for Windows </h2>
+            <h2 class="title"><a id="build_win"></a>Chapter 4.  Building Berkeley DB for Windows </h2>
           </div>
         </div>
       </div>
@@ -50,27 +50,27 @@
             <dl>
               <dt>
                 <span class="sect2">
-                  <a href="build_win.html#idm140089947209088">Visual C++ .NET 2015</a>
+                  <a href="build_win.html#idm140649576933248">Visual C++ .NET 2015</a>
                 </span>
               </dt>
               <dt>
                 <span class="sect2">
-                  <a href="build_win.html#idm140089947245184">Visual C++ .NET 2013</a>
+                  <a href="build_win.html#idm140649574658032">Visual C++ .NET 2013</a>
                 </span>
               </dt>
               <dt>
                 <span class="sect2">
-                  <a href="build_win.html#idm140089947225680">Visual C++ .NET 2012</a>
+                  <a href="build_win.html#idm140649576126544">Visual C++ .NET 2012</a>
                 </span>
               </dt>
               <dt>
                 <span class="sect2">
-                  <a href="build_win.html#idm140089947195904">Visual C++ .NET 2010</a>
+                  <a href="build_win.html#idm140649576534560">Visual C++ .NET 2010</a>
                 </span>
               </dt>
               <dt>
                 <span class="sect2">
-                  <a href="build_win.html#idm140089947244416">Build results</a>
+                  <a href="build_win.html#idm140649576001648">Build results</a>
                 </span>
               </dt>
             </dl>
@@ -100,70 +100,6 @@
               <a href="build_win_csharp.html">Building the C# API</a>
             </span>
           </dt>
-          <dt>
-            <span class="sect1">
-              <a href="build_win_sql.html">Building the SQL API</a>
-            </span>
-          </dt>
-          <dd>
-            <dl>
-              <dt>
-                <span class="sect2">
-                  <a href="build_win_sql.html#idm140089947131696">Setting User Authentication</a>
-                </span>
-              </dt>
-              <dt>
-                <span class="sect2">
-                  <a href="build_win_sql.html#idm140089947154864">Binary Compatibility With SQLite</a>
-                </span>
-              </dt>
-              <dt>
-                <span class="sect2">
-                  <a href="build_win_sql.html#idm140089947169392">Setting Encryption</a>
-                </span>
-              </dt>
-              <dt>
-                <span class="sect2">
-                  <a href="build_win_sql.html#idm140089947135104">Changing Compile Options</a>
-                </span>
-              </dt>
-              <dt>
-                <span class="sect2">
-                  <a href="build_win_sql.html#idm140089947107280">Enabling Extensions</a>
-                </span>
-              </dt>
-              <dt>
-                <span class="sect2">
-                  <a href="build_win_sql.html#win-disablechecksums">Disabling Log Checksums</a>
-                </span>
-              </dt>
-              <dt>
-                <span class="sect2">
-                  <a href="build_win_sql.html#build_jdbc">Building the JDBC Driver</a>
-                </span>
-              </dt>
-              <dt>
-                <span class="sect2">
-                  <a href="build_win_sql.html#idm140089947116400">Using the JDBC Driver</a>
-                </span>
-              </dt>
-              <dt>
-                <span class="sect2">
-                  <a href="build_win_sql.html#idm140089947049808">Using the JDBC Driver in ADF/JDeveloper</a>
-                </span>
-              </dt>
-              <dt>
-                <span class="sect2">
-                  <a href="build_win_sql.html#idm140089947149056">Building the ODBC Driver</a>
-                </span>
-              </dt>
-              <dt>
-                <span class="sect2">
-                  <a href="build_win_sql.html#idm140089947063248"> Using the ADO.NET Driver </a>
-                </span>
-              </dt>
-            </dl>
-          </dd>
           <dt>
             <span class="sect1">
               <a href="build_win_tcl.html">Building the Tcl API</a>
@@ -200,19 +136,13 @@
             <dl>
               <dt>
                 <span class="sect2">
-                  <a href="build_win_test.html#idm140089946861968">Building the software needed
+                  <a href="build_win_test.html#idm140649574841888">Building the software needed
             by the tests</a>
                 </span>
               </dt>
               <dt>
                 <span class="sect2">
-                  <a href="build_win_test.html#idm140089946876832">Running the test suite under Windows</a>
-                </span>
-              </dt>
-              <dt>
-                <span class="sect2">
-                  <a href="build_win_test.html#build_win_test_sql">Building the software
-            needed by the SQL tests</a>
+                  <a href="build_win_test.html#idm140649574900688">Running the test suite under Windows</a>
                 </span>
               </dt>
             </dl>
@@ -304,27 +234,27 @@
           <dl>
             <dt>
               <span class="sect2">
-                <a href="build_win.html#idm140089947209088">Visual C++ .NET 2015</a>
+                <a href="build_win.html#idm140649576933248">Visual C++ .NET 2015</a>
               </span>
             </dt>
             <dt>
               <span class="sect2">
-                <a href="build_win.html#idm140089947245184">Visual C++ .NET 2013</a>
+                <a href="build_win.html#idm140649574658032">Visual C++ .NET 2013</a>
               </span>
             </dt>
             <dt>
               <span class="sect2">
-                <a href="build_win.html#idm140089947225680">Visual C++ .NET 2012</a>
+                <a href="build_win.html#idm140649576126544">Visual C++ .NET 2012</a>
               </span>
             </dt>
             <dt>
               <span class="sect2">
-                <a href="build_win.html#idm140089947195904">Visual C++ .NET 2010</a>
+                <a href="build_win.html#idm140649576534560">Visual C++ .NET 2010</a>
               </span>
             </dt>
             <dt>
               <span class="sect2">
-                <a href="build_win.html#idm140089947244416">Build results</a>
+                <a href="build_win.html#idm140649576001648">Build results</a>
               </span>
             </dt>
           </dl>
@@ -333,7 +263,7 @@
           <div class="titlepage">
             <div>
               <div>
-                <h3 class="title"><a id="idm140089947209088"></a>Visual C++ .NET 2015</h3>
+                <h3 class="title"><a id="idm140649576933248"></a>Visual C++ .NET 2015</h3>
               </div>
             </div>
           </div>
@@ -367,7 +297,7 @@
           <div class="titlepage">
             <div>
               <div>
-                <h3 class="title"><a id="idm140089947245184"></a>Visual C++ .NET 2013</h3>
+                <h3 class="title"><a id="idm140649574658032"></a>Visual C++ .NET 2013</h3>
               </div>
             </div>
           </div>
@@ -407,7 +337,7 @@
           <div class="titlepage">
             <div>
               <div>
-                <h3 class="title"><a id="idm140089947225680"></a>Visual C++ .NET 2012</h3>
+                <h3 class="title"><a id="idm140649576126544"></a>Visual C++ .NET 2012</h3>
               </div>
             </div>
           </div>
@@ -442,7 +372,7 @@
           <div class="titlepage">
             <div>
               <div>
-                <h3 class="title"><a id="idm140089947195904"></a>Visual C++ .NET 2010</h3>
+                <h3 class="title"><a id="idm140649576534560"></a>Visual C++ .NET 2010</h3>
               </div>
             </div>
           </div>
@@ -477,7 +407,7 @@
           <div class="titlepage">
             <div>
               <div>
-                <h3 class="title"><a id="idm140089947244416"></a>Build results</h3>
+                <h3 class="title"><a id="idm140649576001648"></a>Build results</h3>
               </div>
             </div>
           </div>
@@ -566,12 +496,12 @@
       <hr />
       <table width="100%" summary="Navigation footer">
         <tr>
-          <td width="40%" align="left"><a accesskey="p" href="build_android_adfmobile.html">Prev</a> </td>
+          <td width="40%" align="left"><a accesskey="p" href="debug_printlog.html">Prev</a> </td>
           <td width="20%" align="center"> </td>
           <td width="40%" align="right"> <a accesskey="n" href="win_build_cygwin.html">Next</a></td>
         </tr>
         <tr>
-          <td width="40%" align="left" valign="top">Using the JDBC Driver in ADF Mobile for Android </td>
+          <td width="40%" align="left" valign="top">Reviewing Berkeley DB log files </td>
           <td width="20%" align="center">
             <a accesskey="h" href="index.html">Home</a>
           </td>

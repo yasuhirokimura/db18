@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2002, 2019 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 2002, 2020 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *
@@ -149,6 +149,8 @@ public class Store {
             dbConfig.setReadOnly(true);
             dbConfig.setTransactional
                 (storeConfig.getTransactional());
+            dbConfig.enableEncrypted(storeConfig.getEncrypted());
+            dbConfig.setEncrypted(storeConfig.getPassword());
             catalog = new PersistCatalog
                 (env, storePrefix, storePrefix + CATALOG_DB, dbConfig,
                  null /*model*/, config.getMutations(), rawAccess, this);
@@ -165,6 +167,8 @@ public class Store {
                     catalog.openExisting();
                 } else {
                     DatabaseConfig dbConfig = new DatabaseConfig();
+                    dbConfig.enableEncrypted(storeConfig.getEncrypted());
+                    dbConfig.setEncrypted(storeConfig.getPassword());
                     dbConfig.setAllowCreate(storeConfig.getAllowCreate());
                     dbConfig.setExclusiveCreate
                         (storeConfig.getExclusiveCreate());
@@ -1144,6 +1148,8 @@ public class Store {
             config.setTransactional(storeConfig.getTransactional());
             config.setAllowCreate(!storeConfig.getReadOnly());
             config.setReadOnly(storeConfig.getReadOnly());
+            config.setEncrypted(storeConfig.getPassword());
+            config.enableEncrypted(storeConfig.getEncrypted());
             DbCompat.setTypeBtree(config);
             setBtreeComparator(config, meta.getPrimaryKey().getClassName());
             priConfigMap.put(clsName, config);
@@ -1201,6 +1207,8 @@ public class Store {
             config.setTransactional(priConfig.getTransactional());
             config.setAllowCreate(!priConfig.getReadOnly());
             config.setReadOnly(priConfig.getReadOnly());
+            config.setEncrypted(priConfig.getPassword());
+            config.enableEncrypted(priConfig.getEncrypted());
             DbCompat.setTypeBtree(config);
             /* Set secondary properties based on metadata. */
             config.setAllowPopulate(true);

@@ -57,8 +57,8 @@ class GenWix:
         # use excludes to exclude paths, e.g. add files to the array:
         # ...os.path.normpath("dbxml/test"), os.path.normpath("a/b/c")...
 	self.excludes = []
-	self.groups = ["group_csharp", "group_cxx", "group_devo", "group_doc", "group_examples", "group_java", "group_runtime", "group_sql", "group_thrift"]
-	self.groupfiles = ["group.csharp", "group.cxx", "group.devo", "group.doc", "group.examples", "group.java", "group.runtime", "group.sql", "group.thrift"]
+	self.groups = ["group_csharp", "group_cxx", "group_devo", "group_doc", "group_examples", "group_java", "group_runtime"]
+	self.groupfiles = ["group.csharp", "group.cxx", "group.devo", "group.doc", "group.examples", "group.java", "group.runtime"]
 	self.groupcontent = ["","","","","","","","",""]
 	self.outputFile = outfile
 	self.out = open(self.outputFile, "ab")

@@ -11,8 +11,7 @@ serialization speed and proper default sorting.</p>
 <p>When a format is used for database keys, it is important to use default
 sorting for best performance.  Although a custom comparator may be specified
 for a {@link com.sleepycat.db.DatabaseConfig#setBtreeComparator database} or
-{@link <a
-href="{@docRoot}/com/sleepycat/persist/model/KeyField.html#comparable">entity
+{<a href="{@docRoot}/com/sleepycat/persist/model/KeyField.html#comparable">entity
 index</a>}, custom comparators often reduce performance because comparators are
 called very frequently during Btree operations.</p>
 
@@ -62,12 +61,13 @@ character ordering.
 known-length {@code String} values.</p>
 <ul>
 <li>Single-value binding classes for zero-terminated {@code String}
-values.</li>
+values.
     <ul>
     <li>{@link com.sleepycat.bind.tuple.StringBinding}</li>
     </ul>
+	</li>
 <li>Multi-value binding methods for zero-terminated and known-length {@code
-String} values.</li>
+String} values.
     <ul>
     <li>{@link com.sleepycat.bind.tuple.TupleOutput#writeString(String)}</li>
     <li>{@link com.sleepycat.bind.tuple.TupleInput#readString}</li>
@@ -76,6 +76,7 @@ String} values.</li>
     <li>{@link com.sleepycat.bind.tuple.TupleInput#readString(char[])}</li>
     <li>{@link com.sleepycat.bind.tuple.TupleInput#readString(int)}</li>
     </ul>
+	</li>
 </ul>
 
 <h3><a name="integerFormats">Integer Formats</a></h3>
@@ -94,14 +95,15 @@ to be sorted first when comparing values as unsigned byte arrays, as done in a
 database.</p>
 
 <ul>
-<li>Single-value binding classes for signed, fixed size integers.</li>
+<li>Single-value binding classes for signed, fixed size integers.
     <ul>
     <li>{@link com.sleepycat.bind.tuple.ByteBinding}</li>
     <li>{@link com.sleepycat.bind.tuple.ShortBinding}</li>
     <li>{@link com.sleepycat.bind.tuple.IntegerBinding}</li>
     <li>{@link com.sleepycat.bind.tuple.LongBinding}</li>
     </ul>
-<li>Multi-value binding methods for signed, fixed size integers.</li>
+	</li>
+<li>Multi-value binding methods for signed, fixed size integers.
     <ul>
     <li>{@link com.sleepycat.bind.tuple.TupleOutput#writeByte}</li>
     <li>{@link com.sleepycat.bind.tuple.TupleInput#readByte}</li>
@@ -112,6 +114,7 @@ database.</p>
     <li>{@link com.sleepycat.bind.tuple.TupleOutput#writeLong}</li>
     <li>{@link com.sleepycat.bind.tuple.TupleInput#readLong}</li>
     </ul>
+	</li>
 </ul>
 
 <p>Unsigned numbers, including characters, are stored in MSB order with no
@@ -121,13 +124,14 @@ is stored as the unsigned byte value one and {@code false} as the unsigned byte
 value zero.</p>
 
 <ul>
-<li>Single-value binding classes for characters and booleans.</li>
+<li>Single-value binding classes for characters and booleans.
     <ul>
     <li>{@link com.sleepycat.bind.tuple.BooleanBinding}</li>
     <li>{@link com.sleepycat.bind.tuple.CharacterBinding}</li>
     </ul>
+	</li>
 <li>Multi-value binding methods for unsigned, fixed size integers, characters
-and booleans.</li>
+and booleans.
     <ul>
     <li>{@link com.sleepycat.bind.tuple.TupleOutput#writeBoolean}</li>
     <li>{@link com.sleepycat.bind.tuple.TupleInput#readBoolean}</li>
@@ -140,8 +144,9 @@ and booleans.</li>
     <li>{@link com.sleepycat.bind.tuple.TupleOutput#writeUnsignedInt}</li>
     <li>{@link com.sleepycat.bind.tuple.TupleInput#readUnsignedInt}</li>
     </ul>
+	</li>
 <li>Multi-value binding methods for character arrays and unsigned byte arrays
-that may be treated as {@code String} values.</li>
+that may be treated as {@code String} values.
     <ul>
     <li>{@link com.sleepycat.bind.tuple.TupleOutput#writeChars(String)}</li>
     <li>{@link com.sleepycat.bind.tuple.TupleInput#readChars(int)}</li>
@@ -152,6 +157,7 @@ that may be treated as {@code String} values.</li>
     <li>{@link com.sleepycat.bind.tuple.TupleOutput#writeBytes(char[])}</li>
     <li>{@link com.sleepycat.bind.tuple.TupleInput#readBytes(char[])}</li>
     </ul>
+	</li>
 </ul>
 
 <h4>Packed Integer Formats</h4>
@@ -182,13 +188,14 @@ the unsorted format.</p>
 inclusive range [-119,120] in a single byte.</p>
 <ul>
 <li>Single-value binding classes for packed integers with default natural
-sorting.</li>
+sorting.
     <ul>
     <li>{@link com.sleepycat.bind.tuple.SortedPackedIntegerBinding}</li>
     <li>{@link com.sleepycat.bind.tuple.SortedPackedLongBinding}</li>
     </ul>
+	</li>
 <li>Multi-value binding methods for packed integers with default natural
-sorting.</li>
+sorting.
     <ul>
     <li>{@link com.sleepycat.bind.tuple.TupleOutput#writeSortedPackedInt}</li>
     <li>{@link com.sleepycat.bind.tuple.TupleInput#readSortedPackedInt}</li>
@@ -197,6 +204,7 @@ sorting.</li>
     <li>{@link com.sleepycat.bind.tuple.TupleInput#readSortedPackedLong}</li>
     <li>{@link com.sleepycat.bind.tuple.TupleInput#getSortedPackedLongByteLength}</li>
     </ul>
+	</li>
 </ul>
 
 <p>The unsorted packed integer format is an older, legacy format that is used
@@ -206,12 +214,13 @@ supported, this format should not be used for keys.  However, it so happens
 that packed integers in the inclusive range [0,630] are sorted correctly by
 default, and this may be useful for some applications.</p>
 <ul>
-<li>Single-value binding classes for legacy, unsorted packed integers.</li>
+<li>Single-value binding classes for legacy, unsorted packed integers.
     <ul>
     <li>{@link com.sleepycat.bind.tuple.PackedIntegerBinding}</li>
     <li>{@link com.sleepycat.bind.tuple.PackedLongBinding}</li>
     </ul>
-<li>Multi-value binding methods for legacy, unsorted packed integers.</li>
+	</li>
+<li>Multi-value binding methods for legacy, unsorted packed integers.
     <ul>
     <li>{@link com.sleepycat.bind.tuple.TupleOutput#writePackedInt}</li>
     <li>{@link com.sleepycat.bind.tuple.TupleInput#readPackedInt}</li>
@@ -220,6 +229,7 @@ default, and this may be useful for some applications.</p>
     <li>{@link com.sleepycat.bind.tuple.TupleInput#readPackedLong}</li>
     <li>{@link com.sleepycat.bind.tuple.TupleInput#getPackedLongByteLength}</li>
     </ul>
+	</li>
 </ul>
 
 <h4>BigInteger Formats</h4>
@@ -237,16 +247,18 @@ or less.  The maximum {@code BigInteger} value is (2<sup>0x3fff7</sup> - 1) and
 the minimum value is (-2<sup>0x3fff7</sup>).</p>
 
 <ul>
-<li>Single-value binding classes for {@code BigInteger} values.</li>
+<li>Single-value binding classes for {@code BigInteger} values.
     <ul>
     <li>{@link com.sleepycat.bind.tuple.BigIntegerBinding}</li>
     </ul>
-<li>Multi-value binding methods for {@code BigInteger} values.</li>
+	</li>
+<li>Multi-value binding methods for {@code BigInteger} values.
     <ul>
     <li>{@link com.sleepycat.bind.tuple.TupleOutput#writeBigInteger}</li>
     <li>{@link com.sleepycat.bind.tuple.TupleInput#readBigInteger}</li>
     <li>{@link com.sleepycat.bind.tuple.TupleOutput#getBigIntegerByteLength}</li>
     </ul>
+	</li>
 </ul>
 
 <h3><a name="floatFormats">Floating Point Formats</a></h3>
@@ -279,19 +291,21 @@ an unsigned value.</p>
 
 <ul>
 <li>Single-value binding classes for {@code float} and {@code double} values
-with default natural sorting.</li>
+with default natural sorting.
     <ul>
     <li>{@link com.sleepycat.bind.tuple.SortedFloatBinding}</li>
     <li>{@link com.sleepycat.bind.tuple.SortedDoubleBinding}</li>
     </ul>
+	</li>
 <li>Multi-value binding methods for {@code float} and {@code double} values
-with default natural sorting.</li>
+with default natural sorting.
     <ul>
     <li>{@link com.sleepycat.bind.tuple.TupleOutput#writeSortedFloat}</li>
     <li>{@link com.sleepycat.bind.tuple.TupleInput#readSortedFloat}</li>
     <li>{@link com.sleepycat.bind.tuple.TupleOutput#writeSortedDouble}</li>
     <li>{@link com.sleepycat.bind.tuple.TupleInput#readSortedDouble}</li>
     </ul>
+	</li>
 </ul>
 
 <p>The unsorted floating point format is an older, legacy format that is
@@ -300,19 +314,21 @@ have default natural sorting; negative values do not.</p>
 
 <ul>
 <li>Single-value binding classes for legacy, unsorted {@code float} and {@code
-double} values.</li>
+double} values.
     <ul>
     <li>{@link com.sleepycat.bind.tuple.FloatBinding}</li>
     <li>{@link com.sleepycat.bind.tuple.DoubleBinding}</li>
     </ul>
+	</li>
 <li>Multi-value binding methods for legacy, unsorted {@code float} and {@code
-double} values.</li>
+double} values.
     <ul>
     <li>{@link com.sleepycat.bind.tuple.TupleOutput#writeFloat}</li>
     <li>{@link com.sleepycat.bind.tuple.TupleInput#readFloat}</li>
     <li>{@link com.sleepycat.bind.tuple.TupleOutput#writeDouble}</li>
     <li>{@link com.sleepycat.bind.tuple.TupleInput#readDouble}</li>
     </ul>
+	</li>
 </ul>
 
 <h3><a name="bigDecimalFormats">BigDecimal Formats</a></h3>
@@ -322,7 +338,7 @@ representations: a representation that supports default natural sorting, and an
 unsorted representation.  Differences between the two formats are:
 <ul>
 <li>The {@code BigDecimal} format with default natural sorting should normally
-be used for database keys.</li>
+be used for database keys.
     <ul>
     <li>Default natural sorting <em>is</em> supported.</li>
     <li>The stored value is around 3 bytes larger than the unsorted format,
@@ -332,8 +348,9 @@ be used for database keys.</li>
     <li>Trailing zeros after the decimal place are stripped, meaning that
     precision is not preserved.</li>
     </ul>
+	</li>
 <li>The unsorted {@code BigDecimal} format should normally be used for non-key
-values.</li>
+values.
     <ul>
     <li>Default natural sorting is <em>not</em> supported.</li>
     <li>The stored value is around 3 bytes smaller than the sorted format, more
@@ -343,6 +360,7 @@ values.</li>
     <li>Trailing zeros after the decimal place are preserved, meaning that
     precision is preserved.</li>
     </ul>
+	</li>
 </ul>
 
 <p>Both formats store the scale or exponent separately from the unscaled value,
@@ -351,29 +369,33 @@ the scale or exponent increases.</p>
 
 <ul>
 <li>Single-value binding classes for {@code BigDecimal} values with default
-natural sorting.</li>
+natural sorting.
     <ul>
     <li>{@link com.sleepycat.bind.tuple.SortedBigDecimalBinding}</li>
     </ul>
+	</li>
 <li>Multi-value binding methods for {@code BigDecimal} values with default
-natural sorting.</li>
+natural sorting.
     <ul>
     <li>{@link com.sleepycat.bind.tuple.TupleOutput#writeSortedBigDecimal}</li>
     <li>{@link com.sleepycat.bind.tuple.TupleOutput#getSortedBigDecimalMaxByteLength}</li>
     <li>{@link com.sleepycat.bind.tuple.TupleInput#readSortedBigDecimal}</li>
     <li>{@link com.sleepycat.bind.tuple.TupleInput#getSortedBigDecimalByteLength}</li>
     </ul>
-<li>Single-value binding classes for unsorted {@code BigDecimal} values.</li>
+	</li>
+<li>Single-value binding classes for unsorted {@code BigDecimal} values.
     <ul>
     <li>{@link com.sleepycat.bind.tuple.BigDecimalBinding}</li>
     </ul>
-<li>Multi-value binding methods for unsorted {@code BigDecimal} values.</li>
+	</li>
+<li>Multi-value binding methods for unsorted {@code BigDecimal} values.
     <ul>
     <li>{@link com.sleepycat.bind.tuple.TupleOutput#writeBigDecimal}</li>
     <li>{@link com.sleepycat.bind.tuple.TupleOutput#getBigDecimalMaxByteLength}</li>
     <li>{@link com.sleepycat.bind.tuple.TupleInput#readBigDecimal}</li>
     <li>{@link com.sleepycat.bind.tuple.TupleInput#getBigDecimalByteLength}</li>
     </ul>
+	</li>
 </ul>
 
 </body>

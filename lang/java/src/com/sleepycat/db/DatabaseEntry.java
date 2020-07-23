@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2002, 2019 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 2002, 2020 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *
@@ -577,14 +577,12 @@ public class DatabaseEntry {
     }
 
     /**
-Return the record number encoded in this entry's buffer.
-<p>
-This method may be called at any time during the life of the application.
-<p>
-@return
-The record number encoded in this entry's buffer.
-     *
-    @return the decoded record number.
+	Return the record number encoded in this entry's buffer.
+	<p>
+	This method may be called at any time during the life of the application.
+	<p>
+	@return
+	The record number encoded in this entry's buffer.
     */
     public int getRecordNumber() {
         return DbUtil.array2int(data, offset);

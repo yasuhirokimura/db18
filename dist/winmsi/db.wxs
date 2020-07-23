@@ -76,7 +76,6 @@
 	o C# runtime
 	o C/C++ devo
 	o examples
-  o Thrift server/client
     -->
     <Feature Id="Complete" Title="@PRODUCT_NAME@" Description="Complete installation"
 	      Display="expand" Level="1" ConfigurableDirectory="INSTALLDIR">
@@ -111,19 +110,10 @@
 	<ComponentGroupRef Id="group_csharp"/>
 	<ComponentGroupRef Id="group_runtime"/>
     </Feature>
-    <Feature Id="SQLRuntime" Title="SQL runtime and development files" Description="Libraries and header files required for development and running of applications using BDB's SQL interface.  This option includes the Core Runtime." AllowAdvertise="no" Display="expand" Level="1" InstallDefault="source" ConfigurableDirectory="INSTALLDIR">
-	<ComponentGroupRef Id="group_sql"/>
-	<ComponentGroupRef Id="group_runtime"/>
-    </Feature>
     <Feature Id="Examples" Title="Examples (all languages)" Description="@PRODUCT_NAME@ examples for all language interfaces." AllowAdvertise="no" Display="expand" Level="1" InstallDefault="source" ConfigurableDirectory="INSTALLDIR">
 	<ComponentGroupRef Id="group_examples"/>
 	<ComponentGroupRef Id="group_devo"/>
 	<ComponentGroupRef Id="group_runtime"/>
-    </Feature>
-    <Feature Id="Thrift" Title="Server/Client runtime and configuration files" Description="Thrift .jar and configuration files required for running a BDB Server and Client.  This option includes the Core Runtime and Java Runtime." AllowAdvertise="no" Display="expand" Level="1" InstallDefault="source" ConfigurableDirectory="INSTALLDIR">
-      <ComponentGroupRef Id="group_thrift"/>
-      <ComponentGroupRef Id="group_java"/>
-      <ComponentGroupRef Id="group_runtime"/>
     </Feature>
     </Feature> <!-- end of all Features -->
 

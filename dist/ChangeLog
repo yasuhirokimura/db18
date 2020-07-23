@@ -1,5 +1,30 @@
 = Berkeley DB 18.1 Changelog =
 
+== Changes between version 18.1.32 and version 18.1.40 ==
+
+Removed ASM library source files, ASM license from LICENSE file, 
+and DPL test targets with ASM optimizations.
+
+The Berkeley DB client-server architecture is no longer supported.
+If you require the Berkeley DB client-server architecture you must
+use Berkeley DB 18.1.32 or earlier.
+
+The SQL API is no longer supported.  If you require SQL support you
+must use Berkeley DB 18.1.32 or earlier.
+
+Android is no longer supported.  If you require Android support you
+must use Berkeley DB 18.1.32 or earlier.
+
+Fixed several possible crashes when running db_verify on a corrupted
+database. [#27864]
+
+Fixed several possible hangs when running db_verify on a corrupted
+database. [#27864]
+
+Added a warning message when attempting to verify a queue database
+which has many extent files.  Verification will take a long
+time if there are many extent files. [#27864]
+
 == Changes between version 18.1.25 and version 18.1.32 ==
 
 Fixed a few null pointer crashes in the Tcl API when a function 

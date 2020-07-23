@@ -7,14 +7,14 @@
     <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
     <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
     <link rel="start" href="index.html" title="Berkeley DB Installation and Build Guide" />
-    <link rel="up" href="build_unix.html" title="Chapter 6.  Building Berkeley DB for UNIX/POSIX" />
-    <link rel="prev" href="build_unix.html" title="Chapter 6.  Building Berkeley DB for UNIX/POSIX" />
-    <link rel="next" href="build_unix_sql.html" title="Configuring the SQL Interface" />
+    <link rel="up" href="build_unix.html" title="Chapter 5.  Building Berkeley DB for UNIX/POSIX" />
+    <link rel="prev" href="build_unix.html" title="Chapter 5.  Building Berkeley DB for UNIX/POSIX" />
+    <link rel="next" href="build_unix_small.html" title="Building a small memory footprint library" />
   </head>
   <body>
     <div xmlns="" class="navheader">
       <div class="libver">
-        <p>Library Version 18.1.32</p>
+        <p>Library Version 18.1.40</p>
       </div>
       <table width="100%" summary="Navigation header">
         <tr>
@@ -22,9 +22,9 @@
         </tr>
         <tr>
           <td width="20%" align="left"><a accesskey="p" href="build_unix.html">Prev</a> </td>
-          <th width="60%" align="center">Chapter 6.  Building Berkeley DB for UNIX/POSIX
+          <th width="60%" align="center">Chapter 5.  Building Berkeley DB for UNIX/POSIX
     </th>
-          <td width="20%" align="right"> <a accesskey="n" href="build_unix_sql.html">Next</a></td>
+          <td width="20%" align="right"> <a accesskey="n" href="build_unix_small.html">Next</a></td>
         </tr>
       </table>
       <hr />
@@ -326,55 +326,11 @@
             </p>
           </li>
           <li>
-            <p><a id="build_unix_conf.--enable-server"></a>
-                <span class="bold"><strong>--enable-server</strong></span>
-            </p>
-            <p>
-                To install the Berkeley DB Thrift Server and
-                its Java client driver API, enter --enable-server as
-                an argument to configure. The Berkeley DB Thrift Server
-                requires JDK 8 or above.
-            </p>
-            <p>
-                For more information, see the 
-                <em class="citetitle">Berkeley DB Programmer's Reference Guide</em>.
-            </p>
-          </li>
-          <li>
             <p><a id="build_unix_conf.--enable-slices"></a>
                 <span class="bold"><strong>--enable-slices</strong></span>
             </p>
             <p>
                 Enable environment and database slice support.
-            </p>
-          </li>
-          <li>
-            <p><a id="build_unix_conf.--enable-sql"></a>
-                <span class="bold"><strong>--enable-sql</strong></span>
-            </p>
-            <p>
-                To build the command tool dbsql, enter --enable-sql
-                as an argument to configure. The dbsql utility
-                provides access to the Berkeley DB SQL interface. See
-                <a class="xref" href="build_unix_sql.html" title="Configuring the SQL Interface">Configuring the SQL
-        Interface</a> for more
-                information. 
-            </p>
-          </li>
-          <li>
-            <p>
-                <span class="bold"><strong>--enable-sql_compat</strong></span>
-            </p>
-            <p>
-                To build the command tool sqlite3, enter
-                --enable-sql_compat as an argument to configure.
-                Sqlite3 is a command line tool that enables you to
-                manually enter and execute SQL commands. It is
-                identical to the dbsql executable but named so that
-                existing scripts for SQLite can easily work with
-                Berkeley DB. See <a class="xref" href="build_unix_sql.html" title="Configuring the SQL Interface">Configuring the SQL
-        Interface</a> for more
-                information.
             </p>
           </li>
           <li>
@@ -587,9 +543,7 @@
                 Enter <code class="literal">--with-cryptography=yes|no</code>
                 to build Berkeley DB libraries with or without
                 cryptography support. By default, cryptography is
-                enabled for Berkeley DB base libraries, and disabled
-                when building the optional Berkeley DB SQL and JDBC
-                libraries.
+                enabled for Berkeley DB base libraries.
             </p>
             <p>
                 To build Berkeley DB with support for cryptography
@@ -744,16 +698,15 @@ LIBS="-lssl -lcrypto -lpthread"</pre>
           <td width="20%" align="center">
             <a accesskey="u" href="build_unix.html">Up</a>
           </td>
-          <td width="40%" align="right"> <a accesskey="n" href="build_unix_sql.html">Next</a></td>
+          <td width="40%" align="right"> <a accesskey="n" href="build_unix_small.html">Next</a></td>
         </tr>
         <tr>
-          <td width="40%" align="left" valign="top">Chapter 6.  Building Berkeley DB for UNIX/POSIX
+          <td width="40%" align="left" valign="top">Chapter 5.  Building Berkeley DB for UNIX/POSIX
      </td>
           <td width="20%" align="center">
             <a accesskey="h" href="index.html">Home</a>
           </td>
-          <td width="40%" align="right" valign="top"> Configuring the SQL
-        Interface</td>
+          <td width="40%" align="right" valign="top"> Building a small memory footprint library</td>
         </tr>
       </table>
     </div>

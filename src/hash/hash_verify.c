@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 1999, 2019 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 1999, 2020 Oracle and/or its affiliates.  All rights reserved.
  *
  * See the file LICENSE for license information.
  *
@@ -615,7 +615,7 @@ __ham_vrfy_structure(dbp, vdp, meta_pgno, flags)
 				isbad = 1;
 			else
 				goto err;
-		    }
+		}
 
 	/*
 	 * There may be unused hash pages corresponding to buckets
@@ -746,7 +746,7 @@ __ham_vrfy_bucket(dbp, vdp, m, bucket, flags)
 		    "Page %lu: impossible first page in bucket %lu", "%lu %lu"),
 		    (u_long)pgno, (u_long)bucket));
 		/* Unsafe to continue. */
-		isbad = 1;
+		ret = DB_VERIFY_FATAL;
 		goto err;
 	}
 
@@ -776,7 +776,7 @@ __ham_vrfy_bucket(dbp, vdp, m, bucket, flags)
 			EPRINT((env, DB_STR_A("1116",
 			    "Page %lu: hash page referenced twice", "%lu"),
 			    (u_long)pgno));
-			isbad = 1;
+			ret = DB_VERIFY_FATAL;
 			/* Unsafe to continue. */
 			goto err;
 		} else if ((ret = __db_vrfy_pgset_inc(vdp->pgset,
@@ -1307,7 +1307,11 @@ __ham_meta2pgset(dbp, vdp, hmeta, flags, pgset)
 	COMPQUIET(flags, 0);
 	ip = vdp->thread_info;
 
-	DB_ASSERT(dbp->env, pgset != NULL);
+	if (pgset == NULL) {
+		EPRINT((dbp->env, DB_STR("5548",
+			"Error, database contains no visible pages.")));
+		return (DB_VERIFY_FATAL);
+	}
 
 	mpf = dbp->mpf;
 	totpgs = 0;

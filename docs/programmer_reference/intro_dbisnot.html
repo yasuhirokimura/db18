@@ -14,7 +14,7 @@
   <body>
     <div xmlns="" class="navheader">
       <div class="libver">
-        <p>Library Version 18.1.32</p>
+        <p>Library Version 18.1.40</p>
       </div>
       <table width="100%" summary="Navigation header">
         <tr>
@@ -40,22 +40,22 @@
         <dl>
           <dt>
             <span class="sect2">
-              <a href="intro_dbisnot.html#idm140088473078096">Berkeley DB is not a relational database</a>
+              <a href="intro_dbisnot.html#idm140654545139600">Berkeley DB is not a relational database</a>
             </span>
           </dt>
           <dt>
             <span class="sect2">
-              <a href="intro_dbisnot.html#idm140088473252256">Berkeley DB is not an object-oriented database</a>
+              <a href="intro_dbisnot.html#idm140654545451440">Berkeley DB is not an object-oriented database</a>
             </span>
           </dt>
           <dt>
             <span class="sect2">
-              <a href="intro_dbisnot.html#idm140088473264224">Berkeley DB is not a network database</a>
+              <a href="intro_dbisnot.html#idm140654545583056">Berkeley DB is not a network database</a>
             </span>
           </dt>
           <dt>
             <span class="sect2">
-              <a href="intro_dbisnot.html#idm140088473324240">Berkeley DB is not a database server</a>
+              <a href="intro_dbisnot.html#idm140654545589696">Berkeley DB is not a database server</a>
             </span>
           </dt>
         </dl>
@@ -132,13 +132,12 @@
         <div class="titlepage">
           <div>
             <div>
-              <h3 class="title"><a id="idm140088473078096"></a>Berkeley DB is not a relational database</h3>
+              <h3 class="title"><a id="idm140654545139600"></a>Berkeley DB is not a relational database</h3>
             </div>
           </div>
         </div>
         <p>
-            While Berkeley DB does provide a set of optional SQL
-            APIs, usually all access to data stored in Berkeley DB is
+            Access to data stored in Berkeley DB is
             performed using the traditional Berkeley DB APIs. 
         </p>
         <p> 
@@ -146,15 +145,6 @@
             Berkeley DB users will use Berkeley DB. Although the
             interfaces are fairly simple, they are non-standard in
             that they do not support SQL statements. 
-        </p>
-        <p>
-            That said, Berkeley DB does provide a set of SQL APIs
-            that behave nearly identically to SQLite. By using these
-            APIs you can interface with Berkeley DB using SQL
-            statements. For Unix systems, these APIs are not available
-            by default, while for Windows systems they are available
-            by default. For more information, see the
-            <em class="citetitle">Berkeley DB Getting Started with the SQL APIs</em> guide. 
         </p>
         <p> 
             Be aware that SQL support is a double-edged sword. One
@@ -176,7 +166,7 @@
             can be very fast.
         </p>
         <p> 
-            Unless Berkeley DB is used with its SQL APIs, it has no
+            Berkeley DB has no
             notion of <span class="emphasis"><em>schema</em></span> and data types in
             the way that relational systems do. Schema is the
             structure of records in tables, and the relationships
@@ -207,8 +197,7 @@
             high-level database access. Compared to such systems,
             Berkeley DB is a high-performance, transactional library
             for record storage. It is possible to build a relational
-            system on top of Berkeley DB (indeed, this is what the
-            Berkeley DB SQL API really is). In fact, the popular MySQL
+            system on top of Berkeley DB.  In fact, the popular MySQL
             relational system uses Berkeley DB for
             transaction-protected table management, and takes care of
             all the SQL parsing and execution. It uses Berkeley DB for
@@ -220,7 +209,7 @@
         <div class="titlepage">
           <div>
             <div>
-              <h3 class="title"><a id="idm140088473252256"></a>Berkeley DB is not an object-oriented database</h3>
+              <h3 class="title"><a id="idm140654545451440"></a>Berkeley DB is not an object-oriented database</h3>
             </div>
           </div>
         </div>
@@ -249,7 +238,7 @@
         <div class="titlepage">
           <div>
             <div>
-              <h3 class="title"><a id="idm140088473264224"></a>Berkeley DB is not a network database</h3>
+              <h3 class="title"><a id="idm140654545583056"></a>Berkeley DB is not a network database</h3>
             </div>
           </div>
         </div>
@@ -268,7 +257,7 @@
         <div class="titlepage">
           <div>
             <div>
-              <h3 class="title"><a id="idm140088473324240"></a>Berkeley DB is not a database server</h3>
+              <h3 class="title"><a id="idm140654545589696"></a>Berkeley DB is not a database server</h3>
             </div>
           </div>
         </div>
@@ -280,11 +269,6 @@
             at the same time; the library handles coordination among
             the applications, and guarantees that they do not
             interfere with one another. 
-        </p>
-        <p> 
-            Berkeley DB does support the client-server architecture by 
-            providing a stand-alone server program and client driver APIs.
-            For more information, see <a class="xref" href="bdb_server.html" title="Chapter 6. Berkeley DB Server">Berkeley DB Server</a>.
         </p>
         <p> 
             It is also possible to build a server application that uses
