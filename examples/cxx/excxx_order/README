@@ -1,0 +1,40 @@
+This example shows how Oracle Berkeley Database can be used to implement 
+a MacDonald Self-Service Ordering System.This application provides the 
+communication interface via command line.
+
+There are two main entrance points for the system: administrator and customer.
+Administrator needs to set up environment and load the product data into
+ database and then customer can order the products.The command line will 
+ provide several command flags such as "o","c","D","d" and so on.
+
+Administrator: manage the testing environment and manage the product 
+information, incuding insert product into the product database by reading 
+directly or by bulk operation. Login unsername for administrator is admin and
+password for administrator is admin.
+
+Customer: manage the order information and display the product information, 
+including insert the product into order database,display order database and 
+product database.
+
+This example provides two ways for administrator or customer to access data 
+which includes bulk operation and non bulk operation.
+
+Before running the system, the input file is needed with the following format
+in the ./project directory:
+
+product.txt
+1&Chicken Burger&20&Burger
+2&Chicken Bacon Ranch&17&Salad
+3&Chicken McNuggets&15&Chicken
+4&Apple Slices&14&Snack
+
+BUILD and RUN
+
+Windows 
+To build this example, build the excxx_order project in Berkeley_DB solution 
+with Visual Studio platform.
+
+Unix/Linux
+To build this example, build Berkeley DB, then in the build_unix directory 
+execute the command "make excxx_order".
+

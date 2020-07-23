@@ -1,0 +1,328 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 47;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		910BEFB01D61BB5A0044FDDC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 910BEFAF1D61BB5A0044FDDC /* AppDelegate.swift */; };
+		910BEFB21D61BB5A0044FDDC /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 910BEFB11D61BB5A0044FDDC /* ViewController.swift */; };
+		910BEFB51D61BB5A0044FDDC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 910BEFB31D61BB5A0044FDDC /* Main.storyboard */; };
+		910BEFB71D61BB5A0044FDDC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 910BEFB61D61BB5A0044FDDC /* Assets.xcassets */; };
+		910BEFBA1D61BB5A0044FDDC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 910BEFB81D61BB5A0044FDDC /* LaunchScreen.storyboard */; };
+		910BEFC21D6353060044FDDC /* libdb-6.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 910BEFC11D6353060044FDDC /* libdb-6.3.dylib */; };
+		910BEFC41D65834E0044FDDC /* libdb_sql-6.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 910BEFC31D65834E0044FDDC /* libdb_sql-6.3.dylib */; };
+		910BEFC61D6585250044FDDC /* SQLiteDb.swift in Sources */ = {isa = PBXBuildFile; fileRef = 910BEFC51D6585250044FDDC /* SQLiteDb.swift */; };
+		910BEFCA1D65959D0044FDDC /* AuthenticationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 910BEFC91D65959D0044FDDC /* AuthenticationTests.swift */; };
+		910BEFCC1D6706500044FDDC /* TestError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 910BEFCB1D6706500044FDDC /* TestError.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		910BEFAC1D61BB5A0044FDDC /* SQL-UserAuth-Test.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SQL-UserAuth-Test.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		910BEFAF1D61BB5A0044FDDC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		910BEFB11D61BB5A0044FDDC /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		910BEFB41D61BB5A0044FDDC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		910BEFB61D61BB5A0044FDDC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		910BEFB91D61BB5A0044FDDC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		910BEFBB1D61BB5A0044FDDC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		910BEFC11D6353060044FDDC /* libdb-6.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libdb-6.3.dylib"; path = "../../../../build_unix/.libs/libdb-6.3.dylib"; sourceTree = "<group>"; };
+		910BEFC31D65834E0044FDDC /* libdb_sql-6.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libdb_sql-6.3.dylib"; path = "../../../../build_unix/.libs/libdb_sql-6.3.dylib"; sourceTree = "<group>"; };
+		910BEFC51D6585250044FDDC /* SQLiteDb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SQLiteDb.swift; sourceTree = "<group>"; };
+		910BEFC91D65959D0044FDDC /* AuthenticationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthenticationTests.swift; sourceTree = "<group>"; };
+		910BEFCB1D6706500044FDDC /* TestError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestError.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		910BEFA91D61BB5A0044FDDC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				910BEFC41D65834E0044FDDC /* libdb_sql-6.3.dylib in Frameworks */,
+				910BEFC21D6353060044FDDC /* libdb-6.3.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		910BEFA31D61BB5A0044FDDC = {
+			isa = PBXGroup;
+			children = (
+				910BEFC31D65834E0044FDDC /* libdb_sql-6.3.dylib */,
+				910BEFC11D6353060044FDDC /* libdb-6.3.dylib */,
+				910BEFAE1D61BB5A0044FDDC /* SQL-UserAuth-Test */,
+				910BEFAD1D61BB5A0044FDDC /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		910BEFAD1D61BB5A0044FDDC /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				910BEFAC1D61BB5A0044FDDC /* SQL-UserAuth-Test.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		910BEFAE1D61BB5A0044FDDC /* SQL-UserAuth-Test */ = {
+			isa = PBXGroup;
+			children = (
+				910BEFAF1D61BB5A0044FDDC /* AppDelegate.swift */,
+				910BEFB11D61BB5A0044FDDC /* ViewController.swift */,
+				910BEFB31D61BB5A0044FDDC /* Main.storyboard */,
+				910BEFB61D61BB5A0044FDDC /* Assets.xcassets */,
+				910BEFB81D61BB5A0044FDDC /* LaunchScreen.storyboard */,
+				910BEFBB1D61BB5A0044FDDC /* Info.plist */,
+				910BEFC51D6585250044FDDC /* SQLiteDb.swift */,
+				910BEFC91D65959D0044FDDC /* AuthenticationTests.swift */,
+				910BEFCB1D6706500044FDDC /* TestError.swift */,
+			);
+			path = "SQL-UserAuth-Test";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		910BEFAB1D61BB5A0044FDDC /* SQL-UserAuth-Test */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 910BEFBE1D61BB5A0044FDDC /* Build configuration list for PBXNativeTarget "SQL-UserAuth-Test" */;
+			buildPhases = (
+				910BEFA81D61BB5A0044FDDC /* Sources */,
+				910BEFA91D61BB5A0044FDDC /* Frameworks */,
+				910BEFAA1D61BB5A0044FDDC /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "SQL-UserAuth-Test";
+			productName = "SQL-UserAuth-Test";
+			productReference = 910BEFAC1D61BB5A0044FDDC /* SQL-UserAuth-Test.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		910BEFA41D61BB5A0044FDDC /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0730;
+				LastUpgradeCheck = 0730;
+				ORGANIZATIONNAME = "Berkeley DB";
+				TargetAttributes = {
+					910BEFAB1D61BB5A0044FDDC = {
+						CreatedOnToolsVersion = 7.3;
+					};
+				};
+			};
+			buildConfigurationList = 910BEFA71D61BB5A0044FDDC /* Build configuration list for PBXProject "SQL-UserAuth-Test" */;
+			compatibilityVersion = "Xcode 6.3";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 910BEFA31D61BB5A0044FDDC;
+			productRefGroup = 910BEFAD1D61BB5A0044FDDC /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				910BEFAB1D61BB5A0044FDDC /* SQL-UserAuth-Test */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		910BEFAA1D61BB5A0044FDDC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				910BEFBA1D61BB5A0044FDDC /* LaunchScreen.storyboard in Resources */,
+				910BEFB71D61BB5A0044FDDC /* Assets.xcassets in Resources */,
+				910BEFB51D61BB5A0044FDDC /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		910BEFA81D61BB5A0044FDDC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				910BEFCA1D65959D0044FDDC /* AuthenticationTests.swift in Sources */,
+				910BEFCC1D6706500044FDDC /* TestError.swift in Sources */,
+				910BEFB21D61BB5A0044FDDC /* ViewController.swift in Sources */,
+				910BEFB01D61BB5A0044FDDC /* AppDelegate.swift in Sources */,
+				910BEFC61D6585250044FDDC /* SQLiteDb.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		910BEFB31D61BB5A0044FDDC /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				910BEFB41D61BB5A0044FDDC /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		910BEFB81D61BB5A0044FDDC /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				910BEFB91D61BB5A0044FDDC /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		910BEFBC1D61BB5A0044FDDC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		910BEFBD1D61BB5A0044FDDC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		910BEFBF1D61BB5A0044FDDC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"BDBSQL_USER_AUTHENTICATION=1",
+				);
+				HEADER_SEARCH_PATHS = "";
+				INFOPLIST_FILE = "SQL-UserAuth-Test/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = "${SRCROOT}/../../../../build_unix/.libs";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.sleepycat.SQL-UserAuth-Test";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_INCLUDE_PATHS = "${SRCROOT}";
+			};
+			name = Debug;
+		};
+		910BEFC01D61BB5A0044FDDC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				HEADER_SEARCH_PATHS = "";
+				INFOPLIST_FILE = "SQL-UserAuth-Test/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = "${SRCROOT}/../../../../build_unix/.libs";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.sleepycat.SQL-UserAuth-Test";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_INCLUDE_PATHS = "${SRCROOT}";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		910BEFA71D61BB5A0044FDDC /* Build configuration list for PBXProject "SQL-UserAuth-Test" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				910BEFBC1D61BB5A0044FDDC /* Debug */,
+				910BEFBD1D61BB5A0044FDDC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		910BEFBE1D61BB5A0044FDDC /* Build configuration list for PBXNativeTarget "SQL-UserAuth-Test" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				910BEFBF1D61BB5A0044FDDC /* Debug */,
+				910BEFC01D61BB5A0044FDDC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 910BEFA41D61BB5A0044FDDC /* Project object */;
+}

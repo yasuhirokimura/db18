@@ -1,0 +1,132 @@
+--- src/btree.h
++++ src/btree.h
+@@ -120,16 +120,24 @@ int sqlite3BtreeClearTableOfCursor(BtCur
+ int sqlite3BtreeTripAllCursors(Btree*, int, int);
+ 
+ void sqlite3BtreeGetMeta(Btree *pBtree, int idx, u32 *pValue);
+ int sqlite3BtreeUpdateMeta(Btree*, int idx, u32 value);
+ 
+ int sqlite3BtreeNewDb(Btree *p);
+ 
+ /*
++ * BEGIN Berkeley DB specific function forward declarations.
++ */
++int sqlite3BtreeHandleCacheFixup(Btree *, int);
++/*
++ * END Berkeley DB specific function forward declarations.
++ */
++
++/*
+ ** The second parameter to sqlite3BtreeGetMeta or sqlite3BtreeUpdateMeta
+ ** should be one of the following values. The integer values are assigned 
+ ** to constants so that the offset of the corresponding field in an
+ ** SQLite database header may be found using the following formula:
+ **
+ **   offset = 36 + (idx * 4)
+ **
+ ** For example, the free-page-count field is located at byte offset 36 of
+--- src/vdbe.c
++++ src/vdbe.c
+@@ -2489,17 +2492,19 @@ case OP_Column: {
+       }
+     }else{
+       pCrsr = pC->uc.pCursor;
+       assert( pC->eCurType==CURTYPE_BTREE );
+       assert( pCrsr );
+       assert( sqlite3BtreeCursorIsValid(pCrsr) );
+       pC->payloadSize = sqlite3BtreePayloadSize(pCrsr);
+       pC->aRow = sqlite3BtreePayloadFetch(pCrsr, &avail);
+-      assert( avail<=65536 );  /* Maximum page size is 64KiB */
++      /* The BDB version can return data items larger than the largest page.
++      ** assert( avail<=65536 );
++      */
+       if( pC->payloadSize <= (u32)avail ){
+         pC->szRow = pC->payloadSize;
+       }else if( pC->payloadSize > (u32)db->aLimit[SQLITE_LIMIT_LENGTH] ){
+         goto too_big;
+       }else{
+         pC->szRow = avail;
+       }
+     }
+@@ -3172,26 +3177,28 @@ case OP_AutoCommit: {
+ ** if the schema generation counter in P4 differs from the current
+ ** generation counter, then an SQLITE_SCHEMA error is raised and execution
+ ** halts.  The sqlite3_step() wrapper function might then reprepare the
+ ** statement and rerun it from the beginning.
+ */
+ case OP_Transaction: {
+   Btree *pBt;
+   int iMeta;
++  int iSchemaUpdated;
+   int iGen;
+ 
+   assert( p->bIsReader );
+   assert( p->readOnly==0 || pOp->p2==0 );
+   assert( pOp->p1>=0 && pOp->p1<db->nDb );
+   assert( DbMaskTest(p->btreeMask, pOp->p1) );
+   if( pOp->p2 && (db->flags & SQLITE_QueryOnly)!=0 ){
+     rc = SQLITE_READONLY;
+     goto abort_due_to_error;
+   }
++  iSchemaUpdated = 0;
+   pBt = db->aDb[pOp->p1].pBt;
+ 
+   if( pBt ){
+     rc = sqlite3BtreeBeginTrans(pBt, pOp->p2);
+     testcase( rc==SQLITE_BUSY_SNAPSHOT );
+     testcase( rc==SQLITE_BUSY_RECOVERY );
+     if( rc!=SQLITE_OK ){
+       if( (rc&0xff)==SQLITE_BUSY ){
+@@ -3224,18 +3231,24 @@ case OP_Transaction: {
+       p->nStmtDefImmCons = db->nDeferredImmCons;
+     }
+ 
+     /* Gather the schema version number for checking:
+     ** IMPLEMENTATION-OF: R-03189-51135 As each SQL statement runs, the schema
+     ** version is checked to ensure that the schema has not changed since the
+     ** SQL statement was prepared.
+     */
+-    sqlite3BtreeGetMeta(pBt, BTREE_SCHEMA_VERSION, (u32 *)&iMeta);
+-    iGen = db->aDb[pOp->p1].pSchema->iGeneration;
++    if( pOp->p5 ){
++      sqlite3BtreeGetMeta(pBt, BTREE_SCHEMA_VERSION, (u32 *)&iMeta);
++      if (db->errCode == SQLITE_BUSY) {
++        rc = db->errCode;
++        goto abort_due_to_error;
++      }
++      iGen = db->aDb[pOp->p1].pSchema->iGeneration;
++    }
+   }else{
+     iGen = iMeta = 0;
+   }
+   assert( pOp->p5==0 || pOp->p4type==P4_INT32 );
+   if( pOp->p5 && (iMeta!=pOp->p3 || iGen!=pOp->p4.i) ){
+     sqlite3DbFree(db, p->zErrMsg);
+     p->zErrMsg = sqlite3DbStrDup(db, "database schema has changed");
+     /* If the schema-cookie from the database file matches the cookie 
+@@ -3247,22 +3260,25 @@ case OP_Transaction: {
+     ** are queried from within xNext() and other v-table methods using
+     ** prepared queries. If such a query is out-of-date, we do not want to
+     ** discard the database schema, as the user code implementing the
+     ** v-table would have to be ready for the sqlite3_vtab structure itself
+     ** to be invalidated whenever sqlite3_step() is called from within 
+     ** a v-table method.
+     */
+     if( db->aDb[pOp->p1].pSchema->schema_cookie!=iMeta ){
++      iSchemaUpdated = 1;
+       sqlite3ResetOneSchema(db, pOp->p1);
+     }
+     p->expired = 1;
+     rc = SQLITE_SCHEMA;
+   }
+   if( rc ) goto abort_due_to_error;
++  if( pOp->p5 && pBt )
++    sqlite3BtreeHandleCacheFixup(pBt, iSchemaUpdated);
+   break;
+ }
+ 
+ /* Opcode: ReadCookie P1 P2 P3 * *
+ **
+ ** Read cookie number P3 from database P1 and write it into register P2.
+ ** P3==1 is the schema version.  P3==2 is the database format.
+ ** P3==3 is the recommended pager cache size, and so forth.  P1==0 is

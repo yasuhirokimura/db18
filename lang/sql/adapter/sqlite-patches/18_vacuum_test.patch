@@ -1,0 +1,74 @@
+--- test/incrvacuum.test
++++ test/incrvacuum.test
+@@ -439,16 +439,18 @@ while 1 {
+           CREATE TABLE tbl1(a, b);
+           INSERT INTO tbl1 VALUES('hello', 'world');
+         }
+       }
+     }
+     list [expr {[file size test.db] / 1024}]
+   } {20}
+ 
++  if {$::nRow < $::iWrite} break
++
+   do_test incrvacuum-7.${::iWrite}.3 {
+     execsql {
+       SELECT * FROM tbl1;
+     }
+   } {hello world}
+ 
+   if {$::nRow == $::iWrite} break
+   incr ::iWrite
+@@ -685,17 +687,18 @@ do_test incrvacuum-12.5 {
+   execsql { PRAGMA auto_vacuum }
+ } {1}
+ 
+ #----------------------------------------------------------------------
+ # Special case #2: What if one process prepares a "PRAGMA auto_vacuum = XXX"
+ # statement when the database is empty, but doesn't execute it until
+ # after some other process has created the database.
+ #
+-db2 close
++# DBSQL does not do "db2 close" here because incrvacuum-12.2 is excluded 
++# so db2 is not opended.
+ db close
+ forcedelete test.db test.db-journal
+ sqlite3 db test.db  ;  set ::DB [sqlite3_connection_pointer db]
+ sqlite3 db2 test.db
+ 
+ do_test incrvacuum-13.1 {
+   # File size is sometimes 1 instead of 0 due to the hack we put in
+   # to work around ticket #3260.  Search for comments on #3260 in
+@@ -734,18 +734,18 @@ if {[permutation] == ""} {
+   do_test incrvacuum-14.1 {
+     set out [open invalid.db w]
+     puts $out "This is not an SQLite database file"
+     close $out
+     sqlite3 db3 invalid.db
+     catchsql {
+       PRAGMA incremental_vacuum(10);
+     } db3
++    db3 close
+   } {1 {file is encrypted or is not a database}}
+-  db3 close
+ }
+ 
+ do_test incrvacuum-15.1 {
+   db close
+   db2 close
+   forcedelete test.db
+   sqlite3 db test.db
+ 
+--- test/vacuum4.test
++++ test/vacuum4.test
+@@ -60,8 +60,10 @@ do_test vacuum4-1.1 {
+       c110, c111, c112, c113, c114, c115, c116, c117, c118, c119,
+       c120, c121, c122, c123, c124, c125, c126, c127, c128, c129,
+       c130, c131, c132, c133, c134, c135, c136, c137, c138, c139,
+       c140, c141, c142, c143, c144, c145, c146, c147, c148, c149
+     );
+     VACUUM;
+   }
+ } {}
++
++finish_test

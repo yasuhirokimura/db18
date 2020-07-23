@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Getting Started with Transactional Data Store Applications</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Programmer's Reference Guide" />
+    <link rel="up" href="transapp.html" title="Chapter 12.  Berkeley DB Transactional Data Store Applications" />
+    <link rel="prev" href="transapp_app.html" title="Architecting Transactional Data Store applications" />
+    <link rel="next" href="transapp_env_open.html" title="Opening the environment" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 18.1.25</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Getting Started with Transactional Data
+        Store Applications</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="transapp_app.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 12.  Berkeley DB Transactional Data Store Applications </th>
+          <td width="20%" align="right"> <a accesskey="n" href="transapp_env_open.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="quick_start_transapp_app"></a>Getting Started with Transactional Data
+        Store Applications</h2>
+          </div>
+        </div>
+      </div>
+      <div class="itemizedlist">
+        <ul type="disc">
+          <li>
+            <p>
+                Opening the Environment 
+            </p>
+            <p>
+              Use <code class="literal">DB_ENV-&gt;open()</code> to initialize the database environment. Once 
+              the application has called <code class="literal">DB_ENV-&gt;open()</code>, it opens its 
+              databases within the environment. The application then makes changes to 
+              the databases inside of transactions. Note that the databases accessed by a 
+              transaction must not be closed during the transaction.
+            </p>
+            <p>
+              Once all outstanding transactions are finished, all open Berkeley DB files 
+              should be closed. After that the environment should be closed by calling 
+              <code class="literal">DB_ENV-&gt;close()</code>. For more information, see 
+              <a class="xref" href="transapp_env_open.html" title="Opening the environment">Opening the environment</a>.
+            </p>
+          </li>
+          <li>
+            <p>
+                Opening the Databases 
+            </p>
+            <p>
+             For information on opening databases in the database environment, see 
+             <a class="xref" href="transapp_data_open.html" title="Opening the databases">Opening the databases</a>.
+            </p>
+          </li>
+          <li>
+            <p>
+                Using a Transaction
+            </p>
+            <p>
+            There are a number of reasons to include transactional support in your 
+            applications. The most common ones are the following:
+            </p>
+            <div class="itemizedlist">
+              <ul type="circle">
+                <li>
+                  <p>Recoverability</p>
+                  <p>For more information, see 
+             <a class="xref" href="transapp_put.html" title="Recoverability and deadlock handling">Recoverability and deadlock handling</a>.</p>
+                </li>
+                <li>
+                  <p>Atomicity</p>
+                  <p>For more information, see 
+             <a class="xref" href="transapp_atomicity.html" title="Atomicity">Atomicity</a>.</p>
+                </li>
+                <li>
+                  <p>Isolation</p>
+                  <p>For more information, see 
+             <a class="xref" href="transapp_inc.html" title="Isolation">Isolation</a>.</p>
+                </li>
+              </ul>
+            </div>
+          </li>
+          <li>
+            <p>
+                Using Transactional Cursor 
+            </p>
+            <p>
+            Berkeley DB cursors may be used inside a transaction, just like any other 
+            database method. The enclosing transaction ID must be specified when the cursor is 
+            created, but it does not need to be further specified on operations 
+            performed using the cursor. Note that a cursor must be closed before the 
+            enclosing transaction is committed or aborted. For more information, see 
+            <a class="xref" href="transapp_cursor.html" title="Transactional cursors">Transactional cursors</a>.
+            </p>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="transapp_app.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="transapp.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="transapp_env_open.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Architecting Transactional Data
+        Store applications </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Opening the environment</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

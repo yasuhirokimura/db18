@@ -1,0 +1,145 @@
+--- Makefile.in
++++ Makefile.in
+@@ -162,18 +162,18 @@ LTINSTALL = $(LIBTOOL) --mode=install $(
+ 
+ USE_AMALGAMATION = @USE_AMALGAMATION@
+ 
+ # Object files for the SQLite library (non-amalgamation).
+ #
+ LIBOBJS0 = alter.lo analyze.lo attach.lo auth.lo \
+          backup.lo bitvec.lo btmutex.lo btree.lo build.lo \
+          callback.lo complete.lo ctime.lo date.lo dbstat.lo db_encrypt.lo \
+-         db_pragma.lo db_shell.lo delete.lo expr.lo fault.lo fkey.lo \
+-         fts3.lo fts3_aux.lo fts3_expr.lo fts3_hash.lo fts3_icu.lo \
++         db_pragma.lo db_sequence.lo db_shell.lo delete.lo expr.lo fault.lo \
++         fkey.lo fts3.lo fts3_aux.lo fts3_expr.lo fts3_hash.lo fts3_icu.lo \
+          fts3_porter.lo fts3_snippet.lo fts3_tokenizer.lo fts3_tokenizer1.lo \
+          fts3_tokenize_vtab.lo \
+          fts3_unicode.lo fts3_unicode2.lo fts3_write.lo \
+ 	 fts5.lo \
+          func.lo global.lo hash.lo \
+          icu.lo insert.lo json1.lo legacy.lo loadext.lo \
+          main.lo malloc.lo mem0.lo mem1.lo mem2.lo mem3.lo mem5.lo \
+          memjournal.lo \
+@@ -213,16 +213,17 @@ SRC = \
+   $(TOP)/src/build.c \
+   $(TOP)/src/callback.c \
+   $(TOP)/src/complete.c \
+   $(TOP)/src/ctime.c \
+   $(TOP)/src/date.c \
+   $(TOP)/src/dbstat.c \
+   $(TOP)/../adapter/db_encrypt.c \
+   $(TOP)/../adapter/db_pragma.c \
++  $(TOP)/../adapter/db_sequence.c \
+   $(TOP)/../adapter/db_shell.c \
+   $(TOP)/src/delete.c \
+   $(TOP)/src/expr.c \
+   $(TOP)/src/fault.c \
+   $(TOP)/src/fkey.c \
+   $(TOP)/src/func.c \
+   $(TOP)/src/global.c \
+   $(TOP)/src/hash.c \
+@@ -441,16 +442,17 @@ TESTSRC += \
+ 
+ # Source code to the library files needed by the test fixture
+ #
+ TESTSRC2 = \
+   $(TOP)/src/attach.c \
+   $(TOP)/../adapter/backup.c \
+   $(TOP)/src/bitvec.c \
+   $(TOP)/../adapter/btree.c \
++  $(TOP)/../adapter/db_sequence.c \
+   $(TOP)/src/build.c \
+   $(TOP)/src/ctime.c \
+   $(TOP)/src/date.c \
+   $(TOP)/src/dbstat.c \
+   $(TOP)/src/expr.c \
+   $(TOP)/src/func.c \
+   $(TOP)/src/insert.c \
+   $(TOP)/../adapter/wal.c \
+@@ -749,16 +751,20 @@ ctime.lo:	$(TOP)/src/ctime.c $(HDR)
+ db_encrypt.lo:	$(TOP)/../adapter/db_encrypt.c $(HDR) \
+ 		$(TOP)/../adapter/btreeInt.h
+ 	$(LTCOMPILE) $(TEMP_STORE) -c $(TOP)/../adapter/db_encrypt.c
+ 
+ db_pragma.lo:	$(TOP)/../adapter/db_pragma.c $(HDR) \
+ 		$(TOP)/../adapter/btreeInt.h
+ 	$(LTCOMPILE) $(TEMP_STORE) -c $(TOP)/../adapter/db_pragma.c
+ 
++db_sequence.lo:	$(TOP)/../adapter/db_sequence.c $(HDR) \
++		$(TOP)/../adapter/btreeInt.h
++	$(LTCOMPILE) $(TEMP_STORE) -c $(TOP)/../adapter/db_sequence.c
++
+ db_shell.lo:	$(TOP)/../adapter/db_shell.c $(HDR) \
+ 		$(TOP)/../adapter/btreeInt.h
+ 	$(LTCOMPILE) $(TEMP_STORE) -c $(TOP)/../adapter/db_shell.c
+ 
+ delete.lo:	$(TOP)/src/delete.c $(HDR)
+ 	$(LTCOMPILE) $(TEMP_STORE) -c $(TOP)/src/delete.c
+ 
+ expr.lo:	$(TOP)/src/expr.c $(HDR)
+--- src/main.c
++++ src/main.c
+@@ -56,16 +56,18 @@ const char *sqlite3_sourceid(void){ retu
+ int sqlite3_libversion_number(void){ return SQLITE_VERSION_NUMBER; }
+ 
+ /* IMPLEMENTATION-OF: R-20790-14025 The sqlite3_threadsafe() function returns
+ ** zero if and only if SQLite was compiled with mutexing code omitted due to
+ ** the SQLITE_THREADSAFE compile-time option being set to 0.
+ */
+ int sqlite3_threadsafe(void){ return SQLITE_THREADSAFE; }
+ 
++extern int add_sequence_functions(sqlite3 *db);
++
+ /*
+ ** When compiling the test fixture or with debugging enabled (on Win32),
+ ** this variable being set to non-zero will cause OSTRACE macros to emit
+ ** extra diagnostic information.
+ */
+ #ifdef SQLITE_HAVE_OS_TRACE
+ # ifndef SQLITE_DEBUG_OS_TRACE
+ #   define SQLITE_DEBUG_OS_TRACE 0
+@@ -2922,16 +2924,23 @@ static int openDatabase(
+     goto opendb_out;
+   }
+   /* EVIDENCE-OF: R-08308-17224 The default collating function for all
+   ** strings is BINARY. 
+   */
+   db->pDfltColl = sqlite3FindCollSeq(db, SQLITE_UTF8, sqlite3StrBINARY, 0);
+   assert( db->pDfltColl!=0 );
+ 
++  /*
++  ** Berkley DB customization!
++  ** Register any Berkeley DB specific extension functions.
++  */
++  add_sequence_functions(db);
++  /* End Berkeley DB customization. */
++
+   /* Parse the filename/URI argument. */
+   db->openFlags = flags;
+   rc = sqlite3ParseUri(zVfs, zFilename, &flags, &db->pVfs, &zOpen, &zErrMsg);
+   if( rc!=SQLITE_OK ){
+     if( rc==SQLITE_NOMEM ) sqlite3OomFault(db);
+     sqlite3ErrorWithMsg(db, rc, zErrMsg ? "%s" : 0, zErrMsg);
+     sqlite3_free(zErrMsg);
+     goto opendb_out;
+--- tool/mksqlite3c.tcl
++++ tool/mksqlite3c.tcl
+@@ -320,16 +320,17 @@ foreach file {
+    pager.c
+    wal.c
+ 
+    btmutex.c
+    btree.c
+    backup.c
+    db_encrypt.c
+    db_pragma.c
++   db_sequence.c
+    db_shell.c
+ 
+    vdbemem.c
+    vdbeaux.c
+    vdbeapi.c
+    vdbetrace.c
+    vdbe.c
+    vdbeblob.c

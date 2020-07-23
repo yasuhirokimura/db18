@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Chapter 10.  Mutex Methods</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C++ API Reference" />
+    <link rel="up" href="index.html" title="Berkeley DB C++ API Reference" />
+    <link rel="prev" href="mempset_priority.html" title="DbMpoolFile::set_priority()" />
+    <link rel="next" href="mutexalloc.html" title="DbEnv::mutex_alloc()" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 18.1.25</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Chapter 10. 
+                Mutex Methods 
+        </th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="mempset_priority.html">Prev</a> </td>
+          <th width="60%" align="center"> </th>
+          <td width="20%" align="right"> <a accesskey="n" href="mutexalloc.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="chapter" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title"><a id="mutex"></a>Chapter 10. 
+                Mutex Methods 
+        </h2>
+          </div>
+        </div>
+      </div>
+      <p>
+                This chapter describes methods that can be used to manage
+                mutexes within DB. Many of the methods described here
+                are used to configure DB's internal mutex system.
+                However, a series of APIs are available for use as a
+                general-purpose, cross platform mutex management system.
+                These methods can be used independently of DB's main
+                purpose, which is as a high-end data management engine.
+        </p>
+      <div class="sect1" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title" style="clear: both"><a id="mutexlist"></a>Mutex Methods</h2>
+            </div>
+          </div>
+        </div>
+        <div class="navtable">
+          <table border="1" width="80%">
+            <thead>
+              <tr>
+                <th>Mutexes and Related Methods</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <a class="xref" href="mutexalloc.html" title="DbEnv::mutex_alloc()">
+        
+        <span>DbEnv::mutex_alloc()</span>
+    </a>
+                </td>
+                <td>Allocate a mutex</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="mutexfree.html" title="DbEnv::mutex_free()">
+        
+        <span>DbEnv::mutex_free()</span>
+    </a>
+                </td>
+                <td>Free a mutex</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="mutexlock.html" title="DbEnv::mutex_lock()">
+        
+        <span>DbEnv::mutex_lock()</span>
+    </a>
+                </td>
+                <td>Lock a mutex</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="mutexstat.html" title="DbEnv::mutex_stat()">
+        
+        <span>DbEnv::mutex_stat()</span>
+    </a>
+                </td>
+                <td>Mutex statistics</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="mutexstat_print.html" title="DbEnv::mutex_stat_print()">
+        
+        <span>DbEnv::mutex_stat_print()</span>
+    </a>
+                </td>
+                <td>Print mutex statistics</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="mutexunlock.html" title="DbEnv::mutex_unlock()">
+        
+        <span>DbEnv::mutex_unlock()</span>
+    </a>
+                </td>
+                <td>Unlock a mutex</td>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  <span class="bold">
+                    <strong>Mutex Configuration</strong>
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td><a class="xref" href="mutexset_align.html" title="DbEnv::mutex_set_align()">
+        
+        <span>DbEnv::mutex_set_align()</span>
+    </a>, <a class="xref" href="mutexget_align.html" title="DbEnv::mutex_get_align()">
+        
+        <span>DbEnv::mutex_get_align()</span>
+    </a></td>
+                <td>Configure mutex alignment</td>
+              </tr>
+              <tr>
+                <td><a class="xref" href="mutexset_increment.html" title="DbEnv::mutex_set_increment()">
+        
+        <span>DbEnv::mutex_set_increment()</span>
+    </a>, <a class="xref" href="mutexget_increment.html" title="DbEnv::mutex_get_increment()">
+        
+        <span>DbEnv::mutex_get_increment()</span>
+    </a></td>
+                <td>Configure number of additional mutexes</td>
+              </tr>
+              <tr>
+                <td><a class="xref" href="mutexset_init.html" title="DbEnv::mutex_set_init()">
+        
+        <span>DbEnv::mutex_set_init()</span>
+    </a>, <a class="xref" href="mutexget_init.html" title="DbEnv::mutex_get_init()">
+        
+        <span>DbEnv::mutex_get_init()</span>
+    </a></td>
+                <td>Configure initial number of mutexes</td>
+              </tr>
+              <tr>
+                <td><a class="xref" href="mutexset_max.html" title="DbEnv::mutex_set_max()">
+        
+        <span>DbEnv::mutex_set_max()</span>
+    </a>, <a class="xref" href="mutexget_max.html" title="DbEnv::mutex_get_max()">
+        
+        <span>DbEnv::mutex_get_max()</span>
+    </a></td>
+                <td>Configure total number of mutexes</td>
+              </tr>
+              <tr>
+                <td><a class="xref" href="mutexset_tas_spins.html" title="DbEnv::mutex_set_tas_spins()">
+        
+        <span>DbEnv::mutex_set_tas_spins()</span>
+    </a>, <a class="xref" href="mutexget_tas_spins.html" title="DbEnv::mutex_get_tas_spins()">
+        
+        <span>DbEnv::mutex_get_tas_spins()</span>
+    </a></td>
+                <td>Configure test-and-set mutex spin count</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="mempset_priority.html">Prev</a> </td>
+          <td width="20%" align="center"> </td>
+          <td width="40%" align="right"> <a accesskey="n" href="mutexalloc.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">
+        
+        <span>DbMpoolFile::set_priority()</span>
+     </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> 
+        
+        <span>DbEnv::mutex_alloc()</span>
+    </td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

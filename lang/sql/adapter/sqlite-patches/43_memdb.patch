@@ -1,0 +1,22 @@
+--- test/memdb.test
++++ test/memdb.test
+@@ -413,16 +413,19 @@ ifcapable autovacuum {
+     sqlite3 db test.db
+     db cache size 0
+     execsql {
+       PRAGMA auto_vacuum = full;
+       CREATE TABLE t1(a);
+       INSERT INTO t1 VALUES(randstr(1000,1000));
+       INSERT INTO t1 VALUES(randstr(1000,1000));
+       INSERT INTO t1 VALUES(randstr(1000,1000));
++      INSERT INTO t1 VALUES(randstr(1000,1000));
++      INSERT INTO t1 VALUES(randstr(1000,1000));
++      INSERT INTO t1 VALUES(randstr(1000,1000));
+     }
+     set before [db one {PRAGMA page_count}]
+     execsql { DELETE FROM t1 }
+     set after [db one {PRAGMA page_count}]
+     expr {$before>$after}
+   } {1}
+ }
+ 

@@ -1,0 +1,42 @@
+--- src/ctime.c
++++ src/ctime.c
+@@ -34,16 +34,19 @@ static const char * const azCompileOpt[]
+ #define CTIMEOPT_VAL(opt) CTIMEOPT_VAL_(opt)
+ 
+ #if SQLITE_32BIT_ROWID
+   "32BIT_ROWID",
+ #endif
+ #if SQLITE_4_BYTE_ALIGNED_MALLOC
+   "4_BYTE_ALIGNED_MALLOC",
+ #endif
++#ifdef DB_VERSION_STRING
++  "BERKELEY_DB",
++#endif
+ #if SQLITE_CASE_SENSITIVE_LIKE
+   "CASE_SENSITIVE_LIKE",
+ #endif
+ #if SQLITE_CHECK_PAGES
+   "CHECK_PAGES",
+ #endif
+ #if defined(__clang__) && defined(__clang_major__)
+   "COMPILER=clang-" CTIMEOPT_VAL(__clang_major__) "."
+@@ -399,16 +402,19 @@ static const char * const azCompileOpt[]
+   "UNTESTABLE"
+ #endif
+ #if SQLITE_USE_ALLOCA
+   "USE_ALLOCA",
+ #endif
+ #if SQLITE_USER_AUTHENTICATION
+   "USER_AUTHENTICATION",
+ #endif
++#if BDBSQL_USER_AUTHENTICATION_KEYSTORE
++  "BDBSQL_USER_AUTHENTICATION_KEYSTORE",
++#endif
+ #if SQLITE_WIN32_MALLOC
+   "WIN32_MALLOC",
+ #endif
+ #if SQLITE_ZERO_MALLOC
+   "ZERO_MALLOC"
+ #endif
+ };
+ 

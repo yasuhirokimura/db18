@@ -1,0 +1,45 @@
+--- src/shell.c
++++ src/shell.c
+@@ -5733,17 +5741,17 @@ static void main_init(ShellState *data) 
+   data->autoExplain = 1;
+   memcpy(data->colSeparator,SEP_Column, 2);
+   memcpy(data->rowSeparator,SEP_Row, 2);
+   data->showHeader = 0;
+   data->shellFlgs = SHFLG_Lookaside;
+   sqlite3_config(SQLITE_CONFIG_URI, 1);
+   sqlite3_config(SQLITE_CONFIG_LOG, shellLog, data);
+   sqlite3_config(SQLITE_CONFIG_MULTITHREAD);
+-  sqlite3_snprintf(sizeof(mainPrompt), mainPrompt,"sqlite> ");
++  sqlite3_snprintf(sizeof(mainPrompt), mainPrompt,"dbsql> ");
+   sqlite3_snprintf(sizeof(continuePrompt), continuePrompt,"   ...> ");
+ }
+ 
+ /*
+ ** Output text to the console in a font that attracts extra attention.
+ */
+ #ifdef _WIN32
+ static void printBold(const char *zText){
+@@ -6124,20 +6132,21 @@ int SQLITE_CDECL wmain(int argc, wchar_t
+     free(azCmd);
+   }else{
+     /* Run commands received from standard input
+     */
+     if( stdin_is_interactive ){
+       char *zHome;
+       char *zHistory = 0;
+       int nHistory;
++      extern char *db_full_version(int *, int *, int *, int *, int *);
+       printf(
+-        "SQLite version %s %.19s\n" /*extra-version-info*/
++        "%s\n"
+         "Enter \".help\" for usage hints.\n",
+-        sqlite3_libversion(), sqlite3_sourceid()
++        db_full_version(NULL, NULL, NULL, NULL, NULL)
+       );
+       if( warnInmemoryDb ){
+         printf("Connected to a ");
+         printBold("transient in-memory database");
+         printf(".\nUse \".open FILENAME\" to reopen on a "
+                "persistent database.\n");
+       }
+       zHome = find_home_dir(0);

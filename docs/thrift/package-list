@@ -1,0 +1,7 @@
+com.sleepycat.client
+com.sleepycat.client.asm
+com.sleepycat.client.bind
+com.sleepycat.client.collections
+com.sleepycat.client.persist
+com.sleepycat.client.util
+com.sleepycat.thrift

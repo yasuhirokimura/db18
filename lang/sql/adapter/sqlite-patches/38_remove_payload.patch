@@ -1,0 +1,474 @@
+--- src/btree.h
++++ src/btree.h
+@@ -285,26 +285,28 @@ 
+ int sqlite3BtreeInsert(BtCursor*, const BtreePayload *pPayload,
+                        int flags, int seekResult);
+ int sqlite3BtreeFirst(BtCursor*, int *pRes);
+ int sqlite3BtreeLast(BtCursor*, int *pRes);
+ int sqlite3BtreeNext(BtCursor*, int *pRes);
+ int sqlite3BtreeEof(BtCursor*);
+ int sqlite3BtreePrevious(BtCursor*, int *pRes);
+ i64 sqlite3BtreeIntegerKey(BtCursor*);
+-int sqlite3BtreePayload(BtCursor*, u32 offset, u32 amt, void*);
+-const void *sqlite3BtreePayloadFetch(BtCursor*, u32 *pAmt);
+-u32 sqlite3BtreePayloadSize(BtCursor*);
++int sqlite3BtreeKeySize(BtCursor*, i64 *pSize);
++int sqlite3BtreeKey(BtCursor*, u32 offset, u32 amt, void*);
++const void *sqlite3BtreeKeyFetch(BtCursor*, u32 *pAmt);
++const void *sqlite3BtreeDataFetch(BtCursor*, u32 *pAmt);
++int sqlite3BtreeDataSize(BtCursor*, u32 *pSize);
++int sqlite3BtreeData(BtCursor*, u32 offset, u32 amt, void*);
+ 
+ char *sqlite3BtreeIntegrityCheck(Btree*, int *aRoot, int nRoot, int, int*);
+ struct Pager *sqlite3BtreePager(Btree*);
+ i64 sqlite3BtreeRowCountEst(BtCursor*);
+ 
+ #ifndef SQLITE_OMIT_INCRBLOB
+-int sqlite3BtreePayloadChecked(BtCursor*, u32 offset, u32 amt, void*);
+ int sqlite3BtreePutData(BtCursor*, u32 offset, u32 amt, void*);
+ void sqlite3BtreeIncrblobCursor(BtCursor *);
+ #endif
+ void sqlite3BtreeClearCursor(BtCursor *);
+ int sqlite3BtreeSetVersion(Btree *pBt, int iVersion);
+ int sqlite3BtreeCursorHasHint(BtCursor*, unsigned int mask);
+ int sqlite3BtreeIsReadonly(Btree *pBt);
+ int sqlite3HeaderSizeBtree(void);
+--- src/test3.c
++++ src/test3.c
+@@ -378,17 +378,19 @@ static int SQLITE_TCLAPI btree_payload_s
+ 
+   if( argc!=2 ){
+     Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
+        " ID\"", 0);
+     return TCL_ERROR;
+   }
+   pCur = sqlite3TestTextToPtr(argv[1]);
+   sqlite3BtreeEnter(pCur->pBtree);
+-  n = sqlite3BtreePayloadSize(pCur);
++  /* The cursor may be in "require-seek" state. If this is the case, the
++  ** call to BtreeDataSize() will fix it. */
++  sqlite3BtreeDataSize(pCur, (u32*)&n);
+   sqlite3BtreeLeave(pCur->pBtree);
+   sqlite3_snprintf(sizeof(zBuf),zBuf, "%u", n);
+   Tcl_AppendResult(interp, zBuf, 0);
+   return SQLITE_OK;
+ }
+ 
+ /*
+ ** usage:   btree_from_db  DB-HANDLE
+--- src/vdbe.c
++++ src/vdbe.c
+@@ -2453,16 +2453,17 @@ case OP_NotNull: {            /* same as
+ ** register has changed should have this bit set.
+ **
+ ** If the OPFLAG_LENGTHARG and OPFLAG_TYPEOFARG bits are set on P5 when
+ ** the result is guaranteed to only be used as the argument of a length()
+ ** or typeof() function, respectively.  The loading of large blobs can be
+ ** skipped for length() and all content loading can be skipped for typeof().
+ */
+ case OP_Column: {
++  i64 payloadSize64; /* Number of bytes in the record */
+   int p2;            /* column number to retrieve */
+   VdbeCursor *pC;    /* The VDBE cursor */
+   BtCursor *pCrsr;   /* The BTree cursor */
+   u32 *aOffset;      /* aOffset[i] is offset to start of data for i-th column */
+   int len;           /* The length of the serialized data for the column */
+   int i;             /* Loop counter */
+   Mem *pDest;        /* Where to write the extracted value */
+   Mem sMem;          /* For storing the record being decoded */
+@@ -2506,18 +2507,30 @@ case OP_Column: {
+         sqlite3VdbeMemSetNull(pDest);
+         goto op_column_out;
+       }
+     }else{
+       pCrsr = pC->uc.pCursor;
+       assert( pC->eCurType==CURTYPE_BTREE );
+       assert( pCrsr );
+       assert( sqlite3BtreeCursorIsValid(pCrsr) );
+-      pC->payloadSize = sqlite3BtreePayloadSize(pCrsr);
+-      pC->aRow = sqlite3BtreePayloadFetch(pCrsr, &avail);
++      if( pC->isTable==0 ){
++        VVA_ONLY(rc =) sqlite3BtreeKeySize(pCrsr, &payloadSize64);
++        assert( rc==SQLITE_OK ); /* True because of CursorMoveto() call above */
++        /* sqlite3BtreeParseCellPtr() uses getVarint32() to extract the
++        ** payload size, so it is impossible for payloadSize64 to be
++        ** larger than 32 bits. */
++        assert( (payloadSize64 & SQLITE_MAX_U32)==(u64)payloadSize64 );
++        pC->aRow = sqlite3BtreeKeyFetch(pCrsr, &avail);
++        pC->payloadSize = (u32)payloadSize64;
++      }else{
++        VVA_ONLY(rc =) sqlite3BtreeDataSize(pCrsr, &pC->payloadSize);
++        assert( rc==SQLITE_OK );   /* DataSize() cannot fail */
++        pC->aRow = sqlite3BtreeDataFetch(pCrsr, &avail);
++      }
+       /* The BDB version can return data items larger than the largest page.
+       ** assert( avail<=65536 );
+       */
+       if( pC->payloadSize <= (u32)avail ){
+         pC->szRow = pC->payloadSize;
+       }else if( pC->payloadSize > (u32)db->aLimit[SQLITE_LIMIT_LENGTH] ){
+         goto too_big;
+       }else{
+@@ -2568,17 +2581,17 @@ case OP_Column: {
+   if( pC->nHdrParsed<=p2 ){
+     /* If there is more header available for parsing in the record, try
+     ** to extract additional fields up through the p2+1-th field 
+     */
+     if( pC->iHdrOffset<aOffset[0] ){
+       /* Make sure zData points to enough of the record to cover the header. */
+       if( pC->aRow==0 ){
+         memset(&sMem, 0, sizeof(sMem));
+-        rc = sqlite3VdbeMemFromBtree(pC->uc.pCursor, 0, aOffset[0], &sMem);
++        rc = sqlite3VdbeMemFromBtree(pC->uc.pCursor, 0, aOffset[0], !pC->isTable, &sMem);
+         if( rc!=SQLITE_OK ) goto abort_due_to_error;
+         zData = (u8*)sMem.z;
+       }else{
+         zData = pC->aRow;
+       }
+   
+       /* Fill in pC->aType[i] and aOffset[i] values through the p2-th field. */
+     op_column_read_header:
+@@ -2686,17 +2699,17 @@ case OP_Column: {
+       **
+       ** Although sqlite3VdbeSerialGet() may read at most 8 bytes from the
+       ** buffer passed to it, debugging function VdbeMemPrettyPrint() may
+       ** read up to 16. So 16 bytes of bogus content is supplied.
+       */
+       static u8 aZero[16];  /* This is the bogus content */
+       sqlite3VdbeSerialGet(aZero, t, pDest);
+     }else{
+-      rc = sqlite3VdbeMemFromBtree(pC->uc.pCursor, aOffset[p2], len, pDest);
++      rc = sqlite3VdbeMemFromBtree(pC->uc.pCursor, aOffset[p2], len, !pC->isTable, pDest);
+       if( rc!=SQLITE_OK ) goto abort_due_to_error;
+       sqlite3VdbeSerialGet((const u8*)pDest->z, t, pDest);
+       pDest->flags &= ~MEM_Ephem;
+     }
+   }
+ 
+ op_column_out:
+   UPDATE_MAX_BLOBSIZE(pDest);
+@@ -4424,16 +4424,17 @@ case OP_InsertInt: {
+   int seekResult;   /* Result of prior seek or 0 if no USESEEKRESULT flag */
+   const char *zDb;  /* database name - used by the update hook */
+   Table *pTab;      /* Table structure - used by update and pre-update hooks */
+   int op;           /* Opcode for update hook: SQLITE_UPDATE or SQLITE_INSERT */
+   BtreePayload x;   /* Payload to be inserted */
+ 
+   op = 0;
+   pData = &aMem[pOp->p2];
++  memset(&x, 0, sizeof(BtreePayload));
+   assert( pOp->p1>=0 && pOp->p1<p->nCursor );
+   assert( memIsValid(pData) );
+   pC = p->apCsr[pOp->p1];
+   assert( pC!=0 );
+   assert( pC->eCurType==CURTYPE_BTREE );
+   assert( pC->uc.pCursor!=0 );
+   assert( (pOp->p5 & OPFLAG_ISNOOP) || pC->isTable );
+   assert( pOp->p4type==P4_TABLE || pOp->p4type>=P4_STATIC );
+@@ -4718,16 +4731,17 @@ case OP_SorterData: {
+ ** in OP_Result and any OP_Result will invalidate the P2 register content.
+ ** The P2 register content is invalidated by opcodes like OP_Function or
+ ** by any use of another cursor pointing to the same table.
+ */
+ case OP_RowData: {
+   VdbeCursor *pC;
+   BtCursor *pCrsr;
+   u32 n;
++  i64 n64;
+ 
+   pOut = out2Prerelease(p, pOp);
+ 
+   assert( pOp->p1>=0 && pOp->p1<p->nCursor );
+   pC = p->apCsr[pOp->p1];
+   assert( pC!=0 );
+   assert( pC->eCurType==CURTYPE_BTREE );
+   assert( isSorter(pC)==0 );
+@@ -4745,22 +4759,33 @@ case OP_RowData: {
+   */
+   assert( pC->deferredMoveto==0 );
+   assert( sqlite3BtreeCursorIsValid(pCrsr) );
+ #if 0  /* Not required due to the previous to assert() statements */
+   rc = sqlite3VdbeCursorMoveto(pC);
+   if( rc!=SQLITE_OK ) goto abort_due_to_error;
+ #endif
+ 
+-  n = sqlite3BtreePayloadSize(pCrsr);
+-  if( n>(u32)db->aLimit[SQLITE_LIMIT_LENGTH] ){
+-    goto too_big;
++  if( pC->isTable==0 ){
++    assert( !pC->isTable );
++    VVA_ONLY(rc =) sqlite3BtreeKeySize(pCrsr, &n64);
++    assert( rc==SQLITE_OK );    /* True because of CursorMoveto() call above */
++    if( n64>db->aLimit[SQLITE_LIMIT_LENGTH] ){
++      goto too_big;
++    }
++    n = (u32)n64;
++  }else{
++    VVA_ONLY(rc =) sqlite3BtreeDataSize(pCrsr, &n);
++    assert( rc==SQLITE_OK );    /* DataSize() cannot fail */
++    if( n>(u32)db->aLimit[SQLITE_LIMIT_LENGTH] ){
++      goto too_big;
++    }
+   }
+   testcase( n==0 );
+-  rc = sqlite3VdbeMemFromBtree(pCrsr, 0, n, pOut);
++  rc = sqlite3VdbeMemFromBtree(pCrsr, 0, n, !pC->isTable, pOut);
+   if( rc ) goto abort_due_to_error;
+   if( !pOp->p3 ) Deephemeralize(pOut);
+   UPDATE_MAX_BLOBSIZE(pOut);
+   REGISTER_TRACE(pOp->p2, pOut);
+   break;
+ }
+ 
+ /* Opcode: Rowid P1 P2 * * *
+@@ -5173,16 +5174,17 @@ next_tail:
+ ** MakeRecord instructions.  This opcode writes that key
+ ** into the sorter P1.  Data for the entry is nil.
+ */
+ case OP_SorterInsert:       /* in2 */
+ case OP_IdxInsert: {        /* in2 */
+   VdbeCursor *pC;
+   BtreePayload x;
+ 
++  memset(&x, 0, sizeof(BtreePayload));
+   assert( pOp->p1>=0 && pOp->p1<p->nCursor );
+   pC = p->apCsr[pOp->p1];
+   assert( pC!=0 );
+   assert( isSorter(pC)==(pOp->opcode==OP_SorterInsert) );
+   pIn2 = &aMem[pOp->p2];
+   assert( pIn2->flags & MEM_Blob );
+   if( pOp->p5 & OPFLAG_NCHANGE ) p->nChange++;
+   assert( pC->eCurType==CURTYPE_BTREE || pOp->opcode==OP_SorterInsert );
+--- src/vdbeInt.h
++++ src/vdbeInt.h
+@@ -483,17 +483,17 @@ int sqlite3VdbeMemMakeWriteable(Mem*);
+ int sqlite3VdbeMemStringify(Mem*, u8, u8);
+ i64 sqlite3VdbeIntValue(Mem*);
+ int sqlite3VdbeMemIntegerify(Mem*);
+ double sqlite3VdbeRealValue(Mem*);
+ void sqlite3VdbeIntegerAffinity(Mem*);
+ int sqlite3VdbeMemRealify(Mem*);
+ int sqlite3VdbeMemNumerify(Mem*);
+ void sqlite3VdbeMemCast(Mem*,u8,u8);
+-int sqlite3VdbeMemFromBtree(BtCursor*,u32,u32,Mem*);
++int sqlite3VdbeMemFromBtree(BtCursor*,u32,u32,int,Mem*);
+ void sqlite3VdbeMemRelease(Mem *p);
+ int sqlite3VdbeMemFinalize(Mem*, FuncDef*);
+ const char *sqlite3OpcodeName(int);
+ int sqlite3VdbeMemGrow(Mem *pMem, int n, int preserve);
+ int sqlite3VdbeMemClearAndResize(Mem *pMem, int n);
+ int sqlite3VdbeCloseStatement(Vdbe *, int);
+ void sqlite3VdbeFrameDelete(VdbeFrame*);
+ int sqlite3VdbeFrameRestore(VdbeFrame *);
+--- src/vdbeapi.c
++++ src/vdbeapi.c
+@@ -1659,16 +1659,17 @@ static UnpackedRecord *vdbeUnpackRecord(
+ /*
+ ** This function is called from within a pre-update callback to retrieve
+ ** a field of the row currently being updated or deleted.
+ */
+ int sqlite3_preupdate_old(sqlite3 *db, int iIdx, sqlite3_value **ppValue){
+   PreUpdate *p = db->pPreUpdate;
+   Mem *pMem;
+   int rc = SQLITE_OK;
++  i64 payloadSize64;
+ 
+   /* Test that this call is being made from within an SQLITE_DELETE or
+   ** SQLITE_UPDATE pre-update callback, and that iIdx is within range. */
+   if( !p || p->op==SQLITE_INSERT ){
+     rc = SQLITE_MISUSE_BKPT;
+     goto preupdate_old_out;
+   }
+   if( p->pPk ){
+@@ -1679,20 +1680,37 @@ int sqlite3_preupdate_old(sqlite3 *db, i
+     goto preupdate_old_out;
+   }
+ 
+   /* If the old.* record has not yet been loaded into memory, do so now. */
+   if( p->pUnpacked==0 ){
+     u32 nRec;
+     u8 *aRec;
+ 
+-    nRec = sqlite3BtreePayloadSize(p->pCsr->uc.pCursor);
++    if( p->pCsr->isTable==0 ){
++      assert( sqlite3BtreeCursorIsValid(p->pCsr->uc.pCursor) );
++      VVA_ONLY(rc =) sqlite3BtreeKeySize(p->pCsr->uc.pCursor, &payloadSize64);
++      assert( rc==SQLITE_OK ); /* True because of CursorMoveto() call above */
++      /* sqlite3BtreeParseCellPtr() uses getVarint32() to extract the
++      ** payload size, so it is impossible for payloadSize64 to be
++      ** larger than 32 bits. */
++      assert( (payloadSize64 & SQLITE_MAX_U32)==(u64)payloadSize64 );
++      nRec = (u32)payloadSize64;
++    }else{
++      assert( sqlite3BtreeCursorIsValid(p->pCsr->uc.pCursor) );
++      VVA_ONLY(rc =) sqlite3BtreeDataSize(p->pCsr->uc.pCursor, &nRec);
++      assert( rc==SQLITE_OK );   /* DataSize() cannot fail */
++    }
+     aRec = sqlite3DbMallocRaw(db, nRec);
+     if( !aRec ) goto preupdate_old_out;
+-    rc = sqlite3BtreePayload(p->pCsr->uc.pCursor, 0, nRec, aRec);
++    if( p->pCsr->isTable==0 ){
++      rc = sqlite3BtreeKey(p->pCsr->uc.pCursor, 0, nRec, aRec);
++    }else{
++      rc = sqlite3BtreeData(p->pCsr->uc.pCursor, 0, nRec, aRec);
++    }
+     if( rc==SQLITE_OK ){
+       p->pUnpacked = vdbeUnpackRecord(&p->keyinfo, nRec, aRec);
+       if( !p->pUnpacked ) rc = SQLITE_NOMEM;
+     }
+     if( rc!=SQLITE_OK ){
+       sqlite3DbFree(db, aRec);
+       goto preupdate_old_out;
+     }
+--- src/vdbeaux.c
++++ src/vdbeaux.c
+@@ -4386,22 +4386,23 @@ int sqlite3VdbeIdxRowid(sqlite3 *db, BtC
+   Mem m, v;
+ 
+   /* Get the size of the index entry.  Only indices entries of less
+   ** than 2GiB are support - anything large must be database corruption.
+   ** Any corruption is detected in sqlite3BtreeParseCellPtr(), though, so
+   ** this code can safely assume that nCellKey is 32-bits  
+   */
+   assert( sqlite3BtreeCursorIsValid(pCur) );
+-  nCellKey = sqlite3BtreePayloadSize(pCur);
++  VVA_ONLY(rc =) sqlite3BtreeKeySize(pCur, &nCellKey);
++  assert( rc==SQLITE_OK );     /* pCur is always valid so KeySize cannot fail */
+   assert( (nCellKey & SQLITE_MAX_U32)==(u64)nCellKey );
+ 
+   /* Read in the complete content of the index entry */
+   sqlite3VdbeMemInit(&m, db, 0);
+-  rc = sqlite3VdbeMemFromBtree(pCur, 0, (u32)nCellKey, &m);
++  rc = sqlite3VdbeMemFromBtree(pCur, 0, (u32)nCellKey, 1, &m);
+   if( rc ){
+     return rc;
+   }
+ 
+   /* The index entry must begin with a header size */
+   (void)getVarint32((u8*)m.z, szHdr);
+   testcase( szHdr==3 );
+   testcase( szHdr==m.n );
+@@ -4463,25 +4464,26 @@ int sqlite3VdbeIdxKeyCompare(
+   i64 nCellKey = 0;
+   int rc;
+   BtCursor *pCur;
+   Mem m;
+ 
+   assert( pC->eCurType==CURTYPE_BTREE );
+   pCur = pC->uc.pCursor;
+   assert( sqlite3BtreeCursorIsValid(pCur) );
+-  nCellKey = sqlite3BtreePayloadSize(pCur);
++  VVA_ONLY(rc =) sqlite3BtreeKeySize(pCur, &nCellKey);
++  assert( rc==SQLITE_OK );    /* pCur is always valid so KeySize cannot fail */
+   /* nCellKey will always be between 0 and 0xffffffff because of the way
+   ** that btreeParseCellPtr() and sqlite3GetVarint32() are implemented */
+   if( nCellKey<=0 || nCellKey>0x7fffffff ){
+     *res = 0;
+     return SQLITE_CORRUPT_BKPT;
+   }
+   sqlite3VdbeMemInit(&m, db, 0);
+-  rc = sqlite3VdbeMemFromBtree(pCur, 0, (u32)nCellKey, &m);
++  rc = sqlite3VdbeMemFromBtree(pCur, 0, (u32)nCellKey, 1, &m);
+   if( rc ){
+     return rc;
+   }
+   *res = sqlite3VdbeRecordCompare(m.n, m.z, pUnpacked);
+   sqlite3VdbeMemRelease(&m);
+   return SQLITE_OK;
+ }
+ 
+--- src/vdbeblob.c
++++ src/vdbeblob.c
+@@ -445,17 +445,17 @@ static int blobReadWrite(
+   sqlite3_mutex_leave(db->mutex);
+   return rc;
+ }
+ 
+ /*
+ ** Read data from a blob handle.
+ */
+ int sqlite3_blob_read(sqlite3_blob *pBlob, void *z, int n, int iOffset){
+-  return blobReadWrite(pBlob, z, n, iOffset, sqlite3BtreePayloadChecked);
++  return blobReadWrite(pBlob, z, n, iOffset, sqlite3BtreeData);
+ }
+ 
+ /*
+ ** Write data to a blob handle.
+ */
+ int sqlite3_blob_write(sqlite3_blob *pBlob, const void *z, int n, int iOffset){
+   return blobReadWrite(pBlob, (void *)z, n, iOffset, sqlite3BtreePutData);
+ }
+--- src/vdbemem.c
++++ src/vdbemem.c
+@@ -946,58 +946,68 @@ int sqlite3VdbeMemSetStr(
+ **
+ ** If this routine fails for any reason (malloc returns NULL or unable
+ ** to read from the disk) then the pMem is left in an inconsistent state.
+ */
+ static SQLITE_NOINLINE int vdbeMemFromBtreeResize(
+   BtCursor *pCur,   /* Cursor pointing at record to retrieve. */
+   u32 offset,       /* Offset from the start of data to return bytes from. */
+   u32 amt,          /* Number of bytes to return. */
++  int key,          /* If true, retrieve from the btree key, not data. */
+   Mem *pMem         /* OUT: Return data in this Mem structure. */
+ ){
+   int rc;
+   pMem->flags = MEM_Null;
+   if( SQLITE_OK==(rc = sqlite3VdbeMemClearAndResize(pMem, amt+2)) ){
+-    rc = sqlite3BtreePayload(pCur, offset, amt, pMem->z);
++    if( key ){
++      rc = sqlite3BtreeKey(pCur, offset, amt, pMem->z);
++    }else{
++      rc = sqlite3BtreeData(pCur, offset, amt, pMem->z);
++    }
+     if( rc==SQLITE_OK ){
+       pMem->z[amt] = 0;
+       pMem->z[amt+1] = 0;
+       pMem->flags = MEM_Blob|MEM_Term;
+       pMem->n = (int)amt;
+     }else{
+       sqlite3VdbeMemRelease(pMem);
+     }
+   }
+   return rc;
+ }
+ int sqlite3VdbeMemFromBtree(
+   BtCursor *pCur,   /* Cursor pointing at record to retrieve. */
+   u32 offset,       /* Offset from the start of data to return bytes from. */
+   u32 amt,          /* Number of bytes to return. */
++  int key,          /* If true, retrieve from the btree key, not data. */
+   Mem *pMem         /* OUT: Return data in this Mem structure. */
+ ){
+   char *zData;        /* Data from the btree layer */
+   u32 available = 0;  /* Number of bytes available on the local btree page */
+   int rc = SQLITE_OK; /* Return code */
+ 
+   assert( sqlite3BtreeCursorIsValid(pCur) );
+   assert( !VdbeMemDynamic(pMem) );
+ 
+   /* Note: the calls to BtreeKeyFetch() and DataFetch() below assert() 
+   ** that both the BtShared and database handle mutexes are held. */
+   assert( (pMem->flags & MEM_RowSet)==0 );
+-  zData = (char *)sqlite3BtreePayloadFetch(pCur, &available);
++  if( key ){
++    zData = (char *)sqlite3BtreeKeyFetch(pCur, &available);
++  }else{
++    zData = (char *)sqlite3BtreeDataFetch(pCur, &available);
++  }
+   assert( zData!=0 );
+ 
+   if( offset+amt<=available ){
+     pMem->z = &zData[offset];
+     pMem->flags = MEM_Blob|MEM_Ephem;
+     pMem->n = (int)amt;
+   }else{
+-    rc = vdbeMemFromBtreeResize(pCur, offset, amt, pMem);
++    rc = vdbeMemFromBtreeResize(pCur, offset, amt, key, pMem);
+   }
+ 
+   return rc;
+ }
+ 
+ /*
+ ** The pVal argument is known to be a value other than NULL.
+ ** Convert it into a string with encoding enc and return a pointer

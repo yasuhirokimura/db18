@@ -1,0 +1,150 @@
+--- Makefile.in
++++ Makefile.in
+@@ -161,18 +161,18 @@ LTINSTALL = $(LIBTOOL) --mode=install $(
+ ###############################################################################
+ 
+ USE_AMALGAMATION = @USE_AMALGAMATION@
+ 
+ # Object files for the SQLite library (non-amalgamation).
+ #
+ LIBOBJS0 = alter.lo analyze.lo attach.lo auth.lo \
+          backup.lo bitvec.lo btmutex.lo btree.lo build.lo \
+-         callback.lo complete.lo ctime.lo date.lo dbstat.lo db_pragma.lo \
+-         delete.lo expr.lo fault.lo fkey.lo \
++         callback.lo complete.lo ctime.lo date.lo dbstat.lo db_pragma.lo \
++         db_shell.lo delete.lo expr.lo fault.lo fkey.lo \
+          fts3.lo fts3_aux.lo fts3_expr.lo fts3_hash.lo fts3_icu.lo \
+          fts3_porter.lo fts3_snippet.lo fts3_tokenizer.lo fts3_tokenizer1.lo \
+          fts3_tokenize_vtab.lo \
+          fts3_unicode.lo fts3_unicode2.lo fts3_write.lo \
+ 	 fts5.lo \
+          func.lo global.lo hash.lo \
+          icu.lo insert.lo json1.lo legacy.lo loadext.lo \
+          main.lo malloc.lo mem0.lo mem1.lo mem2.lo mem3.lo mem5.lo \
+@@ -212,16 +212,17 @@ SRC = \
+   $(TOP)/../adapter/btreeInt.h \
+   $(TOP)/src/build.c \
+   $(TOP)/src/callback.c \
+   $(TOP)/src/complete.c \
+   $(TOP)/src/ctime.c \
+   $(TOP)/src/date.c \
+   $(TOP)/src/dbstat.c \
+   $(TOP)/../adapter/db_pragma.c \
++  $(TOP)/../adapter/db_shell.c \
+   $(TOP)/src/delete.c \
+   $(TOP)/src/expr.c \
+   $(TOP)/src/fault.c \
+   $(TOP)/src/fkey.c \
+   $(TOP)/src/func.c \
+   $(TOP)/src/global.c \
+   $(TOP)/src/hash.c \
+   $(TOP)/src/hash.h \
+@@ -745,16 +746,20 @@ ctime.lo:	$(TOP)/src/ctime.c $(HDR)
+ 
+ dbstat.lo:	$(TOP)/src/dbstat.c $(HDR)
+ 	$(LTCOMPILE) $(TEMP_STORE) -c $(TOP)/src/dbstat.c
+ 
+ db_pragma.lo:	$(TOP)/../adapter/db_pragma.c $(HDR) \
+ 		$(TOP)/../adapter/btreeInt.h
+ 	$(LTCOMPILE) $(TEMP_STORE) -c $(TOP)/../adapter/db_pragma.c
+ 
++db_shell.lo:	$(TOP)/../adapter/db_shell.c $(HDR) \
++		$(TOP)/../adapter/btreeInt.h
++	$(LTCOMPILE) $(TEMP_STORE) -c $(TOP)/../adapter/db_shell.c
++
+ delete.lo:	$(TOP)/src/delete.c $(HDR)
+ 	$(LTCOMPILE) $(TEMP_STORE) -c $(TOP)/src/delete.c
+ 
+ expr.lo:	$(TOP)/src/expr.c $(HDR)
+ 	$(LTCOMPILE) $(TEMP_STORE) -c $(TOP)/src/expr.c
+ 
+ fault.lo:	$(TOP)/src/fault.c $(HDR)
+ 	$(LTCOMPILE) $(TEMP_STORE) -c $(TOP)/src/fault.c
+--- src/shell.c
++++ src/shell.c
+@@ -3187,16 +3187,27 @@ static char zHelp[] =
+   ".separator COL ?ROW?   Change the column separator and optionally the row\n"
+   "                         separator for both the output mode and .import\n"
+ #if defined(SQLITE_ENABLE_SESSION)
+   ".session CMD ...       Create or control sessions\n"
+ #endif
+   ".sha3sum ?OPTIONS...?  Compute a SHA3 hash of database content\n"
+   ".shell CMD ARGS...     Run CMD ARGS... in a system shell\n"
+   ".show                  Show the current values for various settings\n"
++  ".stat ?ITEM?           Print statistics\n"
++  "                         If ITEM=':env:', print statistics for the\n"
++  "                         Berkeley DB environment.\n"
++  "                         If ITEM=':rep:', print a summary of replication\n"
++  "                         statistics for the Berkeley DB environment.\n"
++  "                         If ITEM is the name of a table or index, print\n"
++  "                         statistics for the table or index.\n"
++  "                         If ITEM is not specified, print statistics for\n"
++  "                         the Berkeley DB environment followed by\n"
++  "                         statistics for all tables and indexes within the\n"
++  "                         database.\n"
+   ".stats ?on|off?        Show stats or turn stats on or off\n"
+   ".system CMD ARGS...    Run CMD ARGS... in a system shell\n"
+   ".tables ?TABLE?        List names of tables\n"
+   "                         If TABLE specified, only list tables matching\n"
+   "                         LIKE pattern TABLE.\n"
+   ".testcase NAME         Begin redirecting output to 'testcase-out.txt'\n"
+   ".timeout MS            Try opening locked tables for MS milliseconds\n"
+   ".timer on|off          Turn SQL timer on or off\n"
+@@ -4902,16 +4913,37 @@ static int do_meta_command(char *zLine, 
+     for (i=0;i<(int)ArraySize(p->colWidth) && p->colWidth[i] != 0;i++) {
+       raw_printf(p->out, "%d ", p->colWidth[i]);
+     }
+     raw_printf(p->out, "\n");
+     utf8_printf(p->out, "%12.12s: %s\n", "filename",
+                 p->zDbFilename ? p->zDbFilename : "");
+   }else
+ 
++  if( c=='s' && strncmp(azArg[0], "stat", n)==0 ){
++    extern int bdbSqlDbStatPrint(sqlite3 *, FILE *, char *);
++    extern int bdbSqlEnvStatPrint(sqlite3 *db, FILE *);
++    extern int bdbSqlRepSumStatPrint(sqlite3 *db, FILE *);
++
++    open_db(p, 0);
++
++    if (nArg == 1 || nArg == 2 && strcmp(azArg[1], ":env:") == 0)
++      rc = bdbSqlEnvStatPrint(p->db, p->out);
++    else if (nArg == 2 && strcmp(azArg[1], ":rep:") == 0)
++      rc = bdbSqlRepSumStatPrint(p->db, p->out);
++    if (rc != SQLITE_OK) {
++      fprintf(stderr, "Error: environment not created yet\n");
++      rc = 1;
++    }
++    else if (nArg == 1)
++      rc = bdbSqlDbStatPrint(p->db, p->out, NULL);
++    else
++      rc = bdbSqlDbStatPrint(p->db, p->out, azArg[1]);
++  }else
++
+   if( c=='s' && strncmp(azArg[0], "stats", n)==0 ){
+     if( nArg==2 ){
+       p->statsOn = booleanValue(azArg[1]);
+     }else if( nArg==1 ){
+       display_stats(p->db, p, 0);
+     }else{
+       raw_printf(stderr, "Usage: .stats ?on|off?\n");
+       rc = 1;
+--- tool/mksqlite3c.tcl
++++ tool/mksqlite3c.tcl
+@@ -319,16 +319,17 @@ foreach file {
+    rowset.c
+    pager.c
+    wal.c
+ 
+    btmutex.c
+    btree.c
+    backup.c
+    db_pragma.c
++   db_shell.c
+ 
+    vdbemem.c
+    vdbeaux.c
+    vdbeapi.c
+    vdbetrace.c
+    vdbe.c
+    vdbeblob.c
+    vdbesort.c

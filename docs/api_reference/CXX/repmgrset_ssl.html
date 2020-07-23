@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>DbEnv::repmgr_set_ssl_config()</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C++ API Reference" />
+    <link rel="up" href="rep.html" title="Chapter 11.  Replication Methods" />
+    <link rel="prev" href="repmgrsite_list.html" title="DbEnv::repmgr_site_list()" />
+    <link rel="next" href="repmgrstart.html" title="DbEnv::repmgr_start()" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 18.1.25</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">
+        
+        <span xmlns="http://www.w3.org/1999/xhtml">DbEnv::repmgr_set_ssl_config()</span>
+    </th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="repmgrsite_list.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 11. 
+                Replication Methods
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="repmgrstart.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="repmgrset_ssl"></a>
+        
+        <span>DbEnv::repmgr_set_ssl_config()</span>
+    </h2>
+          </div>
+        </div>
+      </div>
+      <pre class="programlisting">#include &lt;db_cxx.h&gt;
+ 
+int
+DB_ENV-&gt;repmgr_set_ssl_config(DB_ENV *env, u_int32_t  which, 
+const char *value);</pre>
+      <p>
+     The <code class="methodname">DB_ENV-&gt;repmgr_set_ssl_config()</code> method configures the SSL 
+     support for Berkeley DB Replication Manager Messaging. 
+    </p>
+      <p> 
+     The SSL support for Replication Manager may also be configured using the 
+     environment's <code class="methodname">DB_CONFIG file</code> (<a class="ulink" href="https://docs.oracle.com/cd/E17275_01/html/programmer_reference/env_db_config.html#env_db_config.DB_CONFIG" target="_top">https://docs.oracle.com/cd/E17275_01/html/programmer_reference/env_db_config.html#env_db_config.DB_CONFIG</a>). 
+     The syntax of the entry in that file is a single line with the string 
+     <code class="methodname">repmgr_set_ssl_config</code>, one or more whitespace characters. This is 
+     followed by the name of the parameter to be configured,  one or more whitespace characters, 
+     and finally the value of the ssl config parameter. For example:
+</p>
+      <pre class="programlisting">repmgr_set_ssl_config DB_REPMGR_SSL_CA_CERT ./mycerts1/cacerts/cacert.pem</pre>
+      <p>
+     Because the <code class="methodname">DB_CONFIG</code> file 
+     is read when the database environment is opened, it will silently overrule configuration done 
+     before that time. 
+    </p>
+      <p>
+     The <code class="methodname">DB_ENV-&gt;repmgr_set_ssl_config()</code> method may not be called 
+     before the <code class="methodname">DB_ENV-&gt;open()</code> method is called to open the local 
+     environment. This method should be called before <code class="methodname">DB_ENV-&gt;repmgr_start()</code> 
+     methods are called. 
+    </p>
+      <p>
+     The <code class="methodname">DB_ENV-&gt;repmgr_set_ssl_config()</code> method returns a non-zero 
+     error value on failure and 0 on success. 
+    </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idm140315884345856"></a>Parameters</h3>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idm140315884304144"></a>Value</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                             This parameter must be set to the value corresponding to the option 
+                             selected for the <span class="bold"><strong>Which</strong></span> parameter.
+                     </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idm140315884364448"></a>Which</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                       This parameter must be set to one of the following values:
+                    </p>
+          <div class="itemizedlist">
+            <ul type="disc">
+              <li>
+                <p><code class="literal">DB_REPMGR_SSL_CA_CERT</code>:</p>
+                <p>
+                                    The value for this parameter is used to configure the path to 
+                                    the CA certificate or the CA-chain certificate file whose 
+                                    private key was used to sign the replication node certificate. This 
+                                    certificate is used for verification of certificate provided by 
+                                    peer. If the peer certificate has been signed by the private key 
+                                    of this certificate, then verification will pass. 
+                                    </p>
+                <p>
+                                    Note that either 
+                                    <code class="literal">DB_REPMGR_SSL_CA_CERT</code> or 
+                                    <code class="literal">DB_REPMGR_SSL_CA_DIR</code> must be provided, 
+                                    otherwise an error is raised by the Replication Manager. 
+                                    </p>
+                <p>
+                                    Only a single file can be specified using 
+                                    this option. In case of multiple calls, the latest value specified 
+                                    before <code class="literal">DB_ENV-&gt;repmgr_start()</code> will be used. The certificate 
+                                    must be in <code class="literal">.pem</code>
+                                     format.
+                                   </p>
+              </li>
+              <li>
+                <p><code class="literal">DB_REPMGR_SSL_CA_DIR</code>:</p>
+                <p>
+                                    The value for this parameter is used to configure the path to 
+                                    the directory containing the root and intermediate CA 
+                                    certificates. This directory should contain all individual 
+                                    certificates in the chain used to sign the peer certificate.
+                                   </p>
+                <div class="itemizedlist">
+                  <ul type="circle">
+                    <li>
+                      <p>
+                                         If the CA file or the CA chain file was provided by using 
+                                         the <code class="literal">DB_REPMGR_SSL_CA_CERT</code> option, this API 
+                                         need not be called with this option.
+                                        </p>
+                    </li>
+                    <li>
+                      <p><code class="literal">c_rehash</code> (openssl utility) must be run 
+                                        in the target directory before providing the path of target 
+                                        directory through a call to this API.
+                                        </p>
+                    </li>
+                    <li>
+                      <p>Only a single directory can be specified using this 
+                                        option. In case of multiple calls, the latest value specified 
+                                        before <code class="literal">DB_ENV-&gt;repmgr_start()</code> will be used.
+                                        </p>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+              <li>
+                <p><code class="literal">DB_REPMGR_SSL_REPNODE_CERT</code>:</p>
+                <p>The value for this parameter is used to specify the path of 
+                                    the certificate that represents the replication node and 
+                                    will be used for authentication and SSL connection negotiation. 
+                                    This certificate is signed by previously mentioned CA 
+                                    certificate(s) or Intermediate CA certificates and used 
+                                    for authentication. The certificate must be in .pem format. 
+                                    This configuration parameter is not optional.</p>
+              </li>
+              <li>
+                <p><code class="literal">DB_REPMGR_SSL_REPNODE_PRIVATE_KEY</code>:</p>
+                <p>The value for this parameter is used to configure the path to 
+                                    the private key corresponding to the certificate being used for 
+                                    authentication by this replication node. In case both the private 
+                                    key and the certificate are output to a single file, the value 
+                                    for this will be same as the certificate file provided. This 
+                                    configuration parameter is not optional. The certificate must 
+                                    be in .pem format.</p>
+              </li>
+              <li>
+                <p><code class="literal">DB_REPMGR_SSL_REPNODE_KEY_PASSWD</code>:</p>
+                <p>The value for this parameter is used to configure the password 
+                                    for the private key corresponding to the certificate being used 
+                                    for authentication by this replication node. Note if unsecured 
+                                    private key file (one without password) is being used then there 
+                                    is no need to specify this parameter.</p>
+              </li>
+              <li>
+                <p><code class="literal">DB_REPMGR_SSL_VERIFY_DEPTH</code>:</p>
+                <p>If multiple intermediate CA are being used, then upon SSL 
+                                    connection negotiation, each certificate in the chain is 
+                                    verified. This value specifies the number of levels after 
+                                    which the verification will fail.</p>
+                <p>
+                                    This configuration parameter is optional. The default value is 9.
+                                    </p>
+              </li>
+            </ul>
+          </div>
+          <p>
+                     </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idm140315884246672"></a>Errors</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                    The <code class="methodname">DB_ENV-&gt;repmgr_set_ssl_config()</code> method may 
+                    fail and return one of the following non-zero errors: 
+            </p>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idm140315884295744"></a>EINVAL</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                           If an invalid flag value or parameter was specified or if we are 
+                           calling <code class="methodname">repmgr_set_ssl_config()</code> after 
+                           replication manager has been started.
+                     </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idm140315884328656"></a>Class</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                    <a class="link" href="env.html" title="Chapter 5.  The DbEnv Handle">DbEnv</a>  
+            </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idm140315884333712"></a>See Also</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                     <a class="xref" href="rep.html#replist" title="Replication and Related Methods">Replication and Related Methods</a> 
+                </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="repmgrsite_list.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="rep.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="repmgrstart.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">
+        
+        <span>DbEnv::repmgr_site_list()</span>
+     </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> 
+        
+        <span>DbEnv::repmgr_start()</span>
+    </td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

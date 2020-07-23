@@ -1,0 +1,39 @@
+--- test/loadext.test
++++ test/loadext.test
+@@ -61,16 +61,36 @@ set dlerror_notadll    {%s: file too sho
+ set dlerror_nosymbol   {%s: undefined symbol: %s}
+ 
+ if {$::tcl_platform(os) eq "Darwin"} {
+   set dlerror_nosuchfile {dlopen(%s, 10): image not found}
+   set dlerror_notadll    {dlopen(%1$s, 10): no suitable image found.*}
+   set dlerror_nosymbol   {dlsym(XXX, %2$s): symbol not found}
+ }
+ 
++if {$::tcl_platform(os) eq "FreeBSD"} {
++  set dlerror_nosuchfile {Cannot open "%s"}
++  set dlerror_notadll    {%s: invalid file format}
++  set dlerror_nosymbol   {Undefined symbol "%2$s"}
++}
++
++if {$::tcl_platform(os) eq "SunOS" && $::tcl_platform(machine) eq "i86pc"} {
++  set dlerror_nosuchfile \
++      {ld.so.1: testfixture: fatal: %s: open failed: No such file or directory}
++  set dlerror_notadll    {ld.so.1: testfixture: fatal: %s: unknown file type}
++  set dlerror_nosymbol   {ld.so.1: testfixture: fatal: %2$s: can't find symbol}
++}
++
++if {$::tcl_platform(os) eq "SunOS" && $::tcl_platform(machine) eq "sun4v"} {
++  set dlerror_nosuchfile \
++      {ld.so.1: testfixture: fatal: %s: open failed: No such file or directory}
++  set dlerror_notadll    {ld.so.1: testfixture: fatal: %s: not an ELF file}
++  set dlerror_nosymbol   {ld.so.1: testfixture: fatal: %2$s: can't find symbol}
++}
++
+ if {$::tcl_platform(platform) eq "windows"} {
+   set dlerror_nosuchfile {The specified module could not be found.*}
+   set dlerror_notadll    {%%1 is not a valid Win32 application.*}
+   set dlerror_nosymbol   {The specified procedure could not be found.*}
+ }
+ 
+ # Make sure the test extension actually exists.  If it does not
+ # exist, try to create it.  If unable to create it, then skip this

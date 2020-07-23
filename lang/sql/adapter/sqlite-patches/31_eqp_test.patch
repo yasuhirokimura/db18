@@ -1,0 +1,60 @@
+--- test/eqp.test
++++ test/eqp.test
+@@ -517,32 +517,37 @@ det 5.13 "SELECT a FROM t1 EXCEPT SELECT
+ 
+ 
+ if {![nonzero_reserved_bytes]} {
+   #-------------------------------------------------------------------------
+   # The following tests - eqp-6.* - test that the example C code on 
+   # documentation page eqp.html works. The C code is duplicated in test1.c
+   # and wrapped in Tcl command [print_explain_query_plan] 
+   #
++  db close
++  set cryptokey ""
++  if {[sqlite3 -has-codec]} {
++    set cryptokey "-key xyzzy"
++  }
+   set boilerplate {
+     proc explain_query_plan {db sql} {
+       set stmt [sqlite3_prepare_v2 db $sql -1 DUMMY]
+       print_explain_query_plan $stmt
+       sqlite3_finalize $stmt
+     }
+-    sqlite3 db test.db
++    sqlite3 db test.db %KEY%
+     explain_query_plan db {%SQL%}
+     db close
+     exit
+   }
+   
+   # Do a "Print Explain Query Plan" test.
+   proc do_peqp_test {tn sql res} {
+     set fd [open script.tcl w]
+-    puts $fd [string map [list %SQL% $sql] $::boilerplate]
++    puts $fd [string map [list %SQL% $sql %KEY% $::cryptokey] $::boilerplate]
+     close $fd
+   
+     uplevel do_test $tn [list {
+       set fd [open "|[info nameofexec] script.tcl"]
+       set data [read $fd]
+       close $fd
+       set data
+     }] [list $res]
+@@ -553,16 +558,17 @@ if {![nonzero_reserved_bytes]} {
+   } [string trimleft {
+ 1 0 0 SCAN TABLE t1 USING COVERING INDEX i2
+ 2 0 0 SCAN TABLE t2
+ 2 0 0 USE TEMP B-TREE FOR ORDER BY
+ 0 0 0 COMPOUND SUBQUERIES 1 AND 2 (EXCEPT)
+ }]
+ }
+ 
++sqlite3 db test.db
+ #-------------------------------------------------------------------------
+ # The following tests - eqp-7.* - test that queries that use the OP_Count
+ # optimization return something sensible with EQP.
+ #
+ drop_all_tables
+ 
+ do_execsql_test 7.0 {
+   CREATE TABLE t1(a INT, b INT, ex CHAR(100));

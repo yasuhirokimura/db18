@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Quick Start Guide</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Programmer's Reference Guide" />
+    <link rel="up" href="cam.html" title="Chapter 11.  Berkeley DB Data Store and Concurrent Data Store Applications" />
+    <link rel="prev" href="cam_app.html" title="Architecting Data Store and Concurrent Data Store applications" />
+    <link rel="next" href="transapp.html" title="Chapter 12.  Berkeley DB Transactional Data Store Applications" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 18.1.25</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Quick Start Guide</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="cam_app.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 11.  Berkeley DB Data Store and Concurrent Data Store Applications</th>
+          <td width="20%" align="right"> <a accesskey="n" href="transapp.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="gsg_bdb"></a>Quick Start Guide</h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <dl>
+          <dt>
+            <span class="sect2">
+              <a href="gsg_bdb.html#gsg_ds">Data Store Environment</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="gsg_bdb.html#gsg_cds">Concurrent Data Store Environment</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="gsg_bdb.html#gsg_tds">Transactional Data Store Environment</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>
+    Here is an example program for creating/configuring a Berkeley DB environment (using Data Store, 
+    Concurrent Data Store and Transactional Data Store environments):
+    </p>
+      <pre class="programlisting">int
+main(argc, argv)
+    int argc;
+    char *argv[];
+{
+    DB_ENV *dbenv, *rm;
+    DB *db;
+    DBC *dbc;
+    DB_TXN *txn;
+    const char *home = ".";</pre>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="gsg_ds"></a>Data Store Environment</h3>
+            </div>
+          </div>
+        </div>
+        <div class="itemizedlist">
+          <ul type="disc">
+            <li>
+              <p>Create a Data Store object and configure it. </p>
+              <pre class="programlisting">db_env_create(&amp;dbenv, 0);</pre>
+            </li>
+            <li>
+              <p>Set the cache size.</p>
+              <pre class="programlisting">dbenv-&gt;set_cachesize(dbenv, 0, 64 * 1024, 0);</pre>
+            </li>
+            <li>
+              <p>
+Open the environment. The only flag required is <code class="literal">DB_INIT_MPOOL</code>.
+</p>
+              <pre class="programlisting">dbenv-&gt;open(dbenv, home, DB_INIT_MPOOL | DB_CREATE, 0644);</pre>
+            </li>
+            <li>
+              <p>Create the database handle.</p>
+              <pre class="programlisting">db_create(&amp;db, dbenv, 0);</pre>
+            </li>
+            <li>
+              <p>
+Open the database, no flags are required.
+</p>
+              <pre class="programlisting">db-&gt;open(db, NULL, NULL, "database", DB_BTREE, DB_CREATE, 0644);</pre>
+            </li>
+            <li>
+              <p>Begin a cursor.</p>
+              <pre class="programlisting">db-&gt;cursor(db, NULL, &amp;dbc, 0); </pre>
+            </li>
+            <li>
+              <p>Close the cursor.</p>
+              <pre class="programlisting">dbc-&gt;close(dbc);
+db-&gt;close(db, 0);
+dbenv-&gt;close(dbenv, 0); </pre>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="gsg_cds"></a>Concurrent Data Store Environment</h3>
+            </div>
+          </div>
+        </div>
+        <div class="itemizedlist">
+          <ul type="disc">
+            <li>
+              <p>Create a Concurrent Data Store environment object and configure it.</p>
+              <pre class="programlisting">db_env_create(&amp;dbenv, 0); </pre>
+            </li>
+            <li>
+              <p>Set the cache size.</p>
+              <pre class="programlisting">dbenv-&gt;set_cachesize(dbenv, 0, 64 * 1024, 0);</pre>
+            </li>
+            <li>
+              <p>Open the environment. The environment requires the 
+<code class="literal">DB_INIT_CDB</code> and <code class="literal">DB_INIT_MPOOL</code> flags.
+</p>
+              <pre class="programlisting">dbenv-&gt;open(dbenv, home, DB_INIT_CDB | DB_INIT_MPOOL | DB_CREATE, 0644); </pre>
+            </li>
+            <li>
+              <p>Create the database handle.</p>
+              <pre class="programlisting">db_create(&amp;db, dbenv, 0); </pre>
+            </li>
+            <li>
+              <p>Begin a Concurrent Data Store transaction.</p>
+              <pre class="programlisting">dbenv-&gt;cdsgroup_begin(dbenv, &amp;txn); </pre>
+            </li>
+            <li>
+              <p>Open the database. A Concurrent Data Store transaction is required.</p>
+              <pre class="programlisting">db-&gt;open(db, txn, NULL, "database", DB_BTREE, DB_CREATE, 0644); </pre>
+            </li>
+            <li>
+              <p>Begin a cursor. A transaction and the <code class="literal">DB_WRITECURSOR</code> flag 
+     is required if the cursor will insert values.</p>
+              <pre class="programlisting">db-&gt;cursor(db, txn, &amp;dbc, DB_WRITECURSOR); </pre>
+            </li>
+            <li>
+              <p>Close the cursor.</p>
+              <pre class="programlisting">dbc-&gt;close(dbc);</pre>
+            </li>
+            <li>
+              <p>Commit the transaction.</p>
+              <pre class="programlisting">txn-&gt;commit(txn, 0);
+db-&gt;close(db, 0);
+dbenv-&gt;close(dbenv, 0);</pre>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="gsg_tds"></a>Transactional Data Store Environment</h3>
+            </div>
+          </div>
+        </div>
+        <div class="itemizedlist">
+          <ul type="disc">
+            <li>
+              <p>Create a Transactional environment object and configure it. </p>
+              <pre class="programlisting">db_env_create(&amp;dbenv, 0);</pre>
+            </li>
+            <li>
+              <p>Set the cache size. </p>
+              <pre class="programlisting">dbenv-&gt;set_cachesize(dbenv, 0, 64 * 1024, 0);</pre>
+            </li>
+            <li>
+              <p>Open the environment. The <code class="literal">TDB_INIT_LOCK</code>, <code class="literal">DB_INIT_LOG</code>, 
+ <code class="literal">DB_INIT_MPOOL</code>, <code class="literal">DB_INIT_TXN</code> flags
+    required by it specify that the environment will have transactional
+    support.
+ </p>
+              <pre class="programlisting">dbenv-&gt;open(dbenv, home, 
+TDB_INIT_LOCK | DB_INIT_LOG | DB_INIT_MPOOL | 
+DB_INIT_TXN | DB_CREATE, 0644); </pre>
+            </li>
+            <li>
+              <p>Create the database handle.</p>
+              <pre class="programlisting">db_create(&amp;db, dbenv, 0); </pre>
+            </li>
+            <li>
+              <p>Open the database with the <code class="literal">DB_AUTO_COMMIT</code> flag. For a database to 
+    support transactions it has to be open with either the <code class="literal">DB_AUTO_COMMIT</code> 
+    flag, or a transaction.
+ </p>
+              <pre class="programlisting">db-&gt;open(db, NULL, NULL, "database", DB_BTREE, 
+DB_AUTO_COMMIT | DB_CREATE, 0644); </pre>
+            </li>
+            <li>
+              <p>Begin a transaction.</p>
+              <pre class="programlisting">dbenv-&gt;txn_begin(dbenv, NULL, &amp;txn, 0); </pre>
+            </li>
+            <li>
+              <p>Begin a transactional cursor.</p>
+              <pre class="programlisting">db-&gt;cursor(db, txn, &amp;dbc, 0); </pre>
+            </li>
+            <li>
+              <p>Close the cursor.</p>
+              <pre class="programlisting">dbc-&gt;close(dbc); </pre>
+            </li>
+            <li>
+              <p>Commit and close the transaction.</p>
+              <pre class="programlisting">txn-&gt;commit(txn, 0);
+db-&gt;close(db, 0);
+dbenv-&gt;close(dbenv, 0); </pre>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="cam_app.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="cam.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="transapp.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Architecting Data Store and Concurrent Data Store applications </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Chapter 12.  Berkeley DB Transactional Data Store Applications </td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

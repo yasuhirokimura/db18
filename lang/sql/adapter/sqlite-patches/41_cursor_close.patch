@@ -1,0 +1,134 @@
+--- src/delete.c
++++ src/delete.c
+@@ -529,16 +529,24 @@ void sqlite3DeleteFrom(
+       sqlite3WhereEnd(pWInfo);
+     }else if( pPk ){
+       sqlite3VdbeAddOp2(v, OP_Next, iEphCur, addrLoop+1); VdbeCoverage(v);
+       sqlite3VdbeJumpHere(v, addrLoop);
+     }else{
+       sqlite3VdbeGoto(v, addrLoop);
+       sqlite3VdbeJumpHere(v, addrLoop);
+     }     
++  
++    /* Close the cursors open on the table and its indexes. */
++    if( !isView && !IsVirtual(pTab) ){
++      if( !pPk ) sqlite3VdbeAddOp1(v, OP_Close, iDataCur);
++      for(i=0, pIdx=pTab->pIndex; pIdx; i++, pIdx=pIdx->pNext){
++        sqlite3VdbeAddOp1(v, OP_Close, iIdxCur + i);
++      }
++    }
+   } /* End non-truncate path */
+ 
+   /* Update the sqlite_sequence table by storing the content of the
+   ** maximum rowid counter values recorded while inserting into
+   ** autoincrement tables.
+   */
+   if( pParse->nested==0 && pParse->pTriggerTab==0 ){
+     sqlite3AutoincrementEnd(pParse);
+--- src/update.c
++++ src/update.c
+@@ -646,17 +646,17 @@ void sqlite3Update(
+     if( eOnePass==ONEPASS_MULTI ){
+       assert( hasFK==0 && chngKey==0 );
+       sqlite3VdbeChangeP5(v, OPFLAG_SAVEPOSITION);
+     }
+     if( !pParse->nested ){
+       sqlite3VdbeAppendP4(v, pTab, P4_TABLE);
+     }
+ #else
+-    if( hasFK || chngKey ){
++    if( hasFK || chngKey || pPk != 0 ){
+       sqlite3VdbeAddOp2(v, OP_Delete, iDataCur, 0);
+     }
+ #endif
+     if( bReplace || chngKey ){
+       sqlite3VdbeJumpHere(v, addr1);
+     }
+ 
+     if( hasFK ){
+@@ -698,16 +698,25 @@ void sqlite3Update(
+   }else if( pPk ){
+     sqlite3VdbeResolveLabel(v, labelContinue);
+     sqlite3VdbeAddOp2(v, OP_Next, iEph, addrTop); VdbeCoverage(v);
+   }else{
+     sqlite3VdbeGoto(v, labelContinue);
+   }
+   sqlite3VdbeResolveLabel(v, labelBreak);
+ 
++  /* Close all tables */
++  for(i=0, pIdx=pTab->pIndex; pIdx; pIdx=pIdx->pNext, i++){
++    assert( aRegIdx );
++    if( aToOpen[i+1] ){
++      sqlite3VdbeAddOp2(v, OP_Close, iIdxCur+i, 0);
++    }
++  }
++  if( iDataCur<iIdxCur ) sqlite3VdbeAddOp2(v, OP_Close, iDataCur, 0);
++
+   /* Update the sqlite_sequence table by storing the content of the
+   ** maximum rowid counter values recorded while inserting into
+   ** autoincrement tables.
+   */
+   if( pParse->nested==0 && pParse->pTriggerTab==0 ){
+     sqlite3AutoincrementEnd(pParse);
+   }
+ 
+--- src/vdbeblob.c
++++ src/vdbeblob.c
+@@ -267,16 +267,17 @@ int sqlite3_blob_open(
+       static const VdbeOpList openBlob[] = {
+         {OP_TableLock,      0, 0, 0},  /* 0: Acquire a read or write lock */
+         {OP_OpenRead,       0, 0, 0},  /* 1: Open a cursor */
+         /* blobSeekToRow() will initialize r[1] to the desired rowid */
+         {OP_NotExists,      0, 5, 1},  /* 2: Seek the cursor to rowid=r[1] */
+         {OP_Column,         0, 0, 1},  /* 3  */
+         {OP_ResultRow,      1, 0, 0},  /* 4  */
+         {OP_Halt,           0, 0, 0},  /* 5  */
++	{OP_Close,           0, 0, 0 },  /* 6  */
+       };
+       Vdbe *v = (Vdbe *)pBlob->pStmt;
+       iDb = sqlite3SchemaToIndex(db, pTab->pSchema);
+ 
+       sqlite3VdbeAddOp4Int(v, OP_Transaction, iDb, wrFlag, 
+                            pTab->pSchema->schema_cookie,
+                            pTab->pSchema->iGeneration);
+       sqlite3VdbeChangeP5(v, 1);     
+--- src/where.c
++++ src/where.c
+@@ -4926,16 +4926,37 @@ void sqlite3WhereEnd(WhereInfo *pWInfo){
+     */
+     if( pTabItem->fg.viaCoroutine ){
+       testcase( pParse->db->mallocFailed );
+       translateColumnToCopy(pParse, pLevel->addrBody, pLevel->iTabCur,
+                             pTabItem->regResult, 0);
+       continue;
+     }
+ 
++    /* Close all of the cursors that were opened by sqlite3WhereBegin.
++    ** Except, do not close cursors that will be reused by the OR optimization
++    ** (WHERE_OR_SUBCLAUSE).  And do not close the OP_OpenWrite cursors
++    ** created for the ONEPASS optimization.
++    */
++    if( (pTab->tabFlags & TF_Ephemeral)==0
++     && pTab->pSelect==0
++     && (pWInfo->wctrlFlags & WHERE_OR_SUBCLAUSE)==0
++    ){
++      int ws = pLoop->wsFlags;
++      if( pWInfo->eOnePass==ONEPASS_OFF && (ws & WHERE_IDX_ONLY)==0 ){
++        sqlite3VdbeAddOp1(v, OP_Close, pTabItem->iCursor);
++      }
++      if( (ws & WHERE_INDEXED)!=0
++       && (ws & (WHERE_IPK|WHERE_AUTO_INDEX))==0 
++       && pLevel->iIdxCur!=pWInfo->aiCurOnePass[1]
++      ){
++        sqlite3VdbeAddOp1(v, OP_Close, pLevel->iIdxCur);
++      }
++    }
++
+     /* If this scan uses an index, make VDBE code substitutions to read data
+     ** from the index instead of from the table where possible.  In some cases
+     ** this optimization prevents the table from ever being read, which can
+     ** yield a significant performance boost.
+     ** 
+     ** Calls to the code generator in between sqlite3WhereBegin and
+     ** sqlite3WhereEnd will have created code that references the table
+     ** directly.  This loop scans all that code looking for opcodes

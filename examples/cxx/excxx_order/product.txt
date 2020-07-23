@@ -1,0 +1,11 @@
+1&Chicken Burger&20&Burger
+2&Chicken Bacon Ranch&17&Salad
+3&Chicken McNuggets&15&Chicken
+4&Apple Slices&14&Snack
+5&Coca-Cola&15&Drink
+6&Cheese Burger&8&Burger
+7&Side Salad&12&Salad
+8&McChicken&14&Chicken
+9&Vanilla Cone&10&Snack
+10&Diet Coke&9&Drink
+

@@ -1,0 +1,128 @@
+--- src/vdbe.c
++++ src/vdbe.c
+@@ -1354,17 +1354,20 @@ case OP_ResultRow: {
+   ** ensure that statement-transactions are always nested, not overlapping.
+   ** If the open statement-transaction is not closed here, then the user
+   ** may step another VM that opens its own statement transaction. This
+   ** may lead to overlapping statement transactions.
+   **
+   ** The statement transaction is never a top-level transaction.  Hence
+   ** the RELEASE call below can never fail.
+   */
+-  assert( p->iStatement==0 || db->flags&SQLITE_CountRows );
++  /* assert( p->iStatement==0 || db->flags&SQLITE_CountRows );
++   * This assert does not hold true when read/write incrblobs are used with
++   * Berkeley DB because p->iStatement is set to true in order to create a
++   * statement transaction that is donated to the incrblob cursor. BDB */
+   rc = sqlite3VdbeCloseStatement(p, SAVEPOINT_RELEASE);
+   assert( rc==SQLITE_OK );
+ 
+   /* Invalidate all ephemeral cursor row caches */
+   p->cacheCtr = (p->cacheCtr + 2)|1;
+ 
+   /* Make sure the results of the current row are \000 terminated
+   ** and have an assigned type.  The results are de-ephemeralized as
+@@ -3197,17 +3200,17 @@ case OP_Transaction: {
+       if( (rc&0xff)==SQLITE_BUSY ){
+         p->pc = (int)(pOp - aOp);
+         p->rc = rc;
+         goto vdbe_return;
+       }
+       goto abort_due_to_error;
+     }
+ 
+-    if( pOp->p2 && p->usesStmtJournal 
++    if( pOp->p2 && (!db->aVTrans || p->usesStmtJournal)
+      && (db->autoCommit==0 || db->nVdbeRead>1) 
+     ){
+       assert( sqlite3BtreeIsInTrans(pBt) );
+       if( p->iStatement==0 ){
+         assert( db->nStatement>=0 && db->nSavepoint>=0 );
+         db->nStatement++; 
+         p->iStatement = db->nSavepoint + db->nStatement;
+       }
+@@ -7030,16 +7033,24 @@ abort_due_to_error:
+   if( p->zErrMsg==0 && rc!=SQLITE_IOERR_NOMEM ){
+     sqlite3VdbeError(p, "%s", sqlite3ErrStr(rc));
+   }
+   p->rc = rc;
+   sqlite3SystemError(db, rc);
+   testcase( sqlite3GlobalConfig.xLog!=0 );
+   sqlite3_log(rc, "statement aborts at %d: [%s] %s", 
+                    (int)(pOp - aOp), p->zSql, p->zErrMsg);
++  /* Force a rollback if a locked or busy error happens. BDBSQL*/
++  if ( p->rc == SQLITE_LOCKED || p->rc == SQLITE_BUSY ) {
++       p->errorAction = OE_Abort;
++       if (p->readOnly) {
++         db->nStatement++;
++         p->iStatement = db->nStatement + db->nSavepoint;
++       }
++  }
+   sqlite3VdbeHalt(p);
+   if( rc==SQLITE_IOERR_NOMEM ) sqlite3OomFault(db);
+   rc = SQLITE_ERROR;
+   if( resetSchemaOnFault>0 ){
+     sqlite3ResetOneSchema(db, resetSchemaOnFault-1);
+   }
+ 
+   /* This is the only way out of this procedure.  We have to
+--- src/vdbeblob.c
++++ src/vdbeblob.c
+@@ -126,16 +126,17 @@ int sqlite3_blob_open(
+ ){
+   int nAttempt = 0;
+   int iCol;               /* Index of zColumn in row-record */
+   int rc = SQLITE_OK;
+   char *zErr = 0;
+   Table *pTab;
+   Parse *pParse = 0;
+   Incrblob *pBlob = 0;
++  int iDb;
+ 
+ #ifdef SQLITE_ENABLE_API_ARMOR
+   if( ppBlob==0 ){
+     return SQLITE_MISUSE_BKPT;
+   }
+ #endif
+   *ppBlob = 0;
+ #ifdef SQLITE_ENABLE_API_ARMOR
+@@ -267,17 +268,17 @@ int sqlite3_blob_open(
+         {OP_OpenRead,       0, 0, 0},  /* 1: Open a cursor */
+         /* blobSeekToRow() will initialize r[1] to the desired rowid */
+         {OP_NotExists,      0, 5, 1},  /* 2: Seek the cursor to rowid=r[1] */
+         {OP_Column,         0, 0, 1},  /* 3  */
+         {OP_ResultRow,      1, 0, 0},  /* 4  */
+         {OP_Halt,           0, 0, 0},  /* 5  */
+       };
+       Vdbe *v = (Vdbe *)pBlob->pStmt;
+-      int iDb = sqlite3SchemaToIndex(db, pTab->pSchema);
++      iDb = sqlite3SchemaToIndex(db, pTab->pSchema);
+       VdbeOp *aOp;
+ 
+       sqlite3VdbeAddOp4Int(v, OP_Transaction, iDb, wrFlag, 
+                            pTab->pSchema->schema_cookie,
+                            pTab->pSchema->iGeneration);
+       sqlite3VdbeChangeP5(v, 1);     
+       aOp = sqlite3VdbeAddOpList(v, ArraySize(openBlob), openBlob, iLn);
+ 
+@@ -315,16 +316,20 @@ int sqlite3_blob_open(
+         aOp[1].p4.i = pTab->nCol+1;
+         aOp[3].p2 = pTab->nCol;
+ 
+         pParse->nVar = 0;
+         pParse->nMem = 1;
+         pParse->nTab = 1;
+         sqlite3VdbeMakeReady(v, pParse);
+       }
++      /* This will prevent the statement transaction from being committed,
++       * which would invalidate the incrblob cursor. BDB */
++      if( wrFlag )
++        v->iStatement = db->nSavepoint + 1;
+     }
+    
+     pBlob->iCol = iCol;
+     pBlob->db = db;
+     sqlite3BtreeLeaveAll(db);
+     if( db->mallocFailed ){
+       goto blob_open_out;
+     }

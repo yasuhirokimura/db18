@@ -1,0 +1,83 @@
+--- config.h.in
++++ config.h.in
+@@ -1,13 +1,16 @@
+ /* config.h.in.  Generated from configure.ac by autoheader.  */
+ 
+ /* Define to 1 if you have the <dlfcn.h> header file. */
+ #undef HAVE_DLFCN_H
+ 
++/* Define to 1 if you have the <errno.h> header file. */
++#undef HAVE_ERRNO_H
++
+ /* Define to 1 if you have the `fdatasync' function. */
+ #undef HAVE_FDATASYNC
+ 
+ /* Define to 1 if you have the `gmtime_r' function. */
+ #undef HAVE_GMTIME_R
+ 
+ /* Define to 1 if the system has the type `int16_t'. */
+ #undef HAVE_INT16_T
+--- configure
++++ configure
+@@ -10257,17 +10257,17 @@ cat >>confdefs.h <<_ACEOF
+ _ACEOF
+ 
+ 
+ fi
+ 
+ 
+ #########
+ # Check for needed/wanted headers
+-for ac_header in sys/types.h stdlib.h stdint.h inttypes.h malloc.h
++for ac_header in sys/types.h stdlib.h stdint.h inttypes.h malloc.h errno.h
+ do :
+   as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
+ ac_fn_c_check_header_mongrel "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
+ if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
+   cat >>confdefs.h <<_ACEOF
+ #define `$as_echo "HAVE_$ac_header" | $as_tr_cpp` 1
+ _ACEOF
+ 
+--- configure.ac
++++ configure.ac
+@@ -98,17 +98,17 @@ AC_SYS_LARGEFILE
+ 
+ #########
+ # Check for needed/wanted data types
+ AC_CHECK_TYPES([int8_t, int16_t, int32_t, int64_t, intptr_t, uint8_t,
+                 uint16_t, uint32_t, uint64_t, uintptr_t])
+ 
+ #########
+ # Check for needed/wanted headers
+-AC_CHECK_HEADERS([sys/types.h stdlib.h stdint.h inttypes.h malloc.h])
++AC_CHECK_HEADERS([sys/types.h stdlib.h stdint.h inttypes.h malloc.h errno.h])
+ 
+ #########
+ # Figure out whether or not we have these functions
+ #
+ AC_CHECK_FUNCS([fdatasync gmtime_r isnan localtime_r localtime_s malloc_usable_size strchrnul usleep utime pread pread64 pwrite pwrite64])
+ 
+ #########
+ # By default, we use the amalgamation (this may be changed below...)
+--- src/sqliteInt.h
++++ src/sqliteInt.h
+@@ -196,16 +196,19 @@
+ ** Include standard header files as necessary
+ */
+ #ifdef HAVE_STDINT_H
+ #include <stdint.h>
+ #endif
+ #ifdef HAVE_INTTYPES_H
+ #include <inttypes.h>
+ #endif
++#ifdef HAVE_ERRNO_H
++#include <errno.h>
++#endif
+ 
+ /*
+ ** The following macros are used to cast pointers to integers and
+ ** integers to pointers.  The way you do this varies from one compiler
+ ** to the next, so we have developed the following set of #if statements
+ ** to generate appropriate macros for a wide range of compilers.
+ **
+ ** The correct "ANSI" way to do this is to use the intptr_t type.

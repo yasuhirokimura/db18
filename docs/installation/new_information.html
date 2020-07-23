@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>New Information Available to Replicated Applications</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Installation and Build Guide" />
+    <link rel="up" href="upgrade_181_toc.html" title="Chapter 9.  Upgrading Berkeley DB 12.1.6.2 applications to Berkeley DB 18.1" />
+    <link rel="prev" href="new_flags.html" title="New Replication Manager Flags" />
+    <link rel="next" href="new_utility.html" title="New Utility db_convert" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 18.1.25</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">New Information Available to Replicated Applications</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="new_flags.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 9.  Upgrading Berkeley DB 12.1.6.2 applications to 
+Berkeley DB 18.1 </th>
+          <td width="20%" align="right"> <a accesskey="n" href="new_utility.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="new_information"></a>New Information Available to Replicated Applications</h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <dl>
+          <dt>
+            <span class="sect2">
+              <a href="new_information.html#idm140164927215344">New Error</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="new_information.html#idm140164927170400">New Replication Manager Event</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="new_information.html#idm140164927163952">New Replication Manager Statistic</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="new_information.html#idm140164927161872">New Replication Manager Site Field</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="new_information.html#idm140164927159792">New Replication Manager Site Flag</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>
+        Several small enhancements have been made to the base replication and replication 
+        manager APIs.
+        </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idm140164927215344"></a>New Error</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                    <code class="literal">DB_ENV-&gt;rep_set_priority()</code> returns the new error 
+                    <code class="literal">DB_REP_INELECT</code> if attempting to change the database 
+                    environment's priority while an election is in progress.
+                 </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idm140164927170400"></a>New Replication Manager Event</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                    <code class="literal">DB_EVENT_REP_AUTOTAKEOVER </code>
+                 </p>
+        <p>
+                  The current process, which was previously a subordinate process, has 
+                  taken over as the replication process.
+                 </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idm140164927163952"></a>New Replication Manager Statistic</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                    <code class="literal">ST_GROUP_STABLE_LOG_FILE</code>
+                 </p>
+        <p>
+                  The stable log file indicates the earliest log file which is still 
+                  potentially needed by at least one site in the replication group and 
+                  should not yet be archived.
+                 </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idm140164927161872"></a>New Replication Manager Site Field</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                    <code class="literal">MAX_ACK_LSN</code>
+                 </p>
+        <p>
+                  The log sequence number (LSN) of the most recent transaction acknowledged 
+                  as durable by this remote client site.
+                 </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idm140164927159792"></a>New Replication Manager Site Flag</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                    <code class="literal">DB_REPMGR_ISELECTABLE</code>
+                 </p>
+        <p>
+                  This is a new <code class="literal">flags</code> value in the <code class="literal">DB_REPMGR_SITE</code> structures 
+                  returned by <code class="literal">DB_ENV-&gt;repmgr_site_list()</code>. The 
+                  <code class="literal">DB_REPMGR_ISELECTABLE</code> value means that the site 
+                  can potentially be elected master.
+                 </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="new_flags.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="upgrade_181_toc.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="new_utility.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">New Replication Manager Flags </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> New Utility <code class="literal">db_convert</code></td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

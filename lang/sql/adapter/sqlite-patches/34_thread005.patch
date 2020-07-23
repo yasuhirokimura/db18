@@ -1,0 +1,23 @@
+--- test/thread005.test
++++ test/thread005.test
+@@ -170,17 +170,19 @@ set ThreadProgram {
+     set Sql {
+       BEGIN;
+       SELECT count(*) FROM t1 WHERE b IS NULL;
+       COMMIT;
+     }
+   }
+ 
+   set ::DB [sqlite3_open test.db]
+-
++  if {[sqlite3 -has-codec]} {
++    sqlite3_key $DB xyzzy
++  }
+   execsql { ATTACH 'test2.db' AS aux }
+ 
+   set result "ok"
+   set finish [expr [clock_seconds]+5]
+   while {$result eq "ok" && [clock_seconds] < $finish} {
+     set rc [catch {execsql $Sql} msg]
+     if {$rc} {
+       if {[string match "SQLITE_LOCKED*" $msg]} {

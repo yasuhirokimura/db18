@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>New Replication Manager Flags</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Installation and Build Guide" />
+    <link rel="up" href="upgrade_181_toc.html" title="Chapter 9.  Upgrading Berkeley DB 12.1.6.2 applications to Berkeley DB 18.1" />
+    <link rel="prev" href="new_rep_objects.html" title="New Replication Environment Region Objects" />
+    <link rel="next" href="new_information.html" title="New Information Available to Replicated Applications" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 18.1.25</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">New Replication Manager Flags</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="new_rep_objects.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 9.  Upgrading Berkeley DB 12.1.6.2 applications to 
+Berkeley DB 18.1 </th>
+          <td width="20%" align="right"> <a accesskey="n" href="new_information.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="new_flags"></a>New Replication Manager Flags</h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <dl>
+          <dt>
+            <span class="sect2">
+              <a href="new_flags.html#idm140164927172432">New Parameter Values</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>
+        Prior to the 18.1 release, Berkeley DB's replication manager managed connections 
+        using the <code class="literal">select()</code> call which has a limitation of 1024 open 
+        file descriptors. Application working with a very large number of databases, files 
+        or network connections and thus consuming more than 1024 file descriptors, were 
+        likely to run into this limitation.
+     </p>
+      <p>   
+        Berkeley DB's 18.1 release offers the use of <code class="literal">poll()</code> 
+        and/or <code class="literal">epoll()</code> in preference to <code class="literal">select()</code>.
+        In the new implementation, <code class="literal">poll()</code> is preferred over 
+        <code class="literal">select()</code> because it does not limit the number of open file 
+        descriptors. If <code class="literal">epoll()</code> is available and the number of 
+        open file descriptors is greater than 1024, <code class="literal">epoll()</code> is 
+        preferred over <code class="literal">poll()</code> because it scales better. 
+     </p>
+      <p>
+         No changes are necessary to use the new defaults, but new flags have been added 
+         for the user to disable <code class="literal">poll()</code> and <code class="literal">epoll()</code> and 
+         fall back to <code class="literal">select()</code>.
+     </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idm140164927172432"></a>New Parameter Values</h3>
+            </div>
+          </div>
+        </div>
+        <div class="itemizedlist">
+          <ul type="disc">
+            <li>
+              <code class="literal">DB_REPMGR_CONF_DISABLE_POLL</code>
+              <p>
+                     A new <code class="literal">flags</code> parameter value for the 
+                     <code class="literal">DB_ENV-&gt;rep_set_config()</code> 
+                     method to indicate that <code class="literal">poll()</code> should not be used. 
+                    </p>
+            </li>
+            <li>
+              <code class="literal">DB_REPMGR_CONF_DISABLE_EPOLL</code>
+              <p>
+                     A new <code class="literal">flags</code> parameter value for the 
+                     <code class="literal">DB_ENV-&gt;rep_set_config()</code> method to 
+                     indicate that <code class="literal">epoll()</code> should be used (if supported 
+                     by the target OS). Note that this flag needs to be explicitly 
+                     specified for <code class="literal">epoll()</code> to be used by the replication 
+                     subsystem.
+                   </p>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="new_rep_objects.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="upgrade_181_toc.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="new_information.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">New Replication Environment Region Objects </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> New Information Available to Replicated Applications</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

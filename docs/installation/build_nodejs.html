@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Building Node.js</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Installation and Build Guide" />
+    <link rel="up" href="build_thirdparty.html" title="Chapter 8.  Building Third Party APIs" />
+    <link rel="prev" href="build_thirdparty.html" title="Chapter 8.  Building Third Party APIs" />
+    <link rel="next" href="upgrade_181_toc.html" title="Chapter 9.  Upgrading Berkeley DB 12.1.6.2 applications to Berkeley DB 18.1" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 18.1.25</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Building Node.js</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="build_thirdparty.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 8.  Building Third Party APIs </th>
+          <td width="20%" align="right"> <a accesskey="n" href="upgrade_181_toc.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="build_nodejs"></a>Building Node.js</h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <dl>
+          <dt>
+            <span class="sect2">
+              <a href="build_nodejs.html#additional_info-node.js">Additional Information</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>
+        To install Node.js bindings for the embedded key/value database Oracle Berkeley DB, 
+        you must follow the steps below:
+        </p>
+      <div class="orderedlist">
+        <ol type="1">
+          <li>
+            <p>Install Oracle Berkeley DB 6.3 or higher.</p>
+          </li>
+          <li>
+            <p>
+             Set the appropriate environment variables to point to the installation location 
+             (after installing BDB).
+             </p>
+          </li>
+          <li>
+            <p>Install <code class="literal">bdb-oraclejs</code></p>
+            <p>Once Berkeley DB is installed, install <code class="literal">bdb-oraclejs</code> 
+            by running the following command:</p>
+            <pre class="programlisting">npm install bdb-oraclejs --bdb=/usr/local/bdb/install</pre>
+          </li>
+        </ol>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="additional_info-node.js"></a>Additional Information</h3>
+            </div>
+          </div>
+        </div>
+        <div class="itemizedlist">
+          <ul type="disc">
+            <li>
+              <p><code class="literal">node_modules/bdb-oraclejs/examples</code> - Examples of how 
+            to use Berkeley DB are located in this directory.</p>
+            </li>
+            <li>
+              <p><code class="literal">basic/helloWorld.js</code> - Shows the basics of 
+            Berkeley DB, how to create a database and put and get data.</p>
+            </li>
+            <li>
+              <p><code class="literal">basic/replication.js</code> - Shows how to set up a replication 
+            group and replicate data from the master environment to a replica environment.</p>
+            </li>
+            <li>
+              <p><code class="literal">basic/index.js</code> - Shows how to create an index on a database.</p>
+            </li>
+            <li>
+              <p><code class="literal">basic/externalFiles.js</code> - Shows how to create an external file 
+            record, and how to stream data to and from it.</p>
+            </li>
+            <li>
+              <p><code class="literal">basic/sequence.js</code> - Shows how to create and use a sequence, a 
+            persistent object that returns an increasing or decreasing sequence of integers.</p>
+            </li>
+            <li>
+              <p><code class="literal">node_modules/bdb-oraclejs/docs/index.html</code> - Provides js documents 
+             for bdb-oraclejs. </p>
+            </li>
+            <li>
+              <p>
+<a class="ulink" href="http://www.oracle.com/technetwork/database/database-technologies/berkeleydb/documentation/index.html" target="_top">http://www.oracle.com/technetwork/database/database-technologies/berkeleydb/documentation/index.html</a> 
+         - Provides documentation on Berkeley DB concepts, configurations, and non-node.js APIs.
+         </p>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="build_thirdparty.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="build_thirdparty.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="upgrade_181_toc.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Chapter 8.  Building Third Party APIs  </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Chapter 9.  Upgrading Berkeley DB 12.1.6.2 applications to 
+Berkeley DB 18.1 </td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

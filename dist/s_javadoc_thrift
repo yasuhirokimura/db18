@@ -1,0 +1,24 @@
+#!/bin/sh
+#
+# Build the HTML documentation for the client-server API.
+
+. ./RELEASE
+
+# Save the absolute path of the target Berkeley DB documents directory.
+DB_HOME=`dirname $0`/..
+
+javadoc $JAVADOC_ARGS -protected -d $DB_HOME/docs/thrift \
+-use -link http://docs.oracle.com/javase/8/docs/api/ \
+    -sourcepath $DB_HOME/lang/thrift/generated/java:$DB_HOME/lang/thrift/client/java \
+    -classpath $DB_HOME/lang/thrift/jars/libthrift.jar:$DB_HOME/lang/thrift/jars/slf4j-log4j12.jar:$DB_HOME/lang/thrift/jars/slf4j-api.jar \
+    -stylesheetfile $DB_HOME/lang/java/doc/style.css \
+    -header '<b>Berkeley DB</b><br><font size="-1"> version '$DB_VERSION_MAJOR.$DB_VERSION_MINOR.$DB_VERSION_PATCH'</font>' \
+    -windowtitle 'Oracle - Berkeley DB Client-Server API' -bottom '<font size=1>Copyright (c) 2016, 2018 Oracle and/or its affiliates.  All rights reserved.</font>' \
+    com.sleepycat.thrift \
+    com.sleepycat.client \
+    com.sleepycat.client.collections \
+    com.sleepycat.client.persist \
+    com.sleepycat.client.bind \
+    com.sleepycat.client.util \
+    com.sleepycat.client.asm
+

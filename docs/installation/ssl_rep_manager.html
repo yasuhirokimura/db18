@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Secure Sockets Layer (SSL) Support for the Replication Manager</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Installation and Build Guide" />
+    <link rel="up" href="upgrade_181_toc.html" title="Chapter 9.  Upgrading Berkeley DB 12.1.6.2 applications to Berkeley DB 18.1" />
+    <link rel="prev" href="license_change.html" title="License Change" />
+    <link rel="next" href="mvcc_rep_clients.html" title="Multiversion Concurrency Control (MVCC) for Replication Clients" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 18.1.25</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Secure Sockets Layer (SSL) Support for the Replication 
+        Manager</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="license_change.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 9.  Upgrading Berkeley DB 12.1.6.2 applications to 
+Berkeley DB 18.1 </th>
+          <td width="20%" align="right"> <a accesskey="n" href="mvcc_rep_clients.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="ssl_rep_manager"></a>Secure Sockets Layer (SSL) Support for the Replication 
+        Manager</h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <dl>
+          <dt>
+            <span class="sect2">
+              <a href="ssl_rep_manager.html#idm140164927201552">New Function</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="ssl_rep_manager.html#idm140164927253952">New Flags</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>
+         Berkeley DB's 18.1 release provides SSL support for the replication manager to 
+         enable secure communication among replication manager group members. This mainly prevents:
+         </p>
+      <div class="itemizedlist">
+        <ul type="disc">
+          <li>
+            <p>Snooping of data being exchanged between replication nodes 
+            by encrypting it</p>
+          </li>
+          <li>
+            <p>Spoofing in a replication group by means of certificate-based 
+            authentication</p>
+          </li>
+        </ul>
+      </div>
+      <p>
+         </p>
+      <p>
+         Berkeley DB uses <code class="literal">openssl-library</code> to provide this support. SSL support 
+         is enabled by default in the replication manager. It can be disabled by 
+         setting the replication manager flag (DB_REPMGR_CONF_DISABLE_SSL) before starting the 
+         replication manager. 
+         </p>
+      <p>Note that Berkeley DB supports <code class="literal">openssl-library</code> versions greater than 
+         or equal to 1.0.1 (as <code class="literal">TLSv1_2_method()</code> was introduced between version 1.0.0h and 1.0.1).</p>
+      <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
+        <h3 class="title">Note</h3>
+        <p>Note that SSL support exists on POSIX/UNIX and windows platforms.</p>
+      </div>
+      <p>
+          The methods below are used by the replication manager to provide secure 
+          communication. 
+          </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idm140164927201552"></a>New Function</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+          <code class="literal">DB_ENV-&gt;repmgr_set_ssl_cert()</code>
+        </p>
+        <p>
+                     This method configures the SSL support for Berkeley DB Replication 
+                     Manager Messaging. The SSL support for Replication Manager may 
+                     also be configured using the environment's <code class="literal">DB_CONFIG</code> file. This 
+                     method is used to set the value of one of the following SSL 
+                     configuration options:
+                   </p>
+        <div class="itemizedlist">
+          <ul type="disc">
+            <li>
+              <code class="literal">DB_REPMGR_SSL_CA_CERT</code>
+              <p>
+                     Location of CA certificate or CA chain certificate for verification.  
+                    </p>
+            </li>
+            <li>
+              <code class="literal">DB_REPMGR_SSL_CA_DIR</code>
+              <p>
+                     Location of directory containing all CA /Intermediate CA certificates for verification. 
+                    </p>
+            </li>
+            <li>
+              <code class="literal">DB_REPMGR_SSL_REPNODE_CERT</code>
+              <p>
+                     Location of certificate presented by this node to peers for authentication. 
+                    </p>
+            </li>
+            <li>
+              <code class="literal">DB_REPMGR_SSL_REPNODE_PRIVATE_KEY</code>
+              <p>
+                     Location of Private Key corresponding to the RepNode certificate.
+                    </p>
+            </li>
+            <li>
+              <code class="literal">DB_REPMGR_SSL_REPNODE_KEY_PASSWD</code>
+              <p>
+                     Password protecting the aforementioned Private Key. 
+                    </p>
+            </li>
+            <li>
+              <code class="literal">DB_REPMGR_SSL_VERIFY_DEPTH</code>
+              <p>
+                     Number of levels of verification allowed for peer certificate verification.
+                    </p>
+            </li>
+          </ul>
+        </div>
+        <p>
+                    </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idm140164927253952"></a>New Flags</h3>
+            </div>
+          </div>
+        </div>
+        <div class="itemizedlist">
+          <ul type="disc">
+            <li>
+              <code class="literal">DB_REPMGR_CONF_DISABLE_SSL </code>
+              <p>
+                     This flag can be enabled via <code class="methodname">DB_ENV-&gt;rep_set_config()</code> 
+                     method. When enabled, this flag disables SSL for the Replication Manager. 
+                   </p>
+            </li>
+            <li>
+              <code class="literal">DB_VERB_REPMGR_SSL_ALL</code>
+              <p>
+                     A new <code class="methodname">which</code> parameter value for the 
+                     <code class="methodname">DB_ENV-&gt;set_verbose()</code> 
+                     method to display detailed diagnostic information about all 
+                     Replication Manager SSL processing. 
+                   </p>
+            </li>
+            <li>
+              <code class="literal">DB_VERB_REPMGR_SSL_CONN</code>
+              <p>
+                     A new <code class="methodname">which</code> parameter value for the 
+                     <code class="methodname">DB_ENV-&gt;set_verbose()</code> 
+                     method to display detailed diagnostic information about Replication Manager 
+                     SSL connection setup (connect and accept) and shutdown processing. 
+                   </p>
+            </li>
+            <li>
+              <code class="literal">DB_VERB_REPMGR_SSL_IO</code>
+              <p>
+                     A new <code class="methodname">which</code> parameter value for the 
+                     <code class="methodname">DB_ENV-&gt;set_verbose()</code> 
+                     method to display detailed diagnostic information about Replication Manager 
+                     SSL connection IO (reads and writes).
+                   </p>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="license_change.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="upgrade_181_toc.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="mvcc_rep_clients.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">License Change
+         </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Multiversion Concurrency Control (MVCC) 
+        for Replication Clients</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

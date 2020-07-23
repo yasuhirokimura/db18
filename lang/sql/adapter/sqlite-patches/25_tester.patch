@@ -1,0 +1,412 @@
+--- Makefile.in
++++ Makefile.in
+@@ -474,17 +474,16 @@ TESTSRC2 = \
+   $(TOP)/src/vdbetrace.c \
+   $(TOP)/src/where.c \
+   $(TOP)/src/wherecode.c \
+   $(TOP)/src/whereexpr.c \
+   parse.c \
+   $(TOP)/ext/fts3/fts3.c \
+   $(TOP)/ext/fts3/fts3_aux.c \
+   $(TOP)/ext/fts3/fts3_expr.c \
+-  $(TOP)/ext/fts3/fts3_term.c \
+   $(TOP)/ext/fts3/fts3_tokenizer.c \
+   $(TOP)/ext/fts3/fts3_write.c \
+   $(TOP)/ext/async/sqlite3async.c \
+   $(TOP)/ext/session/sqlite3session.c 
+ 
+ # Header files used by all library source files.
+ #
+ HDR = \
+@@ -1080,17 +1080,17 @@ TESTFIXTURE_FLAGS  = -DTCLSH=1 -DSQLITE_
+ TESTFIXTURE_FLAGS += -DSQLITE_SERVER=1 -DSQLITE_PRIVATE="" -DSQLITE_CORE 
+ TESTFIXTURE_FLAGS += -DBUILD_sqlite
+ TESTFIXTURE_FLAGS += -DSQLITE_SERIES_CONSTRAINT_VERIFY=1
+ TESTFIXTURE_FLAGS += -DSQLITE_DEFAULT_PAGE_SIZE=1024
+ 
+ TESTFIXTURE_SRC0 = $(TESTSRC2) libsqlite3.la
+ TESTFIXTURE_SRC1 = sqlite3.c
+ TESTFIXTURE_SRC = $(TESTSRC) $(TOP)/src/tclsqlite.c
+-TESTFIXTURE_SRC += $(TESTFIXTURE_SRC$(USE_AMALGAMATION))
++TESTFIXTURE_SRC += $(TESTFIXTURE_SRC1)
+ 
+ testfixture$(TEXE):	$(TESTFIXTURE_SRC)
+ 	$(LTLINK) -DSQLITE_NO_SYNC=1 $(TEMP_STORE) $(TESTFIXTURE_FLAGS) \
+ 		-o $@ $(TESTFIXTURE_SRC) $(LIBTCL) $(TLIBS)
+ 
+ # A very detailed test running most or all test cases
+ fulltest:	$(TESTPROGS) fuzztest
+ 	./testfixture$(TEXE) $(TOP)/test/all.test $(TESTOPTS)
+--- test/tester.tcl
++++ test/tester.tcl
+@@ -140,17 +140,17 @@ if {[info command sqlite_orig]==""} {
+ }
+ 
+ proc getFileRetries {} {
+   if {![info exists ::G(file-retries)]} {
+     #
+     # NOTE: Return the default number of retries for [file] operations.  A
+     #       value of zero or less here means "disabled".
+     #
+-    return [expr {$::tcl_platform(platform) eq "windows" ? 50 : 0}]
++    return [expr {$::tcl_platform(platform) eq "windows" ? 10 : 0}]
+   }
+   return $::G(file-retries)
+ }
+ 
+ proc getFileRetryDelay {} {
+   if {![info exists ::G(file-retry-delay)]} {
+     #
+     # NOTE: Return the default number of milliseconds to wait when retrying
+@@ -582,16 +582,19 @@ sqlite3_soft_heap_limit $cmdlinearg(soft
+ # Create a test database
+ #
+ proc reset_db {} {
+   catch {db close}
+   forcedelete test.db
+   forcedelete test.db-journal
+   forcedelete test.db-wal
+   sqlite3 db ./test.db
++  if {[ array names ::env BDB_BLOB_SETTING ] != "" } {
++    db eval "pragma large_record_opt=$::env(BDB_BLOB_SETTING)"
++  }
+   set ::DB [sqlite3_connection_pointer db]
+   if {[info exists ::SETUP_SQL]} {
+     db eval $::SETUP_SQL
+   }
+ }
+ reset_db
+ 
+ # Abort early if this script has been run before.
+@@ -616,16 +619,21 @@ if {0==[info exists ::SLAVE]} {
+   proc set_test_counter {counter args} {
+     if {[llength $args]} {
+       set ::TC($counter) [lindex $args 0]
+     }
+     set ::TC($counter)
+   }
+ }
+ 
++# Pull in the list of test cases that are excluded and ignored when running
++# with Berkeley DB.
++#
++source $testdir/../../../../test/sql/bdb_excl.test
++
+ # Record the fact that a sequence of tests were omitted.
+ #
+ proc omit_test {name reason {append 1}} {
+   set omitList [set_test_counter omit_list]
+   if {$append} {
+     lappend omitList [list $name $reason]
+   }
+   set_test_counter omit_list $omitList
+@@ -729,22 +737,30 @@ proc puts {args} { uplevel puts_override
+ # "/regexp/" then regular expression matching is used.  If $expected is
+ # "~/regexp/" then the regular expression must NOT match.  If $expected is
+ # of the form "#/value-list/" then each term in value-list must be numeric
+ # and must approximately match the corresponding numeric term in $result.
+ # Values must match within 10%.  Or if the $expected term is A..B then the
+ # $result term must be in between A and B.
+ #
+ proc do_test {name cmd expected} {
+-  global argv cmdlinearg
++  global argv cmdlinearg IGNORE_CASES EXCLUDE_CASES
+ 
+   fix_testname name
+ 
+   sqlite3_memdebug_settitle $name
+ 
++  foreach pattern $EXCLUDE_CASES {
++    if {[string match $pattern $name]} {
++      puts "$name... Skipping"
++      flush stdout
++      return
++    }
++  }
++
+ #  if {[llength $argv]==0} {
+ #    set go 1
+ #  } else {
+ #    set go 0
+ #    foreach pattern $argv {
+ #      if {[string match $pattern $name]} {
+ #        set go 1
+ #        break
+@@ -814,22 +830,29 @@ proc do_test {name cmd expected} {
+           set ok [expr {![string match $e $result]}]
+         } else {
+           set ok [string match $expected $result]
+         }
+       } else {
+         set ok [expr {[string compare $result $expected]==0}]
+       }
+       if {!$ok} {
+-        # if {![info exists ::testprefix] || $::testprefix eq ""} {
+-        #   error "no test prefix"
+-        # }
+-        output1 ""
+-        output2 "! $name expected: \[$expected\]\n! $name got:      \[$result\]"
+-        fail_test $name
++        set ignore 0
++        foreach pattern $IGNORE_CASES {
++            if {[string match $pattern $name]} {
++                set ignore 1
++                break
++            }
++        }
++        if {$ignore} {
++            puts " Ignored"
++        } else {
++            puts "\nExpected: \[$expected\]\n     Got: \[$result\]"
++            fail_test $name
++        }
+       } else {
+         output1 " Ok"
+       }
+     }
+   } else {
+     output1 " Omitted"
+     omit_test $name "pattern mismatch" 0
+   }
+@@ -1115,17 +1138,17 @@ proc finalize_testing {} {
+ 
+   vfs_unlink_test
+   sqlite3 db {}
+   # sqlite3_clear_tsd_memdebug
+   db close
+   sqlite3_reset_auto_extension
+ 
+   sqlite3_soft_heap_limit 0
+-  set nTest [incr_ntest]
++  set nTest [set_test_counter count]
+   set nErr [set_test_counter errors]
+ 
+   set nKnown 0
+   if {[file readable known-problems.txt]} {
+     set fd [open known-problems.txt]
+     set content [read $fd]
+     close $fd
+     foreach x $content {set known_error($x) 1}
+@@ -1483,22 +1506,16 @@ proc fix_ifcapable_expr {expr} {
+     }
+     append ret $char
+     set state $newstate
+   }
+   if {$state} {append ret )}
+   return $ret
+ }
+ 
+-# Returns non-zero if the capabilities are present; zero otherwise.
+-#
+-proc capable {expr} {
+-  set e [fix_ifcapable_expr $expr]; return [expr ($e)]
+-}
+-
+ # Evaluate a boolean expression of capabilities.  If true, execute the
+ # code.  Omit the code if false.
+ #
+ proc ifcapable {expr code {else ""} {elsecode ""}} {
+   #regsub -all {[a-z_0-9]+} $expr {$::sqlite_options(&)} e2
+   set e2 [fix_ifcapable_expr $expr]
+   if ($e2) {
+     set c [catch {uplevel 1 $code} r]
+@@ -1601,35 +1618,16 @@ proc crashsql {args} {
+     if {$msg=="child killed: unknown signal"} {
+       set msg "child process exited abnormally"
+     }
+   }
+ 
+   lappend r $msg
+ }
+ 
+-proc run_ioerr_prep {} {
+-  set ::sqlite_io_error_pending 0
+-  catch {db close}
+-  catch {db2 close}
+-  catch {forcedelete test.db}
+-  catch {forcedelete test.db-journal}
+-  catch {forcedelete test2.db}
+-  catch {forcedelete test2.db-journal}
+-  set ::DB [sqlite3 db test.db; sqlite3_connection_pointer db]
+-  sqlite3_extended_result_codes $::DB $::ioerropts(-erc)
+-  if {[info exists ::ioerropts(-tclprep)]} {
+-    eval $::ioerropts(-tclprep)
+-  }
+-  if {[info exists ::ioerropts(-sqlprep)]} {
+-    execsql $::ioerropts(-sqlprep)
+-  }
+-  expr 0
+-}
+-
+ # Usage: do_ioerr_test <test number> <options...>
+ #
+ # This proc is used to implement test cases that check that IO errors
+ # are correctly handled. The first argument, <test number>, is an integer
+ # used to name the tests executed by this proc. Options are as follows:
+ #
+ #     -tclprep          TCL script to run to prepare test.
+ #     -sqlprep          SQL script to run to prepare test.
+@@ -1653,68 +1651,77 @@ proc do_ioerr_test {testname args} {
+   set ::ioerropts(-ckrefcount) 0
+   set ::ioerropts(-restoreprng) 1
+   array set ::ioerropts $args
+ 
+   # TEMPORARY: For 3.5.9, disable testing of extended result codes. There are
+   # a couple of obscure IO errors that do not return them.
+   set ::ioerropts(-erc) 0
+ 
+-  # Create a single TCL script from the TCL and SQL specified
+-  # as the body of the test.
+-  set ::ioerrorbody {}
+-  if {[info exists ::ioerropts(-tclbody)]} {
+-    append ::ioerrorbody "$::ioerropts(-tclbody)\n"
+-  }
+-  if {[info exists ::ioerropts(-sqlbody)]} {
+-    append ::ioerrorbody "db eval {$::ioerropts(-sqlbody)}"
+-  }
+-
+-  save_prng_state
+-  if {$::ioerropts(-cksum)} {
+-    run_ioerr_prep
+-    eval $::ioerrorbody
+-    set ::goodcksum [cksum]
+-  }
+-
+   set ::go 1
+   #reset_prng_state
++  save_prng_state
+   for {set n $::ioerropts(-start)} {$::go} {incr n} {
+     set ::TN $n
+     incr ::ioerropts(-count) -1
+     if {$::ioerropts(-count)<0} break
+ 
+     # Skip this IO error if it was specified with the "-exclude" option.
+     if {[info exists ::ioerropts(-exclude)]} {
+       if {[lsearch $::ioerropts(-exclude) $n]!=-1} continue
+     }
+     if {$::ioerropts(-restoreprng)} {
+       restore_prng_state
+     }
+ 
+     # Delete the files test.db and test2.db, then execute the TCL and
+     # SQL (in that order) to prepare for the test case.
+     do_test $testname.$n.1 {
+-      run_ioerr_prep
++      set ::sqlite_io_error_pending 0
++      catch {db close}
++      catch {db2 close}
++      catch {forcedelete test.db}
++      catch {forcedelete test.db-journal}
++      catch {forcedelete test2.db}
++      catch {forcedelete test2.db-journal}
++      set ::DB [sqlite3 db test.db; sqlite3_connection_pointer db]
++      sqlite3_extended_result_codes $::DB $::ioerropts(-erc)
++      if {[info exists ::ioerropts(-tclprep)]} {
++        eval $::ioerropts(-tclprep)
++      }
++      if {[info exists ::ioerropts(-sqlprep)]} {
++        execsql $::ioerropts(-sqlprep)
++      }
++      expr 0
+     } {0}
+ 
+     # Read the 'checksum' of the database.
+     if {$::ioerropts(-cksum)} {
+-      set ::checksum [cksum]
++      set checksum [cksum]
+     }
+ 
+     # Set the Nth IO error to fail.
+     do_test $testname.$n.2 [subst {
+       set ::sqlite_io_error_persist $::ioerropts(-persist)
+       set ::sqlite_io_error_pending $n
+     }] $n
+ 
+-    # Execute the TCL script created for the body of this test. If
+-    # at least N IO operations performed by SQLite as a result of
+-    # the script, the Nth will fail.
++    # Create a single TCL script from the TCL and SQL specified
++    # as the body of the test.
++    set ::ioerrorbody {}
++    if {[info exists ::ioerropts(-tclbody)]} {
++      append ::ioerrorbody "$::ioerropts(-tclbody)\n"
++    }
++    if {[info exists ::ioerropts(-sqlbody)]} {
++      append ::ioerrorbody "db eval {$::ioerropts(-sqlbody)}"
++    }
++
++    # Execute the TCL Script created in the above block. If
++    # there are at least N IO operations performed by SQLite as
++    # a result of the script, the Nth will fail.
+     do_test $testname.$n.3 {
+       set ::sqlite_io_error_hit 0
+       set ::sqlite_io_error_hardhit 0
+       set r [catch $::ioerrorbody msg]
+       set ::errseen $r
+       set rc [sqlite3_errcode $::DB]
+       if {$::ioerropts(-erc)} {
+         # If we are in extended result code mode, make sure all of the
+@@ -1808,25 +1815,18 @@ proc do_ioerr_test {testname args} {
+     # If an IO error occurred, then the checksum of the database should
+     # be the same as before the script that caused the IO error was run.
+     #
+     if {$::go && $::sqlite_io_error_hardhit && $::ioerropts(-cksum)} {
+       do_test $testname.$n.6 {
+         catch {db close}
+         catch {db2 close}
+         set ::DB [sqlite3 db test.db; sqlite3_connection_pointer db]
+-        set nowcksum [cksum]
+-        set res [expr {$nowcksum==$::checksum || $nowcksum==$::goodcksum}]
+-        if {$res==0} {
+-          output2 "now=$nowcksum"
+-          output2 "the=$::checksum"
+-          output2 "fwd=$::goodcksum"
+-        }
+-        set res
+-      } 1
++        cksum
++      } $checksum
+     }
+ 
+     set ::sqlite_io_error_hardhit 0
+     set ::sqlite_io_error_pending 0
+     if {[info exists ::ioerropts(-cleanup)]} {
+       catch $::ioerropts(-cleanup)
+     }
+   }
+@@ -2018,16 +2018,17 @@ proc wal_set_journal_mode {{db db}} {
+     $db eval "PRAGMA journal_mode = WAL"
+   }
+ }
+ proc wal_check_journal_mode {testname {db db}} {
+   if { [wal_is_wal_mode] } {
+     $db eval { SELECT * FROM sqlite_master }
+     do_test $testname [list $db eval "PRAGMA main.journal_mode"] {wal}
+   }
++  catch { forcedelete test.db-journal/__db.register }
+ }
+ 
+ proc wal_is_capable {} {
+   ifcapable !wal { return 0 }
+   if {[permutation]=="journaltest"} { return 0 }
+   return 1
+ }
+ 
+@@ -2173,16 +2174,17 @@ proc db_save_and_close {} {
+   return ""
+ }
+ proc db_restore {} {
+   foreach f [glob -nocomplain test.db*] { forcedelete $f }
+   foreach f2 [glob -nocomplain sv_test.db*] {
+     set f [string range $f2 3 end]
+     forcecopy $f2 $f
+   }
++  forcedelete test.db-journal/__db.register
+ }
+ proc db_restore_and_reopen {{dbfile test.db}} {
+   catch { db close }
+   db_restore
+   sqlite3 db $dbfile
+ }
+ proc db_delete_and_reopen {{file test.db}} {
+   catch { db close }

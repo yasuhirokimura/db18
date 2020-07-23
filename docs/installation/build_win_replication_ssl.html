@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Building Secure Sockets Layer (SSL) Support for the Replication Manager</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Installation and Build Guide" />
+    <link rel="up" href="build_win.html" title="Chapter 5.  Building Berkeley DB for Windows" />
+    <link rel="prev" href="build_win_tcl.html" title="Building the Tcl API" />
+    <link rel="next" href="win_build_dist_dll.html" title="Distributing DLLs" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 18.1.25</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Building Secure Sockets Layer (SSL) Support for the Replication Manager</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="build_win_tcl.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 5.  Building Berkeley DB for Windows </th>
+          <td width="20%" align="right"> <a accesskey="n" href="win_build_dist_dll.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="build_win_replication_ssl"></a>Building Secure Sockets Layer (SSL) Support for the Replication Manager</h2>
+          </div>
+        </div>
+      </div>
+      <p>
+            Berkeley DB provides SSL support for the Replication Manager via 
+            <code class="literal">OpenSSL-library</code> to enable secure communication 
+            among Replication Manager group members. For more information on OpenSSL, see 
+            <a class="ulink" href="https://www.openssl.org/" target="_top">https://www.openssl.org/</a>.
+        </p>
+      <p>
+            SSL support for replication manager is not built by default. If 
+            you want to build it then you have to define <code class="literal">HAVE_REPMGR_SSL_SUPPORT</code> 
+            in <code class="literal">db_config.h</code> (in <code class="literal">build_windows</code> folder) 
+            and provide path to SSL libraries and headers for each project as specified below. 
+        </p>
+      <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
+        <h3 class="title">Note</h3>
+        <p>
+           You must use <code class="literal">OpenSSL-library</code> versions 
+           greater than or equal to 1.0.1 that includes thread support (see 
+            <a class="ulink" href="https://www.openssl.org/blog/blog/2017/02/21/threads/" target="_top">https://www.openssl.org/blog/blog/2017/02/21/threads/</a>). Unless 
+            this condition is met, the build will fail.
+         </p>
+      </div>
+      <p>To build Berkeley DB with <code class="literal">OpenSSL</code> support, follow 
+        the steps below:</p>
+      <p>
+         Note that the following steps assume that you have installed <code class="literal">OpenSSL</code> 
+         in <code class="filename">D:\OpenSSL-Win64</code>. You can, however, change the location if you want. 
+         Also note that you would use Visual Studio (2010/2012/2013/2015) to perform the
+         steps mentioned below.
+         </p>
+      <div class="orderedlist">
+        <ol type="1">
+          <li>
+            <p>Set <code class="literal">Additional Include Directories</code>.</p>
+            <div class="orderedlist">
+              <ol type="a">
+                <li>
+                  <p>
+             Right-click db project 
+             and choose <span class="emphasis"><em>Properties-&gt;Configuration Properties-&gt; 
+            c/c++-&gt;General-&gt;
+            Additional Include Directories</em></span>.
+             </p>
+                </li>
+                <li>
+                  <p>
+             Add the full pathnames for <code class="filename">D:\OpenSSL-Win64\include</code>.
+             </p>
+                </li>
+                <li>
+                  <p>
+             Click OK.
+             </p>
+                </li>
+              </ol>
+            </div>
+            <p>
+            This directory contains the following header files: <code class="literal">openssl\ssl.h</code>, 
+            <code class="literal">openssl\err.h</code> and <code class="literal">openssl\opensslconf.h</code>.
+             </p>
+          </li>
+          <li>
+            <p>
+           Specify the library files and their corresponding directories.
+           </p>
+            <div class="orderedlist">
+              <ol type="a">
+                <li>
+                  <p>
+             Right-click db project
+            and choose <span class="emphasis"><em>Properties-&gt;Configuration Properties-&gt;Linker-&gt; 
+            General-&gt;Additional Library Directories</em></span>.
+             </p>
+                </li>
+                <li>
+                  <p>
+             Add the full pathnames for <code class="filename">D:\OpenSSL-Win64\lib</code>.
+             </p>
+                </li>
+                <li>
+                  <p>
+             Click OK.
+             </p>
+                </li>
+              </ol>
+            </div>
+            <p>
+            This directory is needed to find the <code class="literal">libeay32.lib</code> 
+            and <code class="literal">ssleay32.lib</code> library files.
+            </p>
+          </li>
+          <li>
+            <p>
+           Specify which libraries are to be linked during the build. 
+           </p>
+            <div class="orderedlist">
+              <ol type="a">
+                <li>
+                  <p>
+             Right-click db project
+             and choose <span class="emphasis"><em>Properties-&gt;Configuration Properties-&gt; 
+            Linker-&gt;Input-&gt;Additional Dependencies</em></span>.
+             </p>
+                </li>
+                <li>
+                  <p>
+            Add the <code class="literal">ssleay32.lib</code> and <code class="literal">libeay32.lib</code> 
+            library names to the existing list of dependencies.
+            </p>
+                </li>
+              </ol>
+            </div>
+          </li>
+          <li>
+            <p>
+            Set the build type to <code class="literal">Release</code> or <code class="literal">Debug</code> 
+            in the drop-down on the tool bar.
+           </p>
+          </li>
+          <li>
+            <p>
+            Build Berkeley DB by right-clicking <code class="literal">db</code> and select <code class="literal">Build</code>. 
+            This builds the Berkeley DB project with SSL support for the Replication Manager.
+           </p>
+          </li>
+        </ol>
+      </div>
+      <p>Note that you must follow the same instructions to build other projects 
+         like <code class="literal">db_tcl</code> or <code class="literal">db_test</code>.</p>
+      <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
+        <h3 class="title">Note</h3>
+        <div class="itemizedlist">
+          <ul type="disc">
+            <li>
+              <p>
+          To build Berkeley DB without OpenSSL support, remove the definition for the 
+          <code class="literal">HAVE_REPMGR_SSL_SUPPORT</code> in 
+          <code class="literal">db_config.h</code> configuration files under the  
+          <code class="literal">build_windows</code> directory.
+          </p>
+            </li>
+            <li>
+              <p>
+           Once you have built Berkeley DB with SSL support for the Replication Manager,
+           you can disable the use of SSL for Replication Manager communication by 
+           setting the flag <code class="literal">DB_REPMGR_CONF_DISABLE_SSL</code> via 
+           <code class="literal">DB_ENV-&gt;REP_SET_CONFIG</code> API. 
+           </p>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="build_win_tcl.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="build_win.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="win_build_dist_dll.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Building the Tcl API </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Distributing DLLs</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

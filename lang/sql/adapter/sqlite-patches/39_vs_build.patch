@@ -1,0 +1,106 @@
+--- src/shell.c
++++ src/shell.c
+@@ -144,22 +144,16 @@
+ 
+ /* ctype macros that work with signed characters */
+ #define IsSpace(X)  isspace((unsigned char)X)
+ #define IsDigit(X)  isdigit((unsigned char)X)
+ #define ToLower(X)  (char)tolower((unsigned char)X)
+ 
+ #if defined(_WIN32) || defined(WIN32)
+ #include <windows.h>
+-
+-/* string conversion routines only needed on Win32 */
+-extern char *sqlite3_win32_unicode_to_utf8(LPCWSTR);
+-extern char *sqlite3_win32_mbcs_to_utf8_v2(const char *, int);
+-extern char *sqlite3_win32_utf8_to_mbcs_v2(const char *, int);
+-extern LPWSTR sqlite3_win32_utf8_to_unicode(const char *zText);
+ #endif
+ 
+ /* On Windows, we normally run with output mode of TEXT so that \n characters
+ ** are automatically translated into \r\n.  However, this behavior needs
+ ** to be disabled in some cases (ex: when generating CSV output and when
+ ** rendering quoted strings that contain \n characters).  The following
+ ** routines take care of that.
+ */
+--- src/sqlite.h.in
++++ src/sqlite.h.in
+@@ -8489,12 +8489,24 @@ SQLITE_EXPERIMENTAL int sqlite3_snapshot
+ /*
+ ** Undo the hack that converts floating point types to integer for
+ ** builds on processors without floating point support.
+ */
+ #ifdef SQLITE_OMIT_FLOATING_POINT
+ # undef double
+ #endif
+ 
++#if defined(_WIN32) || defined(WIN32)
++/* define this macro to eliminate the redefinition errors of VS */
++#define WIN32_LEAN_AND_MEAN
++/* include this header file to bring in type LPCWSTR and LPWSTR */
++#include <wtypes.h>
++/* string conversion routines only needed on Win32 */
++char *sqlite3_win32_unicode_to_utf8(LPCWSTR);
++char *sqlite3_win32_mbcs_to_utf8_v2(const char *, int);
++char *sqlite3_win32_utf8_to_mbcs_v2(const char *, int);
++LPWSTR sqlite3_win32_utf8_to_unicode(const char *zText);
++#endif
++
+ #ifdef __cplusplus
+ }  /* End of the 'extern "C"' block */
+ #endif
+ #endif /* SQLITE3_H */
+--- src/vdbeblob.c
++++ src/vdbeblob.c
+@@ -257,29 +257,29 @@ int sqlite3_blob_open(
+       ** Code external to the Vdbe then "borrows" the b-tree cursor and
+       ** uses it to implement the blob_read(), blob_write() and 
+       ** blob_bytes() functions.
+       **
+       ** The sqlite3_blob_close() function finalizes the vdbe program,
+       ** which closes the b-tree cursor and (possibly) commits the 
+       ** transaction.
+       */
++      VdbeOp *aOp;
+       static const int iLn = VDBE_OFFSET_LINENO(2);
+       static const VdbeOpList openBlob[] = {
+         {OP_TableLock,      0, 0, 0},  /* 0: Acquire a read or write lock */
+         {OP_OpenRead,       0, 0, 0},  /* 1: Open a cursor */
+         /* blobSeekToRow() will initialize r[1] to the desired rowid */
+         {OP_NotExists,      0, 5, 1},  /* 2: Seek the cursor to rowid=r[1] */
+         {OP_Column,         0, 0, 1},  /* 3  */
+         {OP_ResultRow,      1, 0, 0},  /* 4  */
+         {OP_Halt,           0, 0, 0},  /* 5  */
+       };
+       Vdbe *v = (Vdbe *)pBlob->pStmt;
+       iDb = sqlite3SchemaToIndex(db, pTab->pSchema);
+-      VdbeOp *aOp;
+ 
+       sqlite3VdbeAddOp4Int(v, OP_Transaction, iDb, wrFlag, 
+                            pTab->pSchema->schema_cookie,
+                            pTab->pSchema->iGeneration);
+       sqlite3VdbeChangeP5(v, 1);     
+       aOp = sqlite3VdbeAddOpList(v, ArraySize(openBlob), openBlob, iLn);
+ 
+       /* Make sure a mutex is held on the table to be accessed */
+--- src/test_delete.c
++++ src/test_delete.c
+@@ -14,16 +14,18 @@
+ **
+ **   * The journal file.
+ **   * The wal file.
+ **   * The SQLITE_ENABLE_8_3_NAMES version of the db, journal or wal files.
+ **   * Files created by the test_multiplex.c module to extend any of the 
+ **     above.
+ */
+ 
++#include "os_setup.h"
++
+ #if SQLITE_OS_WIN
+ #  include <io.h>
+ #  define F_OK 0
+ #else
+ #  include <unistd.h>
+ #endif
+ #include <string.h>
+ #include <errno.h>

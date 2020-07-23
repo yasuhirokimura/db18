@@ -1,0 +1,11 @@
+module db [extern_c] {
+	module core {
+        header "../../../../build_unix/db.h"
+        export *
+	}
+
+    module sql {
+        header "../../../../build_unix/dbsql.h"
+        export *
+    }
+}

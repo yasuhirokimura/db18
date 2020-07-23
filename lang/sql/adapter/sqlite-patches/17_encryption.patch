@@ -1,0 +1,134 @@
+--- Makefile.in
++++ Makefile.in
+@@ -161,18 +161,18 @@ LTINSTALL = $(LIBTOOL) --mode=install $(
+ ###############################################################################
+ 
+ USE_AMALGAMATION = @USE_AMALGAMATION@
+ 
+ # Object files for the SQLite library (non-amalgamation).
+ #
+ LIBOBJS0 = alter.lo analyze.lo attach.lo auth.lo \
+          backup.lo bitvec.lo btmutex.lo btree.lo build.lo \
+-         callback.lo complete.lo ctime.lo date.lo dbstat.lo db_pragma.lo \
+-         db_shell.lo delete.lo expr.lo fault.lo fkey.lo \
++         callback.lo complete.lo ctime.lo date.lo dbstat.lo db_encrypt.lo \
++         db_pragma.lo db_shell.lo delete.lo expr.lo fault.lo fkey.lo \
+          fts3.lo fts3_aux.lo fts3_expr.lo fts3_hash.lo fts3_icu.lo \
+          fts3_porter.lo fts3_snippet.lo fts3_tokenizer.lo fts3_tokenizer1.lo \
+          fts3_tokenize_vtab.lo \
+          fts3_unicode.lo fts3_unicode2.lo fts3_write.lo \
+ 	 fts5.lo \
+          func.lo global.lo hash.lo \
+          icu.lo insert.lo json1.lo legacy.lo loadext.lo \
+          main.lo malloc.lo mem0.lo mem1.lo mem2.lo mem3.lo mem5.lo \
+@@ -211,16 +211,17 @@ SRC = \
+   $(TOP)/src/btree.h \
+   $(TOP)/src/btreeInt.h \
+   $(TOP)/src/build.c \
+   $(TOP)/src/callback.c \
+   $(TOP)/src/complete.c \
+   $(TOP)/src/ctime.c \
+   $(TOP)/src/date.c \
+   $(TOP)/src/dbstat.c \
++  $(TOP)/../adapter/db_encrypt.c \
+   $(TOP)/../adapter/db_pragma.c \
+   $(TOP)/../adapter/db_shell.c \
+   $(TOP)/src/delete.c \
+   $(TOP)/src/expr.c \
+   $(TOP)/src/fault.c \
+   $(TOP)/src/fkey.c \
+   $(TOP)/src/func.c \
+   $(TOP)/src/global.c \
+@@ -740,16 +741,20 @@ ctime.lo:	$(TOP)/src/ctime.c $(HDR)
+ 	$(LTCOMPILE) $(TEMP_STORE) -c $(TOP)/src/ctime.c
+ 
+ date.lo:	$(TOP)/src/date.c $(HDR)
+ 	$(LTCOMPILE) $(TEMP_STORE) -c $(TOP)/src/date.c
+ 
+ dbstat.lo:	$(TOP)/src/dbstat.c $(HDR)
+ 	$(LTCOMPILE) $(TEMP_STORE) -c $(TOP)/src/dbstat.c
+ 
++db_encrypt.lo:	$(TOP)/../adapter/db_encrypt.c $(HDR) \
++		$(TOP)/../adapter/btreeInt.h
++	$(LTCOMPILE) $(TEMP_STORE) -c $(TOP)/../adapter/db_encrypt.c
++
+ db_pragma.lo:	$(TOP)/../adapter/db_pragma.c $(HDR) \
+ 		$(TOP)/../adapter/btreeInt.h
+ 	$(LTCOMPILE) $(TEMP_STORE) -c $(TOP)/../adapter/db_pragma.c
+ 
+ db_shell.lo:	$(TOP)/../adapter/db_shell.c $(HDR) \
+ 		$(TOP)/../adapter/btreeInt.h
+ 	$(LTCOMPILE) $(TEMP_STORE) -c $(TOP)/../adapter/db_shell.c
+ 
+--- src/tclsqlite.c
++++ src/tclsqlite.c
+@@ -3420,17 +3420,22 @@ static int SQLITE_TCLAPI DbMain(
+       sqlite3_close(p->db);
+       p->db = 0;
+     }
+   }else{
+     zErrMsg = sqlite3_mprintf("%s", sqlite3_errstr(rc));
+   }
+ #if defined(SQLITE_HAS_CODEC) && !defined(SQLITE_OMIT_CODEC_FROM_TCL)
+   if( p->db ){
+-    sqlite3_key(p->db, pKey, nKey);
++    rc = sqlite3_key(p->db, pKey, nKey);
++    if( rc ){
++      zErrMsg = sqlite3_mprintf("%s", sqlite3ErrStr(rc));
++      sqlite3_close(p->db);
++      p->db = 0;
++    }
+   }
+ #endif
+   if( p->db==0 ){
+     Tcl_SetResult(interp, zErrMsg, TCL_VOLATILE);
+     Tcl_Free((char*)p);
+     sqlite3_free(zErrMsg);
+     return TCL_ERROR;
+   }
+--- test/vtab1.test
++++ test/vtab1.test
+@@ -873,18 +873,22 @@ do_test vtab1.7-13 {
+   execsql {
+     SELECT rowid, a, b, c FROM real_abc
+   }
+ } {}
+ 
+ ifcapable attach {
+   do_test vtab1.8-1 {
+     set echo_module ""
++    set key ""
++    if {[sqlite -has-codec]} {
++      set key "xyzzy"
++    }
+     execsql {
+-      ATTACH 'test2.db' AS aux;
++      ATTACH 'test2.db' AS aux KEY $key;
+       CREATE VIRTUAL TABLE aux.e2 USING echo(real_abc);
+     }
+     set echo_module
+   } [list xCreate echo aux e2 real_abc   \
+           xSync   echo(real_abc)         \
+           xCommit echo(real_abc)         \
+   ]
+ }
+--- tool/mksqlite3c.tcl
++++ tool/mksqlite3c.tcl
+@@ -318,16 +318,17 @@ foreach file {
+    pcache1.c
+    rowset.c
+    pager.c
+    wal.c
+ 
+    btmutex.c
+    btree.c
+    backup.c
++   db_encrypt.c
+    db_pragma.c
+    db_shell.c
+ 
+    vdbemem.c
+    vdbeaux.c
+    vdbeapi.c
+    vdbetrace.c
+    vdbe.c

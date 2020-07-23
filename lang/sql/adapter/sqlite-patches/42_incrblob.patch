@@ -1,0 +1,59 @@
+--- src/vdbeaux.c
++++ src/vdbeaux.c
+@@ -18,26 +18,28 @@
+ /*
+ ** Create a new virtual database engine.
+ */
+ Vdbe *sqlite3VdbeCreate(Parse *pParse){
+   sqlite3 *db = pParse->db;
+   Vdbe *p;
+   p = sqlite3DbMallocRawNN(db, sizeof(Vdbe) );
+   if( p==0 ) return 0;
+   memset(&p->aOp, 0, sizeof(Vdbe) - offsetof(Vdbe, aOp));
+   p->db = db;
+   if( db->pVdbe ){
+     db->pVdbe->pPrev = p;
+   }
+   p->pNext = db->pVdbe;
+   p->pPrev = 0;
+   db->pVdbe = p;
+   p->magic = VDBE_MAGIC_INIT;
++  p->nStmtDefCons = -1;
++  p->nStmtDefImmCons = -1;
+   p->pParse = pParse;
+   assert( pParse->aLabel==0 );
+   assert( pParse->nLabel==0 );
+   assert( pParse->nOpAlloc==0 );
+   assert( pParse->szOpAlloc==0 );
+   return p;
+ }
+ 
+@@ -2542,18 +2543,26 @@ static SQLITE_NOINLINE int vdbeCloseStat
+       rc = sqlite3VtabSavepoint(db, SAVEPOINT_RELEASE, iSavepoint);
+     }
+   }
+ 
+   /* If the statement transaction is being rolled back, also restore the 
+   ** database handles deferred constraint counter to the value it had when 
+   ** the statement transaction was opened.  */
+   if( eOp==SAVEPOINT_ROLLBACK ){
+-    db->nDeferredCons = p->nStmtDefCons;
+-    db->nDeferredImmCons = p->nStmtDefImmCons;
++    /*
++    ** The statement counts were never initialized so there is no need
++    ** to reset the values to the database.  This can happen when the
++    ** transaction of the current statement is aborted due
++    ** to deadlock (which is a BDB specific behavior), but the transaction
++    ** statement was never explicitly created by the Vdbe code.*/
++    if (p->nStmtDefCons != -1) {
++      db->nDeferredCons = p->nStmtDefCons;
++      db->nDeferredImmCons = p->nStmtDefImmCons;
++    }
+   }
+   return rc;
+ }
+ int sqlite3VdbeCloseStatement(Vdbe *p, int eOp){
+   if( p->db->nStatement && p->iStatement ){
+     return vdbeCloseStatement(p, eOp);
+   }
+   return SQLITE_OK;
